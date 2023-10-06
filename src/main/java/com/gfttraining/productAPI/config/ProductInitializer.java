@@ -12,24 +12,22 @@ import com.gfttraining.productAPI.model.Category;
 import com.gfttraining.productAPI.model.Product;
 
 import com.gfttraining.productAPI.repositories.ProductRepository;
+import com.gfttraining.productAPI.services.ProductService;
 
 @Component
 public class ProductInitializer implements CommandLineRunner {
-    @Autowired
-    private ProductRepository productRepository;
+    
+    private final ProductService productService;
+
+    public ProductInitializer(ProductService productService){
+        this.productService = productService;
+    }
 
     @Override
     public void run(String... args) throws Exception {
-        List<Product> products = new ArrayList<Product>(
-            Arrays.asList(
-                new Product("Cookies", "Chocolate cookies", new Category("food",25.0), 9.99, 10),
-                new Product("Librito", "Small book", new Category("books",15.0), 9.99, 10),
-                new Product("Joel", "Sports man", new Category("person",99.0), 9.99, 10)
-                )
-            
-        );
-        
-        productRepository.saveAll(products);
+         productService.createProduct("Cookies", "Chocolate cookies", "food", 9.99, 10);
+         productService.createProduct("Librito", "Small book", "books", 5.0, 20);
+         productService.createProduct("Joel", "sports man", "person", 9.99, 1);
     }
         
 }

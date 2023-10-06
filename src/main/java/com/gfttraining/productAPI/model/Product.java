@@ -1,5 +1,11 @@
 package com.gfttraining.productAPI.model;
 
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.gfttraining.productAPI.repositories.CategoryRepository;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -12,6 +18,7 @@ import lombok.Data;
 @Data
 public class Product {
 
+    
     @Id
     @GeneratedValue
     private int id;
@@ -32,22 +39,11 @@ public class Product {
         this.price = price;
         this.stock = stock;
     }
-    // public Product(String name, String description, String category, Double price, int stock) {
-        
-        
-    //     this.name = name;
-    //     this.description = description;
-    //     this.category = category;
-    //     this.price = price;
-    //     this.stock = stock;
-    // }
-
-
 
     public Product(){
-
     }
  
+
     
 
 }
