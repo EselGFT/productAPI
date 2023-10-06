@@ -25,11 +25,15 @@ public class ProductService {
     //     this.categoryRepository = categoryRepository;
     // }
 
-    public void createProduct(String name, String description, String categoryName, Double price, int stock) {
+    public Product createProduct(String name, String description, String categoryName, Double price, int stock) {
 
         Category category = categoryRepository.findById(categoryName).orElse(categoryRepository.findById("other").get());
-
+        
         Product product = new Product(name, description, category, price, stock);
-        productRepository.save(product);
+        
+        return productRepository.save(product);
+        
     }
+
+
 }
