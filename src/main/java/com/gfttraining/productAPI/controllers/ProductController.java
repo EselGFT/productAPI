@@ -46,12 +46,15 @@ public class ProductController {
     public ResponseEntity<Product> postMapping(@RequestBody ProductRequest productRequest){
         HttpHeaders headers = new HttpHeaders();
         return new ResponseEntity<>( 
-                productService.createProduct(productRequest.getName(),productRequest.getDescription(),productRequest.getCategory(),productRequest.getPrice(),productRequest.getStock()),
+                productService.createProduct(
+                    productRequest.getName(),
+                    productRequest.getDescription(),
+                    productRequest.getCategory(),
+                    productRequest.getPrice(),
+                    productRequest.getStock()),
                 headers,   
-                HttpStatus.OK);
-            
-
-        
+                HttpStatus.OK
+            );        
     }
 
 }

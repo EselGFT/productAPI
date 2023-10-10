@@ -1,11 +1,5 @@
 package com.gfttraining.productAPI.model;
 
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
-import com.gfttraining.productAPI.repositories.CategoryRepository;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -27,11 +21,14 @@ public class Product {
     private String description;
 
     @ManyToOne
-    @JoinColumn(name ="category.name")
-    private Category category; // String category
+    @JoinColumn
+    private Category category; 
     private Double price;
     private int stock;
 
+    public Product(){
+    }
+    
     public Product(String name, String description, Category category, Double price, int stock) {
         this.name = name;
         this.description = description;
@@ -40,8 +37,7 @@ public class Product {
         this.stock = stock;
     }
 
-    public Product(){
-    }
+
  
 
     

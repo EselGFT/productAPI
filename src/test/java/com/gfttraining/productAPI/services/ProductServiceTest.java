@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.gfttraining.productAPI.model.Product;
 import com.gfttraining.productAPI.repositories.ProductRepository;
 
 @SpringBootTest
@@ -31,6 +30,7 @@ public class ProductServiceTest {
         assertEquals(1, newSize);
 
     }
+    
     // @Test
     // public void productCreationTest() {
         

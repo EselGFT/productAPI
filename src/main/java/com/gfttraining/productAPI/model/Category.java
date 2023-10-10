@@ -7,6 +7,7 @@ import lombok.Data;
 @Entity
 @Data
 public class Category {
+    
     @Id
     private String name;
     private double discount;
