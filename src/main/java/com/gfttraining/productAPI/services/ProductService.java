@@ -1,6 +1,5 @@
 package com.gfttraining.productAPI.services;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.gfttraining.productAPI.model.Category;
@@ -18,7 +17,7 @@ public class ProductService {
     public ProductService(CategoryRepository categoryRepository, ProductRepository productRepository){
         this.categoryRepository = categoryRepository;
         this.productRepository = productRepository;
-        
+
     }
 
     public Product createProduct(String name, String description, String categoryName, Double price, int stock) {

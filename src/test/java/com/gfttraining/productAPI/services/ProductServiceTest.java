@@ -1,20 +1,23 @@
 package com.gfttraining.productAPI.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.gfttraining.productAPI.repositories.ProductRepository;
 
 @SpringBootTest
 public class ProductServiceTest {
-    @Autowired
-    ProductRepository productRepository;
+    
+    private final ProductRepository productRepository;
+    private final ProductService productService;
+    
+    public ProductServiceTest(ProductRepository productRepository, ProductService productService) {
+        this.productRepository = productRepository;
+        this.productService = productService;
+    }
 
-    @Autowired
-    ProductService productService;
 
     @Test
     public void productCreationTest() {
@@ -30,7 +33,7 @@ public class ProductServiceTest {
         assertEquals(1, newSize);
 
     }
-    
+
     // @Test
     // public void productCreationTest() {
         

@@ -1,6 +1,5 @@
 package com.gfttraining.productAPI.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,8 +14,12 @@ import com.gfttraining.productAPI.services.ProductService;
 @RestController
 public class ProductController {
 
-    @Autowired
-    private ProductService productService;   
+    
+    private final ProductService productService;   
+
+    public ProductController(ProductService productService) {
+        this.productService = productService;
+    }
 
     @PostMapping("/product")
     public ResponseEntity<Product> postMapping(@RequestBody ProductRequest productRequest){
