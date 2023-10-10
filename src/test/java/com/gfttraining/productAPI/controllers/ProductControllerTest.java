@@ -4,6 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -50,6 +53,50 @@ public class ProductControllerTest {
         
         assertEquals(product, response.getBody());
         assertEquals(HttpStatusCode.valueOf(200),response.getStatusCode());
+
+    }
+
+    @Test
+    public void loadProductsControllerTest(){
+        List<ProductRequest> productRequests = Arrays.asList(
+            new ProductRequest(
+                "TestProduct1", 
+                "TestDescription1", 
+                "TestCategory", 
+                10.0, 
+                50),
+            new ProductRequest(
+                "TestProduct2", 
+                "TestDescription2", 
+                "TestCategory", 
+                10.0, 
+                100)            
+        );
+
+        Category category =  new Category("other", 0.0);
+
+        List<Product> products = Arrays.asList(
+            new Product(
+                "TestProduct1", 
+                "TestDescription1", 
+                category, 
+                10.0, 
+                50),
+            new Product(
+                "TestProduct2", 
+                "TestDescription2", 
+                category, 
+                10.0, 
+                100)  
+        );
+
+        Mockito.when(productService.createProducts(productRequests)).thenReturn(products);
+
+        ResponseEntity<Product> response = productController.postLoadProducts(productRequests);
+
+        assertEquals(products, response.getBody());
+        assertEquals(HttpStatusCode.valueOf(200),response.getStatusCode());
+
 
     }
 }
