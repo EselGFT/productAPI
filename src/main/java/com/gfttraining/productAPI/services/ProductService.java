@@ -11,19 +11,15 @@ import com.gfttraining.productAPI.repositories.ProductRepository;
 @Service
 public class ProductService {
     
-    @Autowired
-    CategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepository;
 
-    @Autowired
-    ProductRepository productRepository;
-    // private final CategoryRepository categoryRepository;
-    // private final ProductRepository productRepository;
-    
-    // public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository){
+    private final ProductRepository productRepository;
+
+    public ProductService(CategoryRepository categoryRepository, ProductRepository productRepository){
+        this.categoryRepository = categoryRepository;
+        this.productRepository = productRepository;
         
-    //     this.productRepository = productRepository;
-    //     this.categoryRepository = categoryRepository;
-    // }
+    }
 
     public Product createProduct(String name, String description, String categoryName, Double price, int stock) {
 

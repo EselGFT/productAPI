@@ -12,7 +12,6 @@ import lombok.Data;
 @Data
 public class Product {
 
-    
     @Id
     @GeneratedValue
     private long id;
@@ -28,7 +27,7 @@ public class Product {
 
     public Product(){
     }
-    
+
     public Product(String name, String description, Category category, Double price, int stock) {
         this.name = name;
         this.description = description;
@@ -36,10 +35,5 @@ public class Product {
         this.price = price;
         this.stock = stock;
     }
-
-
- 
-
-    
 
 }

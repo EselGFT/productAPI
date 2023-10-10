@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -14,8 +14,12 @@ import com.gfttraining.productAPI.repositories.CategoryRepository;
 @Component
 public class CategoryInitializer implements CommandLineRunner{
 
-    @Autowired
-    private CategoryRepository categoryRepository;
+   
+    private final  CategoryRepository categoryRepository;
+
+    public CategoryInitializer(CategoryRepository categoryRepository) {
+        this.categoryRepository = categoryRepository;
+    }
 
     @Override
     public void run(String... args) throws Exception {

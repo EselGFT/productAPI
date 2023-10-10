@@ -7,7 +7,7 @@ import lombok.Data;
 @Entity
 @Data
 public class Category {
-    
+
     @Id
     private String name;
     private double discount;
@@ -18,6 +18,4 @@ public class Category {
         this.discount = discount;
     }
 
-
-    //mapa: name -> discount
 }
