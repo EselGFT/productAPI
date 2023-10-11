@@ -7,6 +7,8 @@ import com.gfttraining.productAPI.model.Product;
 import com.gfttraining.productAPI.repositories.CategoryRepository;
 import com.gfttraining.productAPI.repositories.ProductRepository;
 
+import java.util.List;
+
 @Service
 public class ProductService {
     
@@ -28,6 +30,10 @@ public class ProductService {
         
         return productRepository.save(product);
         
+    }
+
+    public List<Product> listProducts() {
+        return productRepository.findAll();
     }
 
 
