@@ -1,10 +1,13 @@
 package com.gfttraining.productAPI.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -65,7 +68,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    @DisplayName("When a product is created but the category is not foun, Then it should be associated with the 'other' category")
+    @DisplayName("When a product is created but the category is not found, Then it should be associated with the 'other' category")
     void createOtherCategoryProductTest(){
         String productName = "TestProduct";
         String productDescription = "TestDescription";
@@ -88,5 +91,19 @@ public class ProductServiceTest {
         assertEquals(other, createdProduct.getCategory());
     }
 
+    @Test
+    @DisplayName("When products are requested to be listed, a list that contains all of them is returned")
+    void listProductsTest() {
+        Product apple = new Product("Apple", "A rounded food object", new Category("food", 25.0), 1.25, 23);
+        Product dictionary = new Product("Dictionary", "A book that defines words", new Category("books", 15.0), 19.89, 13);
 
+        List<Product> products = Arrays.asList(apple, dictionary);
+
+        Mockito.when(productRepository.findAll()).thenReturn(products);
+
+        List<Product> productsToShow = productService.listProducts();
+
+        assertNotNull(productsToShow);
+        assertEquals(products.size(), productsToShow.size());
+    }
 }
