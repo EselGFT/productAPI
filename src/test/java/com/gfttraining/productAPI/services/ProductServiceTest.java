@@ -96,8 +96,8 @@ public class ProductServiceTest {
     @Test
     @DisplayName("When products are requested to be listed, a list that contains all of them is returned")
     void listProductsTest() {
-        Product apple = new Product("Apple", "A rounded food object", new Category("food", 25.0), 1.25, 23);
-        Product dictionary = new Product("Dictionary", "A book that defines words", new Category("books", 15.0), 19.89, 13);
+        Product apple = new Product("Apple", "A rounded food object", new Category("food", 25.0), 1.25, 23, 1.1);
+        Product dictionary = new Product("Dictionary", "A book that defines words", new Category("books", 15.0), 19.89, 13 ,1.0);
 
         List<Product> products = Arrays.asList(apple, dictionary);
 

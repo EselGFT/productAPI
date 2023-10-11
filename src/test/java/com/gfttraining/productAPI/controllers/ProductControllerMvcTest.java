@@ -6,7 +6,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -65,8 +64,8 @@ public class ProductControllerMvcTest {
     @Test
     void listAllMappingTest() throws Exception {
 
-        Product apple = new Product("Apple", "A rounded food object", new Category("food", 25.0), 1.25, 23);
-        Product dictionary = new Product("Dictionary", "A book that defines words", new Category("books", 15.0), 19.89, 13);
+        Product apple = new Product("Apple", "A rounded food object", new Category("food", 25.0), 1.25, 23 ,1.0);
+        Product dictionary = new Product("Dictionary", "A book that defines words", new Category("books", 15.0), 19.89, 13,1.0);
 
         List<Product> products = Arrays.asList(apple, dictionary);
 
