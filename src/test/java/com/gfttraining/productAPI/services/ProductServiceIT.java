@@ -1,20 +1,19 @@
 package com.gfttraining.productAPI.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.gfttraining.productAPI.repositories.ProductRepository;
-import com.gfttraining.productAPI.services.ProductService;
-import org.springframework.boot.test.mock.mockito.MockBean;
+
 
 @SpringBootTest
 public class ProductServiceIT {
     
     @Autowired
     private ProductRepository productRepository;
+
     @Autowired
     private ProductService productService;
 

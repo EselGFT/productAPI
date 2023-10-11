@@ -1,7 +1,6 @@
 package com.gfttraining.productAPI.controllers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -25,7 +24,6 @@ import java.util.Arrays;
 import java.util.List;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
-import jakarta.validation.ValidationException;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 
@@ -49,6 +47,7 @@ public class ProductControllerTest {
 
     @Test
     public void postControllerTest(){
+        
         String productName = "TestProduct";
         String productDescription = "TestDescription";
         String categoryName = "TestCategory";
@@ -71,8 +70,8 @@ public class ProductControllerTest {
 
     @Test
     public void listProductsControllerTest() {
-        Product apple = new Product("Apple", "A rounded food object", new Category("food", 25.0), 1.25, 23);
-        Product dictionary = new Product("Dictionary", "A book that defines words", new Category("books", 15.0), 19.89, 13);
+        Product apple = new Product("Apple", "A rounded food object", new Category("food", 25.0), 1.25, 23,1.0);
+        Product dictionary = new Product("Dictionary", "A book that defines words", new Category("books", 15.0), 19.89, 13,1.1);
 
         List<Product> products = Arrays.asList(apple, dictionary);
 
@@ -84,6 +83,7 @@ public class ProductControllerTest {
 
         assertEquals(products, response.getBody());
         assertEquals(HttpStatusCode.valueOf(200), response.getStatusCode());
+    }
 
     @Test
     public void postProductFailedControllerTest(){
