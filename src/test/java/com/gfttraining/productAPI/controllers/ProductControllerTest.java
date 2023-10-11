@@ -47,6 +47,7 @@ public class ProductControllerTest {
 
     @Test
     public void postControllerTest(){
+        
         String productName = "TestProduct";
         String productDescription = "TestDescription";
         String categoryName = "TestCategory";
