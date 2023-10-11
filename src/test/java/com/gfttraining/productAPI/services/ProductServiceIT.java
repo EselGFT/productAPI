@@ -5,28 +5,27 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.beans.factory.annotation.Autowired;
 import com.gfttraining.productAPI.repositories.ProductRepository;
 import com.gfttraining.productAPI.services.ProductService;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 @SpringBootTest
 public class ProductServiceIT {
-    private final ProductRepository productRepository;
-    private final ProductService productService;
-
-    public ProductServiceIT(ProductRepository productRepository, ProductService productService) {
-        this.productRepository = productRepository;
-        this.productService = productService;
-    }
+    
+    @Autowired
+    private ProductRepository productRepository;
+    @Autowired
+    private ProductService productService;
 
     @Test
     public void productCreationTest() {
-        
+    
         int size = productRepository.findByName("paper").size();
 
         assertEquals(0, size);
 
-        productService.createProduct("paper", "sheet of paper", "office", 4.99, 10);
+        productService.createProduct("paper", "sheet of paper", "office", 4.99, 10, 1.0);
 
         int newSize = productRepository.findByName("paper").size();
 

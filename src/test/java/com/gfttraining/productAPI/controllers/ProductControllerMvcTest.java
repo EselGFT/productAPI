@@ -40,10 +40,12 @@ public class ProductControllerMvcTest {
         String categoryName = "TestCategory";
         Double productPrice = 10.0;
         int productStock = 50;    
+        Double productWeight = 1.0;
 
-        Product product = new Product(productName, productDescription, new Category("other",0.0), productPrice, productStock);
-        ProductRequest productRequest = new ProductRequest(productName, productDescription, categoryName, productPrice, productStock);
-        Mockito.when(productService.createProduct(productName, productDescription, categoryName, productPrice, productStock)).thenReturn(product);
+
+        Product product = new Product(productName, productDescription, new Category("other",0.0), productPrice, productStock, productWeight);
+        ProductRequest productRequest = new ProductRequest(productName, productDescription, categoryName, productPrice, productStock, productWeight);
+        Mockito.when(productService.createProduct(productName, productDescription, categoryName, productPrice, productStock, productWeight)).thenReturn(product);
 
         mockMvc.perform(MockMvcRequestBuilders
                 .post("/product")

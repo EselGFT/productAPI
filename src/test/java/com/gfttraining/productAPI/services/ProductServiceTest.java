@@ -13,7 +13,6 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -32,12 +31,13 @@ public class ProductServiceTest {
     @Mock
     private ProductRepository productRepository;
 
-    @InjectMocks
+    
     private ProductService productService;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        productService = new ProductService(categoryRepository, productRepository);
     }
 
     @Test
@@ -48,16 +48,17 @@ public class ProductServiceTest {
         String categoryName = "TestCategory";
         Double productPrice = 10.0;
         int productStock = 50;
+        Double productWeight = 1.0;
 
         Category testCategory = new Category("TestCategory", 30.0);
         Category other = new Category("other", 0.0);
-        Product product = new Product(productName, productDescription, testCategory, productPrice, productStock);
+        Product product = new Product(productName, productDescription, testCategory, productPrice, productStock, productWeight);
         
         Mockito.when(categoryRepository.findById(categoryName)).thenReturn(Optional.of(testCategory));
         Mockito.when(categoryRepository.findById("other")).thenReturn(Optional.of(other));
         Mockito.when(productRepository.save(product)).thenReturn(product);
 
-        Product createdProduct = productService.createProduct(productName, productDescription, categoryName, productPrice, productStock);
+        Product createdProduct = productService.createProduct(productName, productDescription, categoryName, productPrice, productStock, productWeight);
         
         verify(categoryRepository, times(1)).findById(categoryName);
         verify(categoryRepository, times(1)).findById("other");
@@ -75,14 +76,15 @@ public class ProductServiceTest {
         String categoryName = "TestCategory";
         Double productPrice = 10.0;
         int productStock = 50;
+        Double productWeight = 1.0;
 
         Category other = new Category("other", 0.0);
-        Product product = new Product(productName, productDescription, other, productPrice, productStock);
+        Product product = new Product(productName, productDescription, other, productPrice, productStock, productWeight);
         
         Mockito.when(categoryRepository.findById("other")).thenReturn(Optional.of(other));
         Mockito.when(productRepository.save(product)).thenReturn(product);
 
-        Product createdProduct = productService.createProduct(productName, productDescription, categoryName, productPrice, productStock);
+        Product createdProduct = productService.createProduct(productName, productDescription, categoryName, productPrice, productStock, productWeight);
         
         verify(categoryRepository, times(1)).findById(categoryName);
         verify(categoryRepository, times(1)).findById("other");
