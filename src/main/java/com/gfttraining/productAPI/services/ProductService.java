@@ -20,11 +20,11 @@ public class ProductService {
 
     }
 
-    public Product createProduct(String name, String description, String categoryName, Double price, int stock) {
+    public Product createProduct(String name, String description, String categoryName, Double price, int stock, Double weight) {
 
         Category category = categoryRepository.findById(categoryName).orElse(categoryRepository.findById("other").get());
         
-        Product product = new Product(name, description, category, price, stock);
+        Product product = new Product(name, description, category, price, stock, weight);
         
         return productRepository.save(product);
         

@@ -1,8 +1,11 @@
 package com.gfttraining.productAPI.controllers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,6 +21,12 @@ import com.gfttraining.productAPI.model.Product;
 import com.gfttraining.productAPI.model.ProductRequest;
 import com.gfttraining.productAPI.services.ProductService;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.ValidationException;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
+
 public class ProductControllerTest {
 
     @Mock
@@ -26,10 +35,14 @@ public class ProductControllerTest {
     @InjectMocks
     ProductController productController;
 
+    private Validator validator;
          
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+         validator = factory.getValidator();
+        
     }
 
     @Test
@@ -39,17 +52,40 @@ public class ProductControllerTest {
         String categoryName = "TestCategory";
         Double productPrice = 10.0;
         int productStock = 50;    
+        Double productWeight = 1.0;
 
-        Product product = new Product(productName, productDescription, new Category("other",0.0), productPrice, productStock);
-        ProductRequest productRequest = new ProductRequest(productName, productDescription, categoryName, productPrice, productStock);
-        Mockito.when(productService.createProduct(productName, productDescription, categoryName, productPrice, productStock)).thenReturn(product);
+        Product product = new Product(productName, productDescription, new Category("other",0.0), productPrice, productStock, productWeight);
+        ProductRequest productRequest = new ProductRequest(productName, productDescription, categoryName, productPrice, productStock, productWeight);
+        Mockito.when(productService.createProduct(productName, productDescription, categoryName, productPrice, productStock, productWeight)).thenReturn(product);
         
         ResponseEntity<Product> response = productController.postMapping(productRequest);
 
-        verify(productService, times(1)).createProduct(productName, productDescription, categoryName, productPrice, productStock);
+        verify(productService, times(1)).createProduct(productName, productDescription, categoryName, productPrice, productStock, productWeight);
         
         assertEquals(product, response.getBody());
         assertEquals(HttpStatusCode.valueOf(200),response.getStatusCode());
 
+    }
+
+    @Test
+    public void postProductFailedControllerTest(){
+        String productName = "TestProduct";
+        String productDescription = "TestDescription";
+        String categoryName = "TestCategory";
+        Double productPrice = -1.0;
+        int productStock = 50;    
+        Double productWeight = 1.0;
+
+        Product product = new Product(productName, productDescription, new Category("other",0.0), productPrice, productStock, productWeight);
+        ProductRequest productRequest = new ProductRequest(productName, productDescription, categoryName, productPrice, productStock, productWeight);
+        Mockito.when(productService.createProduct(productName, productDescription, categoryName, productPrice, productStock, productWeight)).thenReturn(product);
+        
+        ResponseEntity<Product> response = productController.postMapping(productRequest);
+        Set<ConstraintViolation<ProductRequest>> violations = validator.validate(productRequest);
+        
+        verify(productService, times(1)).createProduct(productName, productDescription, categoryName, productPrice, productStock, productWeight);
+        
+        assertEquals(1, violations.size());
+        //assertThrows(ValidationException.class, () -> productController.postMapping(productRequest));
     }
 }
