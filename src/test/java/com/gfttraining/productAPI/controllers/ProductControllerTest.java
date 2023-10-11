@@ -21,6 +21,8 @@ import com.gfttraining.productAPI.model.Product;
 import com.gfttraining.productAPI.model.ProductRequest;
 import com.gfttraining.productAPI.services.ProductService;
 
+import java.util.Arrays;
+import java.util.List;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.ValidationException;
@@ -68,6 +70,22 @@ public class ProductControllerTest {
     }
 
     @Test
+    public void listProductsControllerTest() {
+        Product apple = new Product("Apple", "A rounded food object", new Category("food", 25.0), 1.25, 23);
+        Product dictionary = new Product("Dictionary", "A book that defines words", new Category("books", 15.0), 19.89, 13);
+
+        List<Product> products = Arrays.asList(apple, dictionary);
+
+        Mockito.when(productService.listProducts()).thenReturn(products);
+
+        ResponseEntity<List<Product>> response = productController.listProducts();
+
+        verify(productService, times(1)).listProducts();
+
+        assertEquals(products, response.getBody());
+        assertEquals(HttpStatusCode.valueOf(200), response.getStatusCode());
+
+    @Test
     public void postProductFailedControllerTest(){
         String productName = "TestProduct";
         String productDescription = "TestDescription";
@@ -87,5 +105,6 @@ public class ProductControllerTest {
         
         assertEquals(1, violations.size());
         //assertThrows(ValidationException.class, () -> productController.postMapping(productRequest));
+
     }
 }
