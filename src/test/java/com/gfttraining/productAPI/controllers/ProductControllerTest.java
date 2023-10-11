@@ -92,7 +92,7 @@ public class ProductControllerTest {
 
         Mockito.when(productService.createProducts(productRequests)).thenReturn(products);
 
-        ResponseEntity<Product> response = productController.postLoadProducts(productRequests);
+        ResponseEntity<List<Product>> response = productController.postLoadProducts(productRequests);
 
         assertEquals(products, response.getBody());
         assertEquals(HttpStatusCode.valueOf(200),response.getStatusCode());
