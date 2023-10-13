@@ -6,32 +6,45 @@ import static org.mockito.Mockito.verify;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 
 import com.gfttraining.productAPI.model.Category;
 import com.gfttraining.productAPI.model.Product;
 import com.gfttraining.productAPI.model.ProductRequest;
+import com.gfttraining.productAPI.repositories.ProductRepository;
 import com.gfttraining.productAPI.services.ProductService;
+
 
 public class ProductControllerTest {
 
     @Mock
     ProductService productService;
+    @Mock
+    ProductRepository productRepository;
 
     @InjectMocks
     ProductController productController;
-
-         
+    
+    
+    
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+    	
+
+        MockitoAnnotations.openMocks(this);  
+        
+
     }
 
+         
+   
     @Test
     public void postControllerTest(){
         String productName = "TestProduct";
@@ -51,5 +64,27 @@ public class ProductControllerTest {
         assertEquals(product, response.getBody());
         assertEquals(HttpStatusCode.valueOf(200),response.getStatusCode());
 
+    }
+    
+    @Test
+    public void putUpdateControllerTest() {
+    	   	
+    	String productName = "TestProduct";
+        String productDescription = "TestDescription";
+        String categoryName = "TestCategory";
+        Double productPrice = 10.0;
+        int productStock = 50; 
+        int id = 1;        
+        ProductRequest productRequest = new ProductRequest(productName, productDescription, categoryName, productPrice, productStock);
+        Product product = new Product(productName, productDescription, new Category("other",0.0), productPrice, productStock);        
+        Mockito.when(productService.updateProduct(id,productName, productDescription, categoryName, productPrice, productStock)).thenReturn(product);        
+        ResponseEntity<Product> response = productController.putUpdate(id, productRequest); 
+        
+        
+        assertEquals(product, response.getBody());
+        assertEquals(HttpStatusCode.valueOf(200),response.getStatusCode());
+        
+        
+          	
     }
 }
