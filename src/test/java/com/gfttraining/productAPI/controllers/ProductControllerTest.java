@@ -6,6 +6,9 @@ import static org.mockito.Mockito.verify;
 
 import java.util.Set;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -20,8 +23,6 @@ import com.gfttraining.productAPI.model.Product;
 import com.gfttraining.productAPI.model.ProductRequest;
 import com.gfttraining.productAPI.services.ProductService;
 
-import java.util.Arrays;
-import java.util.List;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -41,7 +42,7 @@ public class ProductControllerTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-         validator = factory.getValidator();
+        validator = factory.getValidator();
         
     }
 
@@ -104,7 +105,55 @@ public class ProductControllerTest {
         verify(productService, times(1)).createProduct(productName, productDescription, categoryName, productPrice, productStock, productWeight);
         
         assertEquals(1, violations.size());
-        //assertThrows(ValidationException.class, () -> productController.postMapping(productRequest));
+        
+
+    }
+
+    @Test
+    public void loadProductsControllerTest(){
+        List<ProductRequest> productRequests = Arrays.asList(
+            new ProductRequest(
+                "TestProduct1", 
+                "TestDescription1", 
+                "TestCategory", 
+                10.0, 
+                50,
+                1.0),
+            new ProductRequest(
+                "TestProduct2", 
+                "TestDescription2", 
+                "TestCategory", 
+                10.0, 
+                100,
+                1.0)            
+        );
+
+        Category category =  new Category("other", 0.0);
+
+        List<Product> products = Arrays.asList(
+            new Product(
+                "TestProduct1", 
+                "TestDescription1", 
+                category, 
+                10.0, 
+                50,
+                1.0),
+            new Product(
+                "TestProduct2", 
+                "TestDescription2", 
+                category, 
+                10.0, 
+                100,
+                1.0)  
+        );
+
+        Mockito.when(productService.createProducts(productRequests)).thenReturn(products);
+
+        ResponseEntity<List<Product>> response = productController.postLoadProducts(productRequests);
+
+        assertEquals(products, response.getBody());
+        assertEquals(HttpStatusCode.valueOf(200),response.getStatusCode());
+
 
     }
 }

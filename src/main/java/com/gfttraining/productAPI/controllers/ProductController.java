@@ -1,5 +1,7 @@
 package com.gfttraining.productAPI.controllers;
 
+import java.util.List;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +14,6 @@ import com.gfttraining.productAPI.model.Product;
 import com.gfttraining.productAPI.model.ProductRequest;
 import com.gfttraining.productAPI.services.ProductService;
 
-import java.util.List;
 import jakarta.validation.Valid;
 
 @RestController
@@ -35,6 +36,7 @@ public class ProductController {
         );
     }
 
+   
     @PostMapping("/product")
     public ResponseEntity<Product> postMapping(@RequestBody @Valid ProductRequest productRequest)
     {
@@ -50,6 +52,17 @@ public class ProductController {
                 headers,   
                 HttpStatus.OK
             );        
+    }
+
+    
+    @PostMapping("/products")
+    public ResponseEntity<List<Product>> postLoadProducts(@RequestBody List<ProductRequest> productRequests) {
+        HttpHeaders header = new HttpHeaders();
+        return new ResponseEntity<>(
+            productService.createProducts(productRequests),
+            header,
+            HttpStatus.OK
+        );
     }
 
 }

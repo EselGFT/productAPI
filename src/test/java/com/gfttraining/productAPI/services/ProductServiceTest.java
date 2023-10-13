@@ -19,6 +19,7 @@ import org.mockito.MockitoAnnotations;
 
 import com.gfttraining.productAPI.model.Category;
 import com.gfttraining.productAPI.model.Product;
+import com.gfttraining.productAPI.model.ProductRequest;
 import com.gfttraining.productAPI.repositories.CategoryRepository;
 import com.gfttraining.productAPI.repositories.ProductRepository;
 
@@ -107,5 +108,63 @@ public class ProductServiceTest {
 
         assertNotNull(productsToShow);
         assertEquals(products.size(), productsToShow.size());
+    }    
+    
+    @Test
+    @DisplayName("When a product is created but the category is not foun, Then it should be associated with the 'other' category")
+    void createProductsTest(){
+        List<ProductRequest> productRequests = Arrays.asList(
+            new ProductRequest(
+                "TestProduct1", 
+                "TestDescription1", 
+                "food", 
+                10.0, 
+                50,
+                1.0),
+            new ProductRequest(
+                "TestProduct2", 
+                "TestDescription2", 
+                "TestCategory", 
+                10.0, 
+                100,
+                1.0)            
+        );
+
+        Category other = new Category("other", 0.0);
+        Category food = new Category("food", 25.0);
+ 
+        Product productTest1 = new Product(
+                "TestProduct1", 
+                "TestDescription1", 
+                food, 
+                10.0, 
+                50,
+                1.0);
+
+        Product productTest2 = new Product(
+                "TestProduct2", 
+                "TestDescription2", 
+                other, 
+                10.0, 
+                100,
+                1.0);        
+        
+        
+        List<Product> products = Arrays.asList(productTest1, productTest2);
+        Mockito.when(categoryRepository.findById("food")).thenReturn(Optional.of(food));
+        Mockito.when(categoryRepository.findById("other")).thenReturn(Optional.of(other));
+
+        Mockito.when(productRepository.save(productTest1)).thenReturn(productTest1);
+        Mockito.when(productRepository.save(productTest2)).thenReturn(productTest2);
+
+        List<Product> createdProducts = productService.createProducts(productRequests);
+        
+        //verify(categoryRepository, times(1)).findById(categoryName);
+       // verify(categoryRepository, times(1)).findById("other");
+      //  verify(productRepository, times(1)).save(any(Product.class));
+
+        assertEquals(products, createdProducts);
     }
+
+
 }
