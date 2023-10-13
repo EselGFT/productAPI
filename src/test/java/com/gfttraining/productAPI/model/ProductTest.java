@@ -3,20 +3,31 @@ package com.gfttraining.productAPI.model;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+
+import java.util.Set;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 
 
 public class ProductTest {
 
     Category category;
     Product product;
+    Validator validator;
 
     @BeforeEach
     public void setUp(){
         this.category = new Category("Electronics", 25.0);
         this.product = new Product("Laptop", "Powerful laptop", category, 999.99, 10, 1.0);
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();   
     }
 
     @Test
@@ -128,6 +139,46 @@ public class ProductTest {
     public void toStringTest() {
         assertNotNull(product.toString());
     }
+    
+    @Test
+    public void noErrorValidatorTest() {
+        validator.validate(product);
+        Set<ConstraintViolation<Product>> violations = validator.validate(product);
+        assertEquals(0, violations.size());        
+    }
+    
+    @Test
+    public void nameValidatorTest() {
+        product.setName("");
+        validator.validate(product);
+        Set<ConstraintViolation<Product>> violations = validator.validate(product);
+        assertEquals(1, violations.size());        
+    }
+
+    @Test
+    public void priceValidatorTest() {
+        product.setPrice(-1.0);
+        validator.validate(product);
+        Set<ConstraintViolation<Product>> violations = validator.validate(product);
+        assertEquals(1, violations.size());        
+    }
+
+    @Test
+    public void stockValidatorTest() {
+        product.setStock(-1);
+        validator.validate(product);
+        Set<ConstraintViolation<Product>> violations = validator.validate(product);
+        assertEquals(1, violations.size());        
+    }
+
+    @Test
+    public void weightValidatorTest() {
+        product.setWeight(-1.0);
+        validator.validate(product);
+        Set<ConstraintViolation<Product>> violations = validator.validate(product);
+        assertEquals(1, violations.size());        
+    }
+
     
 
 

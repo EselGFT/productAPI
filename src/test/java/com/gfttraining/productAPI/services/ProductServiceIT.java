@@ -7,13 +7,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.gfttraining.productAPI.repositories.ProductRepository;
 
-
 @SpringBootTest
 public class ProductServiceIT {
     
     @Autowired
     private ProductRepository productRepository;
-
     @Autowired
     private ProductService productService;
 

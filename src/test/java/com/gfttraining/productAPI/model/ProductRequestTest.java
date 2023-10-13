@@ -4,17 +4,28 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+import java.util.Set;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
+
 public class ProductRequestTest {
 
     ProductRequest productRequest;
-
+    Validator validator;
+    
     @BeforeEach
     public void setUp(){
         this.productRequest = new ProductRequest("Laptop", "Powerful laptop", "laptop", 999.99, 10,1.0);
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
+
     }
 
     @Test
@@ -126,4 +137,43 @@ public class ProductRequestTest {
     public void toStringTest() {
         assertNotNull(productRequest.toString());
     }
+
+    @Test
+    public void nameNotBlankValidatorTest() {
+        productRequest.setName("");
+        validator.validate(productRequest);
+        Set<ConstraintViolation<ProductRequest>> violations = validator.validate(productRequest);
+        assertEquals(1, violations.size());
+        
+    }   
+
+    
+    @Test
+    public void priceValidatorTest() {
+        productRequest.setPrice(-1.0);
+        validator.validate(productRequest);
+        Set<ConstraintViolation<ProductRequest>> violations = validator.validate(productRequest);
+        assertEquals(1, violations.size());
+        
+    }  
+    
+    @Test
+    public void stockValidatorTest() {
+        productRequest.setStock(-1);
+        validator.validate(productRequest);
+        Set<ConstraintViolation<ProductRequest>> violations = validator.validate(productRequest);
+        assertEquals(1, violations.size());
+        
+    }  
+
+    @Test
+    public void weightValidatorTest() {
+        productRequest.setStock(-1);
+        validator.validate(productRequest);
+        Set<ConstraintViolation<ProductRequest>> violations = validator.validate(productRequest);
+        assertEquals(1, violations.size());
+        
+    }      
+    
+
 }

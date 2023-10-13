@@ -4,17 +4,28 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+import java.util.Set;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
+
 public class CategoryTest {
     
     Category category;
+    Validator validator;
 
     @BeforeEach
     public void setUp(){
         this.category = new Category("Electronics", 25.0);
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
+
     }
 
     @Test
@@ -78,5 +89,33 @@ public class CategoryTest {
     @DisplayName("Converting a category to a string should not return null")
     public void toStringTest() {
         assertNotNull(category.toString());
+    }
+    
+    @Test
+    public void nameNotBlankValidatorTest() {
+        category.setName("");
+        validator.validate(category);
+        Set<ConstraintViolation<Category>> violations = validator.validate(category);
+        assertEquals(1, violations.size());
+        
     }    
+
+    @Test
+    public void negativeDiscountValidatorTest() {
+        category.setDiscount(-1.0);
+        validator.validate(category);
+        Set<ConstraintViolation<Category>> violations = validator.validate(category);
+        assertEquals(1, violations.size());
+        
+    }
+    
+    @Test
+    public void overHundredDiscountValidatorTest() {
+        category.setDiscount(101.0);
+        validator.validate(category);
+        Set<ConstraintViolation<Category>> violations = validator.validate(category);
+        assertEquals(1, violations.size());
+        
+    }   
+
 }

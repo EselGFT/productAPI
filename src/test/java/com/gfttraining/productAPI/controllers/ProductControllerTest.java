@@ -23,8 +23,6 @@ import com.gfttraining.productAPI.model.Product;
 import com.gfttraining.productAPI.model.ProductRequest;
 import com.gfttraining.productAPI.services.ProductService;
 
-import java.util.Arrays;
-import java.util.List;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -44,7 +42,7 @@ public class ProductControllerTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-         validator = factory.getValidator();
+        validator = factory.getValidator();
         
     }
 
@@ -107,7 +105,7 @@ public class ProductControllerTest {
         verify(productService, times(1)).createProduct(productName, productDescription, categoryName, productPrice, productStock, productWeight);
         
         assertEquals(1, violations.size());
-        //assertThrows(ValidationException.class, () -> productController.postMapping(productRequest));
+        
 
     }
 

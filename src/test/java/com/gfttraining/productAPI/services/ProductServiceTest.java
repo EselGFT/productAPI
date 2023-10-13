@@ -108,7 +108,9 @@ public class ProductServiceTest {
 
         assertNotNull(productsToShow);
         assertEquals(products.size(), productsToShow.size());
-    }    @Test
+    }    
+    
+    @Test
     @DisplayName("When a product is created but the category is not foun, Then it should be associated with the 'other' category")
     void createProductsTest(){
         List<ProductRequest> productRequests = Arrays.asList(

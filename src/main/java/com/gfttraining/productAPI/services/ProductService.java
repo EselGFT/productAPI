@@ -10,8 +10,6 @@ import com.gfttraining.productAPI.model.ProductRequest;
 import com.gfttraining.productAPI.repositories.CategoryRepository;
 import com.gfttraining.productAPI.repositories.ProductRepository;
 
-import java.util.List;
-
 @Service
 public class ProductService {
     
