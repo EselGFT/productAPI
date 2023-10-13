@@ -56,7 +56,7 @@ public class ProductController {
 
     
     @PostMapping("/products")
-    public ResponseEntity<List<Product>> postLoadProducts(@RequestBody List<ProductRequest> productRequests) {
+    public ResponseEntity<List<Product>> postLoadProducts(@RequestBody @Valid List<ProductRequest> productRequests) {
         HttpHeaders header = new HttpHeaders();
         return new ResponseEntity<>(
             productService.createProducts(productRequests),
