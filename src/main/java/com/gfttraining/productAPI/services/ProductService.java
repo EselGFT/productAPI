@@ -3,7 +3,6 @@ package com.gfttraining.productAPI.services;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import com.gfttraining.productAPI.model.Category;
 import com.gfttraining.productAPI.model.Product;
@@ -24,11 +23,11 @@ public class ProductService {
 
     }
 
-    public Product createProduct(String name, String description, String categoryName, Double price, int stock, Double weight) {
+    public Product createProduct(ProductRequest productRequest) {
 
-        Category category = categoryRepository.findById(categoryName).orElse(categoryRepository.findById("other").get());
+        Category category = categoryRepository.findById(productRequest.getCategory()).orElse(categoryRepository.findById("other").get());
         
-        Product product = new Product(name, description, category, price, stock, weight);
+        Product product = new Product(productRequest.getName(), productRequest.getDescription(), category, productRequest.getPrice(), productRequest.getStock(), productRequest.getWeight());
         
         return productRepository.save(product);
         
@@ -71,7 +70,7 @@ public class ProductService {
 
     public List<Product> createProducts(List<ProductRequest> productRequests) {
         return productRequests.stream()
-                .map(pr -> createProduct(pr.getName(), pr.getDescription(), pr.getCategory(), pr.getPrice(), pr.getStock(), pr.getWeight()))
+                .map(productRequest -> createProduct(productRequest))
                 .toList();
     }
 
