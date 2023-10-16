@@ -2,10 +2,8 @@ package com.gfttraining.productAPI.controllers;
 
 import java.util.List;
 
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,10 +30,8 @@ public class ProductController {
 
     @GetMapping("/products")
     public ResponseEntity<List<Product>> listProducts() {
-        HttpHeaders headers = new HttpHeaders();
         return new ResponseEntity<>(
                 productService.listProducts(),
-                headers,
                 HttpStatus.OK
         );
     }
@@ -44,16 +40,8 @@ public class ProductController {
     @PostMapping("/product")
     public ResponseEntity<Product> postMapping(@RequestBody @Valid ProductRequest productRequest)
     {
-        HttpHeaders headers = new HttpHeaders();
         return new ResponseEntity<>( 
-                productService.createProduct(
-                    productRequest.getName(),
-                    productRequest.getDescription(),
-                    productRequest.getCategory(),
-                    productRequest.getPrice(),
-                    productRequest.getStock(),
-                    productRequest.getWeight()),
-                headers,   
+                productService.createProduct(productRequest),
                 HttpStatus.OK
             );        
     }
@@ -61,29 +49,17 @@ public class ProductController {
 
     @PostMapping("/products")
     public ResponseEntity<List<Product>> postLoadProducts(@RequestBody @Valid List<ProductRequest> productRequests) {
-        HttpHeaders header = new HttpHeaders();
         return new ResponseEntity<>(
             productService.createProducts(productRequests),
-            header,
             HttpStatus.OK
         );
     }
 
     @PutMapping("/products/{id_product}")
-    public ResponseEntity<Product> putUpdate (@PathVariable Long id_product,  @RequestBody @Valid ProductRequest UpdateProductRequest) {
-    	HttpHeaders headers = new HttpHeaders();
+    public ResponseEntity<Product> putUpdate (@PathVariable Long id_product,  @RequestBody ProductRequest updateProductRequest) {
         return new ResponseEntity<>(
-                productService.updateProduct(
-                		id_product,
-                		UpdateProductRequest.getName(),
-                		UpdateProductRequest.getDescription(),
-                		UpdateProductRequest.getCategory(),
-                		UpdateProductRequest.getPrice(),
-                		UpdateProductRequest.getStock(),
-                        UpdateProductRequest.getWeight()),
-
-                headers,
-                HttpStatus.OK
+            productService.updateProduct(id_product, updateProductRequest),
+            HttpStatus.OK
             );
     }
 

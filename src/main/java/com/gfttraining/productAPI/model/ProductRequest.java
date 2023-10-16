@@ -21,14 +21,14 @@ public class ProductRequest {
 
     @NotNull(message = "Stock should not be null")
     @Min(value = 0, message="Stock should not be less than 0")
-    private int stock;
+    private Integer stock;
 
     @NotNull(message = "Weight should not be null")
     @Min(value = 0, message="Weight should not be less than 0")
     private Double weight;
 
     public ProductRequest(){
-
+        
     }
     
    

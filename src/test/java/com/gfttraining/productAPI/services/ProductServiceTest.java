@@ -54,12 +54,13 @@ public class ProductServiceTest {
         Category testCategory = new Category("TestCategory", 30.0);// poridamos porner aqui category name no?
         Category other = new Category("other", 0.0);
         Product product = new Product(productName, productDescription, testCategory, productPrice, productStock, productWeight);
-        
+        ProductRequest productRequest = new ProductRequest(productName, productDescription, categoryName, productPrice, productStock, productWeight);
+
         Mockito.when(categoryRepository.findById(categoryName)).thenReturn(Optional.of(testCategory));
         Mockito.when(categoryRepository.findById("other")).thenReturn(Optional.of(other));
         Mockito.when(productRepository.save(product)).thenReturn(product);
 
-        Product createdProduct = productService.createProduct(productName, productDescription, categoryName, productPrice, productStock, productWeight);
+        Product createdProduct = productService.createProduct(productRequest);
         
         verify(categoryRepository, times(1)).findById(categoryName);
         verify(categoryRepository, times(1)).findById("other");
@@ -82,11 +83,12 @@ public class ProductServiceTest {
 
         Category other = new Category("other", 0.0);
         Product product = new Product(productName, productDescription, other, productPrice, productStock, productWeight);
-        
+        ProductRequest productRequest = new ProductRequest(productName, productDescription, categoryName, productPrice, productStock, productWeight);
+
         Mockito.when(categoryRepository.findById("other")).thenReturn(Optional.of(other));
         Mockito.when(productRepository.save(product)).thenReturn(product);
 
-        Product createdProduct = productService.createProduct(productName, productDescription, categoryName, productPrice, productStock, productWeight);
+        Product createdProduct = productService.createProduct(productRequest);
         
         verify(categoryRepository, times(1)).findById(categoryName);
         verify(categoryRepository, times(1)).findById("other");
@@ -109,21 +111,21 @@ public class ProductServiceTest {
         
         Category other = new Category("other", 0.0);
         Product product = new Product(productName, productDescription, other, productPrice, productStock,productWeight);
-        
+        ProductRequest productRequest = new ProductRequest(productName, productDescription, categoryName, productPrice, productStock, productWeight);
         Mockito.when(categoryRepository.findById("other")).thenReturn(Optional.of(other));
         Mockito.when(productRepository.findById(id)).thenReturn(Optional.of(product));
         Mockito.when(productRepository.save(product)).thenReturn(product);       
               
-        Product productAfterUpdate = productService.updateProduct(id, productName, "test product", categoryName, productPrice, 35,productWeight);
+        Product productAfterUpdate = productService.updateProduct(id, productRequest);
 
         verify(categoryRepository, times(1)).findById("other");
         verify(productRepository, times(1)).save(any(Product.class));
 
         assertEquals(productAfterUpdate.getName(),productName);
         assertEquals(productAfterUpdate.getCategory().getName(), "other");
-        assertEquals(productAfterUpdate.getDescription(),"test product");
+        assertEquals(productAfterUpdate.getDescription(),productDescription);
         assertEquals(productAfterUpdate.getPrice(), productPrice);
-        assertEquals(productAfterUpdate.getStock(),35);
+        assertEquals(productAfterUpdate.getStock(),productStock);
         assertEquals(productAfterUpdate.getWeight(), productWeight);
     }
     
