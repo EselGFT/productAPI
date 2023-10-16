@@ -2,6 +2,7 @@ package com.gfttraining.productAPI.controllers;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -11,6 +12,8 @@ import jakarta.validation.ConstraintViolationException;
 
 @RestControllerAdvice
 public class ProductControllerAdvice {
+
+    
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<String> handleConstraintViolationException(ConstraintViolationException ex) {
@@ -35,4 +38,10 @@ public class ProductControllerAdvice {
 
         return new ResponseEntity<>(errorMessage.toString(), HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<String> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+         return new ResponseEntity<>("Request parameters have a wrong format, please consult the OpenAPI docu", HttpStatus.BAD_REQUEST);
+    }
+    
 }

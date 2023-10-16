@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import com.gfttraining.productAPI.model.ProductRequest;
 import com.gfttraining.productAPI.repositories.ProductRepository;
 
 @SpringBootTest
@@ -22,7 +24,7 @@ public class ProductServiceIT {
 
         assertEquals(0, size);
 
-        productService.createProduct("paper", "sheet of paper", "office", 4.99, 10, 1.0);
+        productService.createProduct(new ProductRequest("paper", "sheet of paper", "office", 4.99, 10, 1.0));
 
         int newSize = productRepository.findByName("paper").size();
 
