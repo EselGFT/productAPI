@@ -64,16 +64,6 @@ public class ProductService {
     	
     	
     }
-    
-    /*
-    public List<Product> products () {
-    	return productRepository.findAll();
-    }
-    
-    public Product productById (@PathVariable int id) {
-    	return productRepository.findById(id).get();
-    	
-    }*/
 
     public List<Product> listProducts() {
         return productRepository.findAll();
