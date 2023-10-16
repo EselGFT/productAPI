@@ -108,8 +108,10 @@ public class ProductServiceTest {
         Mockito.when(productRepository.save(product)).thenReturn(product);       
               
         Product productAfterUpdate = productService.updateProduct(id, productName, "test product", categoryName, productPrice, 35);
-        
-        
+
+        verify(categoryRepository, times(1)).findById("other");
+        verify(productRepository, times(1)).save(any(Product.class));
+
         assertEquals(productAfterUpdate.getName(),productName);
         assertEquals(productAfterUpdate.getCategory().getName(), "other");
         assertEquals(productAfterUpdate.getDescription(),"test product");

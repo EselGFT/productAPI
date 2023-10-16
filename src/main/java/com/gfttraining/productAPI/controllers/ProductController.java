@@ -54,22 +54,11 @@ public class ProductController {
                 		UpdateProductRequest.getCategory(),
                 		UpdateProductRequest.getPrice(),
                 		UpdateProductRequest.getStock()),
+
                 headers,   
                 HttpStatus.OK
             );     
     }
     
-    /*
-    @GetMapping("/products")
-    public List<Product> listaProductos() {
-		
-		return productService.products();
-	}
-    
-    @GetMapping("/products/{id}")
-    public Product productById(int id) {
-		
-		return productService.productById(id);
-	}*/
 
 }
