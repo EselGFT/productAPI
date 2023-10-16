@@ -6,6 +6,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -18,6 +19,8 @@ import com.gfttraining.productAPI.model.ProductRequest;
 import com.gfttraining.productAPI.repositories.ProductRepository;
 import com.gfttraining.productAPI.services.ProductService;
 
+import jakarta.validation.Valid;
+
 @RestController
 public class ProductController {
 
@@ -28,8 +31,20 @@ public class ProductController {
         this.productService = productService;
     }
 
+    @GetMapping("/products")
+    public ResponseEntity<List<Product>> listProducts() {
+        HttpHeaders headers = new HttpHeaders();
+        return new ResponseEntity<>(
+                productService.listProducts(),
+                headers,
+                HttpStatus.OK
+        );
+    }
+
+
     @PostMapping("/product")
-    public ResponseEntity<Product> postMapping(@RequestBody ProductRequest productRequest){
+    public ResponseEntity<Product> postMapping(@RequestBody @Valid ProductRequest productRequest)
+    {
         HttpHeaders headers = new HttpHeaders();
         return new ResponseEntity<>( 
                 productService.createProduct(
@@ -37,16 +52,28 @@ public class ProductController {
                     productRequest.getDescription(),
                     productRequest.getCategory(),
                     productRequest.getPrice(),
-                    productRequest.getStock()),
+                    productRequest.getStock(),
+                    productRequest.getWeight()),
                 headers,   
                 HttpStatus.OK
             );        
     }
-    
-    @PutMapping("/products/{id_product}") 
+
+
+    @PostMapping("/products")
+    public ResponseEntity<List<Product>> postLoadProducts(@RequestBody @Valid List<ProductRequest> productRequests) {
+        HttpHeaders header = new HttpHeaders();
+        return new ResponseEntity<>(
+            productService.createProducts(productRequests),
+            header,
+            HttpStatus.OK
+        );
+    }
+
+    @PutMapping("/products/{id_product}")
     public ResponseEntity<Product> putUpdate (@PathVariable int id_product, @RequestBody ProductRequest UpdateProductRequest) {
     	HttpHeaders headers = new HttpHeaders();
-        return new ResponseEntity<>( 
+        return new ResponseEntity<>(
                 productService.updateProduct(
                 		id_product,
                 		UpdateProductRequest.getName(),
@@ -55,10 +82,10 @@ public class ProductController {
                 		UpdateProductRequest.getPrice(),
                 		UpdateProductRequest.getStock()),
 
-                headers,   
+                headers,
                 HttpStatus.OK
-            );     
+            );
     }
-    
+
 
 }

@@ -18,9 +18,9 @@ public class ProductInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-         productService.createProduct("Cookies", "Chocolate cookies", "food", 9.99, 10);
-         productService.createProduct("Librito", "Small book", "books", 5.0, 20);
-         productService.createProduct("Joel", "sports man", "person", 9.99, 1);
+         productService.createProduct("Cookies", "Chocolate cookies", "food", 9.99, 10,1.0);
+         productService.createProduct("Book", "Small book", "books", 5.0, 20,1.0);
+         productService.createProduct("Desk", "Big desk", "furniture", 9.99, 1,1.0);
     }
         
 }
