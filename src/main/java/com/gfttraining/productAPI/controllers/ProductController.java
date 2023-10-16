@@ -31,10 +31,8 @@ public class ProductController {
 
     @GetMapping("/products")
     public ResponseEntity<List<Product>> listProducts() {
-        HttpHeaders headers = new HttpHeaders();
         return new ResponseEntity<>(
                 productService.listProducts(),
-                headers,
                 HttpStatus.OK
         );
     }
@@ -43,10 +41,8 @@ public class ProductController {
     @PostMapping("/product")
     public ResponseEntity<Product> postMapping(@RequestBody @Valid ProductRequest productRequest)
     {
-        HttpHeaders headers = new HttpHeaders();
         return new ResponseEntity<>( 
                 productService.createProduct(productRequest),
-                headers,   
                 HttpStatus.OK
             );        
     }
@@ -54,29 +50,17 @@ public class ProductController {
 
     @PostMapping("/products")
     public ResponseEntity<List<Product>> postLoadProducts(@RequestBody @Valid List<ProductRequest> productRequests) {
-        HttpHeaders header = new HttpHeaders();
         return new ResponseEntity<>(
             productService.createProducts(productRequests),
-            header,
             HttpStatus.OK
         );
     }
 
     @PutMapping("/products/{id_product}")
-    public ResponseEntity<Product> putUpdate (@PathVariable int id_product,  @RequestBody @Valid ProductRequest UpdateProductRequest) {
-    	HttpHeaders headers = new HttpHeaders();
+    public ResponseEntity<Product> putUpdate (@PathVariable int id_product,  @RequestBody ProductRequest updateProductRequest) {
         return new ResponseEntity<>(
-                productService.updateProduct(
-                		id_product,
-                		UpdateProductRequest.getName(),
-                		UpdateProductRequest.getDescription(),
-                		UpdateProductRequest.getCategory(),
-                		UpdateProductRequest.getPrice(),
-                		UpdateProductRequest.getStock(),
-                        UpdateProductRequest.getWeight()),
-
-                headers,
-                HttpStatus.OK
+            productService.updateProduct(id_product, updateProductRequest),
+            HttpStatus.OK
             );
     }
 

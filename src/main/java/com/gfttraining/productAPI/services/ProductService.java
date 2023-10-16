@@ -33,29 +33,30 @@ public class ProductService {
         
     }
     
-    public Product updateProduct (int id,String name, String description, String categoryName, Double price, int stock,Double productWeight){
+    public Product updateProduct (int id, ProductRequest productRequest){
     	    	 
-    	Category category = categoryRepository.findById(categoryName).orElse(categoryRepository.findById("other").get());
+    	Category category = categoryRepository.findById(productRequest.getCategory()).orElse(categoryRepository.findById("other").get());
     	
     	Product productUpdate = productRepository.findById(id).get();
-    	if (name != null) {
-    		productUpdate.setName(name);    		
+        
+    	if (productRequest.getName() != null) {
+    		productUpdate.setName(productRequest.getName());    		
     	} 
-    	if (description != null) {
-    		productUpdate.setDescription(description);    		
+    	if (productRequest.getDescription()!= null) {
+    		productUpdate.setDescription(productRequest.getDescription());    		
     	}
-    	if (categoryName != null) {
+    	if (productRequest.getCategory() != null) {
     		productUpdate.setCategory(category);    		
     	}
-    	if (price != null) {
-    		productUpdate.setPrice(price);    		
+    	if (productRequest.getPrice() != 0) {
+    		productUpdate.setPrice(productRequest.getPrice());    		
     	}
 
-    	if(stock != 0){
-    		productUpdate.setStock(stock);    		
+    	if(productRequest.getStock() != 0){
+    		productUpdate.setStock(productRequest.getStock());    		
     	}
-        if (productWeight != null) {
-            productUpdate.setWeight(productWeight);
+        if (productRequest.getWeight() != 0) {
+            productUpdate.setWeight(productRequest.getWeight());
         }
     	
     	return productRepository.save(productUpdate);
