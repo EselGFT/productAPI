@@ -51,7 +51,7 @@ public class ProductServiceTest {
         int productStock = 50;
         Double productWeight = 1.0;
 
-        Category testCategory = new Category("TestCategory", 30.0);
+        Category testCategory = new Category("TestCategory", 30.0);// poridamos porner aqui category name no?
         Category other = new Category("other", 0.0);
         Product product = new Product(productName, productDescription, testCategory, productPrice, productStock, productWeight);
         
@@ -69,6 +69,7 @@ public class ProductServiceTest {
         
     }
 
+   
     @Test
     @DisplayName("When a product is created but the category is not found, Then it should be associated with the 'other' category")
     void createOtherCategoryProductTest(){
@@ -93,6 +94,42 @@ public class ProductServiceTest {
 
         assertEquals(other, createdProduct.getCategory());
     }
+    
+    @Test
+    void updateProductsTest () {
+    	
+    	
+    	String productName = "TestProduct";
+        String productDescription = "TestDescription";
+        String categoryName = "TestCategory";
+        Double productPrice = 10.0;
+        int productStock = 50;
+        Double productWeight = 1.0;
+        int id = 1;
+        
+        Category other = new Category("other", 0.0);
+        Product product = new Product(productName, productDescription, other, productPrice, productStock,productWeight);
+        
+        Mockito.when(categoryRepository.findById("other")).thenReturn(Optional.of(other));
+        Mockito.when(productRepository.findById(1)).thenReturn(Optional.of(product));
+        Mockito.when(productRepository.save(product)).thenReturn(product);       
+              
+        Product productAfterUpdate = productService.updateProduct(id, productName, "test product", categoryName, productPrice, 35,productWeight);
+
+        verify(categoryRepository, times(1)).findById("other");
+        verify(productRepository, times(1)).save(any(Product.class));
+
+        assertEquals(productAfterUpdate.getName(),productName);
+        assertEquals(productAfterUpdate.getCategory().getName(), "other");
+        assertEquals(productAfterUpdate.getDescription(),"test product");
+        assertEquals(productAfterUpdate.getPrice(), productPrice);
+        assertEquals(productAfterUpdate.getStock(),35);
+        assertEquals(productAfterUpdate.getWeight(), productWeight);
+    }
+    
+    
+   
+   
 
     @Test
     @DisplayName("When products are requested to be listed, a list that contains all of them is returned")
