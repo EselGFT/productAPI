@@ -71,7 +71,7 @@ public class ProductController {
     }
 
     @PutMapping("/products/{id_product}")
-    public ResponseEntity<Product> putUpdate (@PathVariable int id_product, @RequestBody ProductRequest UpdateProductRequest) {
+    public ResponseEntity<Product> putUpdate (@PathVariable int id_product,  @RequestBody @Valid ProductRequest UpdateProductRequest) {
     	HttpHeaders headers = new HttpHeaders();
         return new ResponseEntity<>(
                 productService.updateProduct(
@@ -80,7 +80,8 @@ public class ProductController {
                 		UpdateProductRequest.getDescription(),
                 		UpdateProductRequest.getCategory(),
                 		UpdateProductRequest.getPrice(),
-                		UpdateProductRequest.getStock()),
+                		UpdateProductRequest.getStock(),
+                        UpdateProductRequest.getWeight()),
 
                 headers,
                 HttpStatus.OK

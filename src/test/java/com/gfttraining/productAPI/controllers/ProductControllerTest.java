@@ -85,10 +85,11 @@ public class ProductControllerTest {
         String categoryName = "TestCategory";
         Double productPrice = 10.0;
         int productStock = 50;
+        Double productWeight = 1.0;
         int id = 1;
-        ProductRequest productRequest = new ProductRequest(productName, productDescription, categoryName, productPrice, productStock);
-        Product product = new Product(productName, productDescription, new Category("other",0.0), productPrice, productStock);
-        Mockito.when(productService.updateProduct(id,productName, productDescription, categoryName, productPrice, productStock)).thenReturn(product);
+        ProductRequest productRequest = new ProductRequest(productName, productDescription, categoryName, productPrice, productStock,productWeight);
+        Product product = new Product(productName, productDescription, new Category("other",0.0), productPrice, productStock,productWeight);
+        Mockito.when(productService.updateProduct(id,productName, productDescription, categoryName, productPrice, productStock,productWeight)).thenReturn(product);
         ResponseEntity<Product> response = productController.putUpdate(id, productRequest);
 
 

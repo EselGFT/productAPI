@@ -103,17 +103,18 @@ public class ProductServiceTest {
         String productDescription = "TestDescription";
         String categoryName = "TestCategory";
         Double productPrice = 10.0;
-        int productStock = 50; 
+        int productStock = 50;
+        Double productWeight = 1.0;
         int id = 1;
         
         Category other = new Category("other", 0.0);
-        Product product = new Product(productName, productDescription, other, productPrice, productStock);
+        Product product = new Product(productName, productDescription, other, productPrice, productStock,productWeight);
         
         Mockito.when(categoryRepository.findById("other")).thenReturn(Optional.of(other));
         Mockito.when(productRepository.findById(1)).thenReturn(Optional.of(product));
         Mockito.when(productRepository.save(product)).thenReturn(product);       
               
-        Product productAfterUpdate = productService.updateProduct(id, productName, "test product", categoryName, productPrice, 35);
+        Product productAfterUpdate = productService.updateProduct(id, productName, "test product", categoryName, productPrice, 35,productWeight);
 
         verify(categoryRepository, times(1)).findById("other");
         verify(productRepository, times(1)).save(any(Product.class));
@@ -123,6 +124,7 @@ public class ProductServiceTest {
         assertEquals(productAfterUpdate.getDescription(),"test product");
         assertEquals(productAfterUpdate.getPrice(), productPrice);
         assertEquals(productAfterUpdate.getStock(),35);
+        assertEquals(productAfterUpdate.getWeight(), productWeight);
     }
     
     

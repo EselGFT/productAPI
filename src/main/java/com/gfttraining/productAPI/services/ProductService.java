@@ -34,7 +34,7 @@ public class ProductService {
         
     }
     
-    public Product updateProduct (int id,String name, String description, String categoryName, Double price, int stock){
+    public Product updateProduct (int id,String name, String description, String categoryName, Double price, int stock,Double productWeight){
     	    	 
     	Category category = categoryRepository.findById(categoryName).orElse(categoryRepository.findById("other").get());
     	
@@ -51,9 +51,13 @@ public class ProductService {
     	if (price != null) {
     		productUpdate.setPrice(price);    		
     	}
+
     	if(stock != 0){
     		productUpdate.setStock(stock);    		
-    	} 
+    	}
+        if (productWeight != null) {
+            productUpdate.setWeight(productWeight);
+        }
     	
     	return productRepository.save(productUpdate);
     	
