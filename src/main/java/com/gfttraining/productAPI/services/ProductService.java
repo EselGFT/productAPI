@@ -34,8 +34,10 @@ public class ProductService {
     }
     
     public Product updateProduct (int id, ProductRequest productRequest){
+        System.out.println(productRequest);
+        
     	    	 
-    	Category category = categoryRepository.findById(productRequest.getCategory()).orElse(categoryRepository.findById("other").get());
+    	
     	
     	Product productUpdate = productRepository.findById(id).get();
         
@@ -46,16 +48,16 @@ public class ProductService {
     		productUpdate.setDescription(productRequest.getDescription());    		
     	}
     	if (productRequest.getCategory() != null) {
+            Category category = categoryRepository.findById(productRequest.getCategory()).orElse(categoryRepository.findById("other").get());
     		productUpdate.setCategory(category);    		
     	}
-    	if (productRequest.getPrice() != 0) {
+    	if (productRequest.getPrice() != null) {
     		productUpdate.setPrice(productRequest.getPrice());    		
     	}
-
-    	if(productRequest.getStock() != 0){
+    	if(productRequest.getStock() != null){
     		productUpdate.setStock(productRequest.getStock());    		
     	}
-        if (productRequest.getWeight() != 0) {
+        if (productRequest.getWeight() != null) {
             productUpdate.setWeight(productRequest.getWeight());
         }
     	

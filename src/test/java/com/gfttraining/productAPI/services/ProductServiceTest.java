@@ -125,7 +125,7 @@ public class ProductServiceTest {
         assertEquals(productAfterUpdate.getCategory().getName(), "other");
         assertEquals(productAfterUpdate.getDescription(),productDescription);
         assertEquals(productAfterUpdate.getPrice(), productPrice);
-        assertEquals(productAfterUpdate.getStock(),35);
+        assertEquals(productAfterUpdate.getStock(),productStock);
         assertEquals(productAfterUpdate.getWeight(), productWeight);
     }
     
