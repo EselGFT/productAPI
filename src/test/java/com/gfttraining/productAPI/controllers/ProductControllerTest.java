@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.catalina.connector.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -86,7 +87,7 @@ public class ProductControllerTest {
         Double productPrice = 10.0;
         int productStock = 50;
         Double productWeight = 1.0;
-        int id = 1;
+        long  id = 1;
         ProductRequest productRequest = new ProductRequest(productName, productDescription, categoryName, productPrice, productStock,productWeight);
         Product product = new Product(productName, productDescription, new Category("other",0.0), productPrice, productStock,productWeight);
         Mockito.when(productService.updateProduct(id,productName, productDescription, categoryName, productPrice, productStock,productWeight)).thenReturn(product);
@@ -184,6 +185,40 @@ public class ProductControllerTest {
 
         assertEquals(products, response.getBody());
         assertEquals(HttpStatusCode.valueOf(200),response.getStatusCode());
+
+
+    }
+
+    @Test
+    public void getProductsWithIDs(){
+        Category category =  new Category("other", 0.0);
+
+        List<Product> products = Arrays.asList(
+            new Product(
+                "TestProduct1",
+                "TestDescription1",
+                category,
+                10.0,
+                50,
+                1.0),
+            new Product(
+                "TestProduct2",
+                "TestDescription2",
+                category,
+                10.0,
+                100,
+                1.0)
+        );
+
+
+        List<Long> idList = Arrays.asList(Long.valueOf(1),Long.valueOf(2));
+        Mockito.when(productService.listProductsWithIDs(idList)).thenReturn(products);
+
+        verify(productService, times(1)).listProductsWithIDs(idList);
+
+        ResponseEntity<List<Product>> retrievedProducts = productController.productsWithIDs(idList);
+
+        assertEquals(products, retrievedProducts);
 
 
     }

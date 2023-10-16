@@ -1,5 +1,6 @@
 package com.gfttraining.productAPI.services;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -10,6 +11,8 @@ import com.gfttraining.productAPI.model.Product;
 import com.gfttraining.productAPI.model.ProductRequest;
 import com.gfttraining.productAPI.repositories.CategoryRepository;
 import com.gfttraining.productAPI.repositories.ProductRepository;
+
+import jakarta.validation.Valid;
 
 @Service
 public class ProductService {
@@ -34,7 +37,7 @@ public class ProductService {
         
     }
     
-    public Product updateProduct (int id,String name, String description, String categoryName, Double price, int stock,Double productWeight){
+    public Product updateProduct (Long id,String name, String description, String categoryName, Double price, int stock,Double productWeight){
     	    	 
     	Category category = categoryRepository.findById(categoryName).orElse(categoryRepository.findById("other").get());
     	
@@ -83,6 +86,10 @@ public class ProductService {
         return productRequests.stream()
                 .map(pr -> createProduct(pr.getName(), pr.getDescription(), pr.getCategory(), pr.getPrice(), pr.getStock(), pr.getWeight()))
                 .toList();
+    }
+
+    public List<Product> listProductsWithIDs(List<Long> ids) {
+        return productRepository.findAllById(ids);
     }
 
 

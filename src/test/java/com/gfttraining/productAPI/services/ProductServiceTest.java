@@ -105,13 +105,13 @@ public class ProductServiceTest {
         Double productPrice = 10.0;
         int productStock = 50;
         Double productWeight = 1.0;
-        int id = 1;
+        long id = 1;
         
         Category other = new Category("other", 0.0);
         Product product = new Product(productName, productDescription, other, productPrice, productStock,productWeight);
         
         Mockito.when(categoryRepository.findById("other")).thenReturn(Optional.of(other));
-        Mockito.when(productRepository.findById(1)).thenReturn(Optional.of(product));
+        Mockito.when(productRepository.findById(id)).thenReturn(Optional.of(product));
         Mockito.when(productRepository.save(product)).thenReturn(product);       
               
         Product productAfterUpdate = productService.updateProduct(id, productName, "test product", categoryName, productPrice, 35,productWeight);

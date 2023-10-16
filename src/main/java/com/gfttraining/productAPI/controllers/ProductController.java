@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.gfttraining.productAPI.model.Product;
 import com.gfttraining.productAPI.model.ProductRequest;
-import com.gfttraining.productAPI.repositories.ProductRepository;
 import com.gfttraining.productAPI.services.ProductService;
 
 import jakarta.validation.Valid;
@@ -71,7 +70,7 @@ public class ProductController {
     }
 
     @PutMapping("/products/{id_product}")
-    public ResponseEntity<Product> putUpdate (@PathVariable int id_product,  @RequestBody @Valid ProductRequest UpdateProductRequest) {
+    public ResponseEntity<Product> putUpdate (@PathVariable Long id_product,  @RequestBody @Valid ProductRequest UpdateProductRequest) {
     	HttpHeaders headers = new HttpHeaders();
         return new ResponseEntity<>(
                 productService.updateProduct(
@@ -88,5 +87,12 @@ public class ProductController {
             );
     }
 
+    @PostMapping("/productsWithIDs")
+   public ResponseEntity<List<Product>> productsWithIDs (@RequestBody List<Long> ids) {
+        return new ResponseEntity<>(
+            productService.listProductsWithIDs(ids),
+            HttpStatus.OK
+        );
+    }    
 
 }
