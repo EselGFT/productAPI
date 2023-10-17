@@ -50,7 +50,7 @@ public class ProductRequestTest {
         assertNull(productRequestDefault.getDescription());
         assertNull(productRequestDefault.getCategory());
         assertNull(productRequestDefault.getPrice());
-        assertEquals(0, productRequestDefault.getStock());
+        assertNull(productRequestDefault.getStock());
     }
 
     @Test

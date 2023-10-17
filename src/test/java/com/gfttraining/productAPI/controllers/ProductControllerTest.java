@@ -66,11 +66,11 @@ public class ProductControllerTest {
 
         Product product = new Product(productName, productDescription, new Category("other",0.0), productPrice, productStock, productWeight);
         ProductRequest productRequest = new ProductRequest(productName, productDescription, categoryName, productPrice, productStock, productWeight);
-        Mockito.when(productService.createProduct(productName, productDescription, categoryName, productPrice, productStock, productWeight)).thenReturn(product);
+        Mockito.when(productService.createProduct(productRequest)).thenReturn(product);
         
         ResponseEntity<Product> response = productController.postMapping(productRequest);
 
-        verify(productService, times(1)).createProduct(productName, productDescription, categoryName, productPrice, productStock, productWeight);
+        verify(productService, times(1)).createProduct(productRequest);
         
         assertEquals(product, response.getBody());
         assertEquals(HttpStatusCode.valueOf(200),response.getStatusCode());
@@ -89,7 +89,7 @@ public class ProductControllerTest {
         int id = 1;
         ProductRequest productRequest = new ProductRequest(productName, productDescription, categoryName, productPrice, productStock,productWeight);
         Product product = new Product(productName, productDescription, new Category("other",0.0), productPrice, productStock,productWeight);
-        Mockito.when(productService.updateProduct(id,productName, productDescription, categoryName, productPrice, productStock,productWeight)).thenReturn(product);
+        Mockito.when(productService.updateProduct(id,productRequest)).thenReturn(product);
         ResponseEntity<Product> response = productController.putUpdate(id, productRequest);
 
 
@@ -128,12 +128,12 @@ public class ProductControllerTest {
 
         Product product = new Product(productName, productDescription, new Category("other",0.0), productPrice, productStock, productWeight);
         ProductRequest productRequest = new ProductRequest(productName, productDescription, categoryName, productPrice, productStock, productWeight);
-        Mockito.when(productService.createProduct(productName, productDescription, categoryName, productPrice, productStock, productWeight)).thenReturn(product);
+        Mockito.when(productService.createProduct(productRequest)).thenReturn(product);
 
         ResponseEntity<Product> response = productController.postMapping(productRequest);
         Set<ConstraintViolation<ProductRequest>> violations = validator.validate(productRequest);
 
-        verify(productService, times(1)).createProduct(productName, productDescription, categoryName, productPrice, productStock, productWeight);
+        verify(productService, times(1)).createProduct(productRequest);
 
         assertEquals(1, violations.size());
 

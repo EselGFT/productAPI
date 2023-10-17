@@ -44,7 +44,7 @@ public class ProductControllerMvcTest {
 
         Product product = new Product(productName, productDescription, new Category("other",0.0), productPrice, productStock, productWeight);
         ProductRequest productRequest = new ProductRequest(productName, productDescription, categoryName, productPrice, productStock, productWeight);
-        Mockito.when(productService.createProduct(productName, productDescription, categoryName, productPrice, productStock, productWeight)).thenReturn(product);
+        Mockito.when(productService.createProduct(productRequest)).thenReturn(product);
 
         mockMvc.perform(MockMvcRequestBuilders
                 .post("/product")
