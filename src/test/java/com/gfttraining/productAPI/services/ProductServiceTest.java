@@ -136,11 +136,11 @@ public class ProductServiceTest {
     @Test
     @DisplayName("WHEN deletepProduct is executed THEN delete a product object")
     void deleteProductTest () throws NonExistingProductException {
-        int id = 1;
+        long id = 1;
         Category other = new Category("other", 0.0);
         Product product = new Product("TestProduct", "TestDescription", other, 10.0, 50,1.0);
 
-        Mockito.when(productRepository.findById(1)).thenReturn(Optional.of(product));
+        Mockito.when(productRepository.findById(id)).thenReturn(Optional.of(product));
         Mockito.doNothing().when(productRepository).deleteById(id);
         productService.deleteProduct(id);
         verify(productRepository,times(1)).deleteById(id);
@@ -151,7 +151,7 @@ public class ProductServiceTest {
     @Test
     @DisplayName("WHEN Non Existing Products is try to delete  THEN NonExistingProductException is thrown")
     void deleteProductTrhowsExceptionTest () throws NonExistingProductException {
-        int id = 1;
+        long id = 1;
         Category other = new Category("other", 0.0);
         Product product = new Product("TestProduct", "TestDescription", other, 10.0, 50,1.0);
 
@@ -169,12 +169,12 @@ public class ProductServiceTest {
     @DisplayName("WHEN a product is requested GIVEN its ID THEN the requested product is returned")
     void listProductTest() throws NonExistingProductException {
         Product apple = new Product("Apple", "A rounded food object", new Category("food", 25.0), 1.25, 23, 1.1);
-
-        Mockito.when(productRepository.findById(1)).thenReturn(Optional.of(apple));
+        long id = 1;
+        Mockito.when(productRepository.findById(id)).thenReturn(Optional.of(apple));
 
         Product found = productService.listProductById(1);
 
-        verify(productRepository, times(1)).findById(1);
+        verify(productRepository, times(1)).findById(id);
 
         assertEquals(apple,found);
         assertEquals(apple.getName(),found.getName());

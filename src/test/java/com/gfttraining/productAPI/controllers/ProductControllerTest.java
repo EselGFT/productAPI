@@ -106,9 +106,9 @@ public class ProductControllerTest {
     @DisplayName("WHEN deleteProduct is executed THEN delete a product object")
     public void deleteProductsControllerTest () throws NonExistingProductException {
         Product dictionary = new Product("Dictionary", "A book that defines words", new Category("books", 15.0), 19.89, 13,1.1);
-        int id = 1;
+        long id = 1;
 
-        Mockito.when(productRepository.findById(1)).thenReturn(Optional.of(dictionary));
+        Mockito.when(productRepository.findById(id)).thenReturn(Optional.of(dictionary));
         Mockito.doNothing().when(productService).deleteProduct(id);
         ResponseEntity<?> response = productController.deleteProduct(id);
         assertEquals(HttpStatusCode.valueOf(200),response.getStatusCode());

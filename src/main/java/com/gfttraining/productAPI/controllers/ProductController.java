@@ -71,7 +71,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/products/{id_product}")
-    public ResponseEntity <?> deleteProduct (@PathVariable int id_product) throws NonExistingProductException  {
+    public ResponseEntity <?> deleteProduct (@PathVariable long id_product) throws NonExistingProductException  {
         productService.deleteProduct(id_product);
         return new ResponseEntity<>(
                 HttpStatus.OK

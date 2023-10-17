@@ -36,15 +36,11 @@ public class ProductService {
         return productRepository.save(product);
         
     }
-    
-    public Product updateProduct (int id, ProductRequest productRequest){
-        System.out.println(productRequest);
-
-        Category category = categoryRepository.findById(productRequest.getCategory()).orElse(categoryRepository.findById("other").get());
+        
     public Product updateProduct (Long id, ProductRequest productRequest){
         
     	    	 
-    	
+    	Category category = categoryRepository.findById(productRequest.getCategory()).orElse(categoryRepository.findById("other").get());
     	
     	Product productUpdate = productRepository.findById(id).get();
 
@@ -59,7 +55,7 @@ public class ProductService {
     	return productRepository.save(productUpdate);
     }
 
-    public void deleteProduct (int id) throws NonExistingProductException {
+    public void deleteProduct (long id) throws NonExistingProductException {
 
         if (productRepository.findById(id).isEmpty()){
            throw new NonExistingProductException("The provided ID is non existent");
@@ -76,7 +72,7 @@ public class ProductService {
 
 
 
-    public Product listProductById(int id) throws NonExistingProductException {
+    public Product listProductById(long id) throws NonExistingProductException {
         return productRepository.findById(id)
                 .orElseThrow(() -> new NonExistingProductException("The provided ID is non existent"));
     }
