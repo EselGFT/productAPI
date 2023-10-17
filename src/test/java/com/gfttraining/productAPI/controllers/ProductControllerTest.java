@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -92,9 +93,33 @@ public class ProductControllerTest {
         Mockito.when(productService.updateProduct(id,productRequest)).thenReturn(product);
         ResponseEntity<Product> response = productController.putUpdate(id, productRequest);
 
-
+        verify(productService, times(1)).updateProduct(id,productName, productDescription, categoryName, productPrice, productStock,productWeight);
         assertEquals(product, response.getBody());
         assertEquals(HttpStatusCode.valueOf(200),response.getStatusCode());
+
+
+
+    }
+
+    @Test
+    @DisplayName("GIVE an id WHEN a deleteProducts is executed THEN delete a product object")
+    public void deleteProductControllerTest () {
+        String productName = "TestProduct";
+        String productDescription = "TestDescription";
+        String categoryName = "TestCategory";
+        Double productPrice = 10.0;
+        int productStock = 50;
+        Double productWeight = 1.0;
+        Product product = new Product(productName, productDescription, new Category("other",0.0), productPrice, productStock,productWeight);
+        int id =1;
+
+        Mockito.doNothing().when(productService).deleteProducts(id);
+        ResponseEntity <?> response = productController.deleteProduct(id);
+
+        verify(productService, times(1)).deleteProducts(id);
+
+        assertEquals(HttpStatusCode.valueOf(200),response.getStatusCode());
+
 
 
 

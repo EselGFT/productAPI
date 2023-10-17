@@ -127,12 +127,23 @@ public class ProductServiceTest {
         assertEquals(productAfterUpdate.getPrice(), productPrice);
         assertEquals(productAfterUpdate.getStock(),productStock);
         assertEquals(productAfterUpdate.getWeight(), productWeight);
-    }
-    
-    
-   
-   
 
+    }
+
+    @Test
+    @DisplayName("GIVE an id WHEN a JPA's deleteById is executed THEN delete a product object" )
+    void deleteProducts () {
+
+        int id =1;
+
+        Mockito.doNothing().when(productRepository).deleteById(id);
+        productRepository.deleteById(id);
+
+        //verify(productRepository,times(1)).findById(id);
+        verify(productRepository,times(1)).deleteById(id);
+        //verify(productRepository,times(1)).delete(apple);
+
+    }
     @Test
     @DisplayName("When products are requested to be listed, a list that contains all of them is returned")
     void listProductsTest() {
