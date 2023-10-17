@@ -1,7 +1,6 @@
 package com.gfttraining.productAPI.services;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -10,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import com.gfttraining.productAPI.exceptions.NonExistingProductException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -128,10 +128,30 @@ public class ProductServiceTest {
         assertEquals(productAfterUpdate.getStock(),productStock);
         assertEquals(productAfterUpdate.getWeight(), productWeight);
     }
-    
-    
-   
-   
+
+    // start of listProductById() tests
+
+    @Test
+    @DisplayName("WHEN a product is requested GIVEN its ID THEN the requested product is returned")
+    void listProductTest() throws NonExistingProductException {
+        Product apple = new Product("Apple", "A rounded food object", new Category("food", 25.0), 1.25, 23, 1.1);
+
+        Mockito.when(productRepository.findById(1)).thenReturn(Optional.of(apple));
+
+        Product found = productService.listProductById(1);
+
+        verify(productRepository, times(1)).findById(1);
+
+        assertEquals(apple,found);
+        assertEquals(apple.getName(),found.getName());
+        assertEquals(apple.getCategory().getName(), found.getCategory().getName());
+        assertEquals(apple.getDescription(),found.getDescription());
+        assertEquals(apple.getPrice(), found.getPrice());
+        assertEquals(apple.getStock(),found.getStock());
+        assertEquals(apple.getWeight(), found.getWeight());
+    }
+
+    // end of listProductById() tests
 
     @Test
     @DisplayName("When products are requested to be listed, a list that contains all of them is returned")

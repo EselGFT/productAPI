@@ -1,6 +1,6 @@
 package com.gfttraining.productAPI.controllers;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -9,7 +9,10 @@ import java.util.Set;
 import java.util.Arrays;
 import java.util.List;
 
+import com.gfttraining.productAPI.exceptions.NonExistingProductException;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -116,6 +119,38 @@ public class ProductControllerTest {
         assertEquals(products, response.getBody());
         assertEquals(HttpStatusCode.valueOf(200), response.getStatusCode());
     }
+
+    // start of listProductById() tests
+
+    @Test
+    @DisplayName("WHEN requesting a product GIVEN it's ID THEN the product with the corresponding ID is returned")
+    public void listProductControllerTest() throws NonExistingProductException {
+        Product apple = new Product("Apple", "A rounded food object", new Category("food", 25.0), 1.25, 23,1.0);
+
+        Mockito.when(productService.listProductById(0)).thenReturn(apple);
+
+        ResponseEntity<Product> response = productController.getProductById(0);
+
+        verify(productService, times(1)).listProductById(0);
+
+        assertEquals(apple, response.getBody());
+        assertEquals(HttpStatusCode.valueOf(200), response.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("WHEN requesting a product GIVEN a non existing product ID THEN an instance of NonExistingProductException is thrown")
+    void nonExistingProductListControllerTest() throws NonExistingProductException{
+        Product apple = new Product("Apple", "A rounded food object", new Category("food", 25.0), 1.25, 23,1.0);
+
+        Mockito.when(productService.listProductById(1)).thenReturn(apple);
+        Mockito.when(productService.listProductById(2)).thenThrow(new NonExistingProductException(""));
+
+        assertDoesNotThrow(() -> productController.getProductById(1));
+
+        assertThrows(NonExistingProductException.class, () -> productController.getProductById(2));
+    }
+
+    // end of listProductById() tests
 
     @Test
     public void postProductFailedControllerTest(){
