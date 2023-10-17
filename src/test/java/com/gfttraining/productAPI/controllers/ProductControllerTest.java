@@ -97,6 +97,7 @@ public class ProductControllerTest {
         Mockito.when(productService.updateProduct(id,productRequest)).thenReturn(product);
         ResponseEntity<Product> response = productController.putUpdate(id, productRequest);
 
+        verify(productService, times(1)).updateProduct(id,productRequest);
         assertEquals(product, response.getBody());
         assertEquals(HttpStatusCode.valueOf(200),response.getStatusCode());
 
