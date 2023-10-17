@@ -1,6 +1,6 @@
 package com.gfttraining.productAPI.controllers;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -96,7 +96,7 @@ public class ProductControllerTest {
         Mockito.when(productService.updateProduct(id,productRequest)).thenReturn(product);
         ResponseEntity<Product> response = productController.putUpdate(id, productRequest);
 
-        verify(productService, times(1)).updateProduct(id,productName, productDescription, categoryName, productPrice, productStock,productWeight);
+        verify(productService, times(1)).updateProduct(id,productRequest);
         assertEquals(product, response.getBody());
         assertEquals(HttpStatusCode.valueOf(200),response.getStatusCode());
 
