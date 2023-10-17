@@ -22,6 +22,7 @@ public class ProductServiceIT {
     private ProductService productService;
 
     @Test
+    @DisplayName("GIVEN an initial amount of products WHEN a new one is created THEN the number of products increases by 1")
     public void productCreationTest() {
     
         int size = productRepository.findByName("paper").size();
@@ -55,27 +56,12 @@ public class ProductServiceIT {
     // end of listProductById() tests
 
     @Test
+    @DisplayName("WHEN we get all the products from the service and the repository THEN both lists should be the same size")
     void listProductsTest() {
         int existingProducts = productRepository.findAll().size();
         int productsToList = productService.listProducts().size();
 
         assertEquals(existingProducts, productsToList);
     }
-
-    // @Test
-    // public void productCreationTest() {
-        
-    //     int size = productRepository.findByName("paper").size();
-
-    //     assertEquals(0, size);
-
-    //     productService.createProduct("paper", "sheet of paper", "office", 4.99, 10);
-
-    //     int newSize = productRepository.findByName("paper").size();
-
-    //     assertEquals(1, newSize);
-
-    // }
-
 
 }

@@ -35,6 +35,7 @@ public class ProductControllerMvcTest {
     }
 
     @Test
+    @DisplayName("GIVEN the information to create a product WHEN the create product endpoint is called THEN the product is created in the database with the data indicated")
     void postMappingTest() throws Exception {
         String productName = "TestProduct";
         String productDescription = "TestDescription";
@@ -64,6 +65,7 @@ public class ProductControllerMvcTest {
     }
 
     @Test
+    @DisplayName("WHEN the list all products endpoint is called THEN a list containing all the products in the database is returned")
     void listAllMappingTest() throws Exception {
 
         Product apple = new Product("Apple", "A rounded food object", new Category("food", 25.0), 1.25, 23 ,1.0);
@@ -117,8 +119,4 @@ public class ProductControllerMvcTest {
 
     }
 
-    @Test
-    void listOneProductStringTest() {
-
-    }
 }
