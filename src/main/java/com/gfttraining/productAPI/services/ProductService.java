@@ -1,17 +1,17 @@
 package com.gfttraining.productAPI.services;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.gfttraining.productAPI.exceptions.NotAllProductsFoundException;
 import com.gfttraining.productAPI.model.Category;
 import com.gfttraining.productAPI.model.Product;
 import com.gfttraining.productAPI.model.ProductRequest;
+import com.gfttraining.productAPI.model.ProductResponse;
 import com.gfttraining.productAPI.repositories.CategoryRepository;
 import com.gfttraining.productAPI.repositories.ProductRepository;
 
-import jakarta.validation.Valid;
 
 @Service
 public class ProductService {
@@ -79,8 +79,17 @@ public class ProductService {
                 .toList();
     }
 
-    public List<Product> listProductsWithIDs(List<Long> ids) {
-        return productRepository.findAllById(ids);
+    public List<ProductResponse> listProductsWithIDs(List<Long> ids) throws NotAllProductsFoundException {
+        List<Product> foundIds= productRepository.findAllById(ids);
+        if(foundIds.size() == ids.size()){
+            return foundIds.stream().map(product -> new ProductResponse(product)).toList();
+        }else{           
+            List<Long> notFoundIds = ids.stream()
+                .filter(id -> foundIds.stream().noneMatch(product -> product.getId() == id))
+                .toList();
+
+            throw new NotAllProductsFoundException("Product IDs not found: " + notFoundIds);          
+        }
     }
 
 

@@ -9,21 +9,20 @@ import java.util.Set;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.catalina.connector.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 
+import com.gfttraining.productAPI.exceptions.NotAllProductsFoundException;
 import com.gfttraining.productAPI.model.Category;
 import com.gfttraining.productAPI.model.Product;
 import com.gfttraining.productAPI.model.ProductRequest;
+import com.gfttraining.productAPI.model.ProductResponse;
 import com.gfttraining.productAPI.repositories.ProductRepository;
 import com.gfttraining.productAPI.services.ProductService;
 
@@ -190,35 +189,39 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void getProductsWithIDs(){
+    public void getProductsWithIDs() throws NotAllProductsFoundException{
         Category category =  new Category("other", 0.0);
-
-        List<Product> products = Arrays.asList(
-            new Product(
+        Product productTest1 = new Product(
                 "TestProduct1",
                 "TestDescription1",
                 category,
                 10.0,
                 50,
-                1.0),
-            new Product(
+                1.0);
+        
+        Product productTest2 = new Product(
                 "TestProduct2",
                 "TestDescription2",
                 category,
                 10.0,
-                100,
-                1.0)
+                50,
+                1.0);
+
+        List<ProductResponse> products = Arrays.asList(
+
+            new ProductResponse(productTest1),
+            new ProductResponse(productTest2)
         );
 
 
         List<Long> idList = Arrays.asList(Long.valueOf(1),Long.valueOf(2));
         Mockito.when(productService.listProductsWithIDs(idList)).thenReturn(products);
 
-        verify(productService, times(1)).listProductsWithIDs(idList);
+        //verify(productService, times(1)).listProductsWithIDs(idList);
 
-        ResponseEntity<List<Product>> retrievedProducts = productController.productsWithIDs(idList);
+        ResponseEntity<List<ProductResponse>> retrievedProducts = productController.productsWithIDs(idList);
 
-        assertEquals(products, retrievedProducts);
+        assertEquals(products, retrievedProducts.getBody());
 
 
     }

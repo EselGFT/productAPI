@@ -25,7 +25,7 @@ public class Product {
 
     @ManyToOne
     @JoinColumn
-    @NotNull
+    @NotNull(message = "Category should not be null")
     private Category category;
     
     @NotNull(message = "Price should not be null")
@@ -39,7 +39,10 @@ public class Product {
     @NotNull(message = "Weight should not be null")
     @Min(value = 0, message="Weight should not be less than 0")
     private Double weight;
+
     
+    
+
     public Product(){
     }
 

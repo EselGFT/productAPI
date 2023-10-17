@@ -11,9 +11,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-
+import com.gfttraining.productAPI.exceptions.NotAllProductsFoundException;
 import com.gfttraining.productAPI.model.Product;
 import com.gfttraining.productAPI.model.ProductRequest;
+import com.gfttraining.productAPI.model.ProductResponse;
 import com.gfttraining.productAPI.services.ProductService;
 
 import jakarta.validation.Valid;
@@ -64,7 +65,7 @@ public class ProductController {
     }
 
     @PostMapping("/productsWithIDs")
-   public ResponseEntity<List<Product>> productsWithIDs (@RequestBody List<Long> ids) {
+   public ResponseEntity<List<ProductResponse>> productsWithIDs (@RequestBody List<Long> ids) throws NotAllProductsFoundException {
         return new ResponseEntity<>(
             productService.listProductsWithIDs(ids),
             HttpStatus.OK

@@ -17,9 +17,11 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import com.gfttraining.productAPI.exceptions.NotAllProductsFoundException;
 import com.gfttraining.productAPI.model.Category;
 import com.gfttraining.productAPI.model.Product;
 import com.gfttraining.productAPI.model.ProductRequest;
+import com.gfttraining.productAPI.model.ProductResponse;
 import com.gfttraining.productAPI.repositories.CategoryRepository;
 import com.gfttraining.productAPI.repositories.ProductRepository;
 
@@ -205,5 +207,36 @@ public class ProductServiceTest {
         assertEquals(products, createdProducts);
     }
 
+    @Test
+    public void listProductsWithIDsTest() throws NotAllProductsFoundException{
+
+        Category food = new Category("food", 25.0);
+        Product productTest1 = new Product(
+                "TestProduct1", 
+                "TestDescription1", 
+                food, 
+                10.0, 
+                50,
+                1.0);
+
+        Product productTest2 = new Product(
+                "TestProduct2", 
+                "TestDescription2", 
+                food, 
+                10.0, 
+                100,
+                1.0);        
+        
+        
+        List<Product> products = Arrays.asList(productTest1, productTest2);
+        List<Long> idList = Arrays.asList(Long.valueOf(1),Long.valueOf(2));
+
+        Mockito.when(productRepository.findAllById(idList)).thenReturn(products);
+        List<ProductResponse> productsResponseExpected= Arrays.asList(new ProductResponse(productTest1), new ProductResponse(productTest2));
+        List<ProductResponse> productsRetrievedList = productService.listProductsWithIDs(idList);
+        assertEquals(productsResponseExpected, productsRetrievedList);
+
+
+    }
 
 }

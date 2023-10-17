@@ -81,4 +81,6 @@ public class ProductControllerMvcTest {
             .andExpect(MockMvcResultMatchers.jsonPath("@.[0].category.name").value("food"))
             .andExpect(MockMvcResultMatchers.jsonPath("@.[1].stock").value(13));
     }
+
+
 }
