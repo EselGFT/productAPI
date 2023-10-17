@@ -1,5 +1,6 @@
 package com.gfttraining.productAPI.controllers;
 
+import com.gfttraining.productAPI.exceptions.NonExistingProductException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -16,7 +17,6 @@ import jakarta.validation.ConstraintViolationException;
 @RestControllerAdvice
 public class ProductControllerAdvice {
 
-    
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<String> handleConstraintViolationException(ConstraintViolationException ex) {
@@ -42,6 +42,18 @@ public class ProductControllerAdvice {
         return new ResponseEntity<>(errorMessage.toString(), HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(NonExistingProductException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<String> handleNonExistingProductException(NonExistingProductException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(NumberFormatException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<String> handleNumberFormatException(NumberFormatException ex) {
+        return new ResponseEntity<>("Your input does not match the one required by the endpoint, " +
+                "please refer to the OpenAPI documentation", HttpStatus.BAD_REQUEST);
+    }
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<String> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {

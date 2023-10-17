@@ -141,6 +141,7 @@ public class ProductTest {
     }
     
     @Test
+    @DisplayName("GIVEN a correct product WHEN its validated THEN it doesn't create a violation")
     public void noErrorValidatorTest() {
         validator.validate(product);
         Set<ConstraintViolation<Product>> violations = validator.validate(product);
@@ -148,6 +149,7 @@ public class ProductTest {
     }
     
     @Test
+    @DisplayName("GIVEN an empty name WHEN its validated THEN it creates a violation")
     public void nameValidatorTest() {
         product.setName("");
         validator.validate(product);
@@ -156,6 +158,7 @@ public class ProductTest {
     }
 
     @Test
+    @DisplayName("GIVEN a negative price WHEN its validated THEN it creates a violation")
     public void priceValidatorTest() {
         product.setPrice(-1.0);
         validator.validate(product);
@@ -164,6 +167,7 @@ public class ProductTest {
     }
 
     @Test
+    @DisplayName("GIVEN a negative stock WHEN its validated THEN it creates a violation")
     public void stockValidatorTest() {
         product.setStock(-1);
         validator.validate(product);
@@ -172,6 +176,7 @@ public class ProductTest {
     }
 
     @Test
+    @DisplayName("GIVEN a negative weight WHEN its validated THEN it creates a violation")
     public void weightValidatorTest() {
         product.setWeight(-1.0);
         validator.validate(product);

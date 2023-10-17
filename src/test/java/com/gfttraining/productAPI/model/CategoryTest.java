@@ -92,6 +92,7 @@ public class CategoryTest {
     }
     
     @Test
+    @DisplayName("GIVEN an empty category name WHEN its validated THEN it creates a violation")
     public void nameNotBlankValidatorTest() {
         category.setName("");
         validator.validate(category);
@@ -101,6 +102,7 @@ public class CategoryTest {
     }    
 
     @Test
+    @DisplayName("GIVEN a negative discount WHEN its validated THEN it creates a violation")
     public void negativeDiscountValidatorTest() {
         category.setDiscount(-1.0);
         validator.validate(category);
@@ -110,6 +112,7 @@ public class CategoryTest {
     }
     
     @Test
+    @DisplayName("GIVEN a discount over 100 WHEN its validated THEN it creates a violation")
     public void overHundredDiscountValidatorTest() {
         category.setDiscount(101.0);
         validator.validate(category);

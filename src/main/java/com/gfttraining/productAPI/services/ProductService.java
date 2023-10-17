@@ -2,6 +2,7 @@ package com.gfttraining.productAPI.services;
 
 import java.util.List;
 
+import com.gfttraining.productAPI.exceptions.NonExistingProductException;
 import org.springframework.stereotype.Service;
 
 import com.gfttraining.productAPI.exceptions.NotAllProductsFoundException;
@@ -36,41 +37,48 @@ public class ProductService {
         
     }
     
+    public Product updateProduct (int id, ProductRequest productRequest){
+        System.out.println(productRequest);
+
+        Category category = categoryRepository.findById(productRequest.getCategory()).orElse(categoryRepository.findById("other").get());
     public Product updateProduct (Long id, ProductRequest productRequest){
         
     	    	 
     	
     	
     	Product productUpdate = productRepository.findById(id).get();
-        
-    	if (productRequest.getName() != null) {
-    		productUpdate.setName(productRequest.getName());    		
-    	} 
-    	if (productRequest.getDescription()!= null) {
-    		productUpdate.setDescription(productRequest.getDescription());    		
-    	}
-    	if (productRequest.getCategory() != null) {
-            Category category = categoryRepository.findById(productRequest.getCategory()).orElse(categoryRepository.findById("other").get());
-    		productUpdate.setCategory(category);    		
-    	}
-    	if (productRequest.getPrice() != null) {
-    		productUpdate.setPrice(productRequest.getPrice());    		
-    	}
-    	if(productRequest.getStock() != null){
-    		productUpdate.setStock(productRequest.getStock());    		
-    	}
-        if (productRequest.getWeight() != null) {
-            productUpdate.setWeight(productRequest.getWeight());
-        }
+
+        productUpdate.setName(productRequest.getName());
+        productUpdate.setDescription(productRequest.getDescription());
+    	productUpdate.setCategory(category);
+    	productUpdate.setPrice(productRequest.getPrice());
+    	productUpdate.setStock(productRequest.getStock());
+    	productUpdate.setWeight(productRequest.getWeight());
+
     	
     	return productRepository.save(productUpdate);
-    	
-    	
-    	
+    }
+
+    public void deleteProduct (int id) throws NonExistingProductException {
+
+        if (productRepository.findById(id).isEmpty()){
+           throw new NonExistingProductException("The provided ID is non existent");
+         }else {
+            productRepository.deleteById(id);
+         }
+
+
     }
 
     public List<Product> listProducts() {
         return productRepository.findAll();
+    }
+
+
+
+    public Product listProductById(int id) throws NonExistingProductException {
+        return productRepository.findById(id)
+                .orElseThrow(() -> new NonExistingProductException("The provided ID is non existent"));
     }
 
     public List<Product> createProducts(List<ProductRequest> productRequests) {

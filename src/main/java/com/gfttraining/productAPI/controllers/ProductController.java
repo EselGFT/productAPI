@@ -2,14 +2,12 @@ package com.gfttraining.productAPI.controllers;
 
 import java.util.List;
 
+import com.gfttraining.productAPI.exceptions.NonExistingProductException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.gfttraining.productAPI.exceptions.NotAllProductsFoundException;
 import com.gfttraining.productAPI.model.Product;
@@ -37,6 +35,14 @@ public class ProductController {
         );
     }
 
+    @GetMapping("/products/{id_product}")
+    public ResponseEntity<Product> getProductById(@PathVariable int id_product) throws NonExistingProductException {
+
+        return new ResponseEntity<>(
+                productService.listProductById(id_product),
+                HttpStatus.OK
+        );
+    }
 
     @PostMapping("/product")
     public ResponseEntity<Product> postMapping(@RequestBody @Valid ProductRequest productRequest)
@@ -64,6 +70,14 @@ public class ProductController {
             );
     }
 
+    @DeleteMapping("/products/{id_product}")
+    public ResponseEntity <?> deleteProduct (@PathVariable int id_product) throws NonExistingProductException  {
+        productService.deleteProduct(id_product);
+        return new ResponseEntity<>(
+                HttpStatus.OK
+        );
+
+    }
     @PostMapping("/productsWithIDs")
    public ResponseEntity<List<ProductResponse>> productsWithIDs (@RequestBody List<Long> ids) throws NotAllProductsFoundException {
         return new ResponseEntity<>(

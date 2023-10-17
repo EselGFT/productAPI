@@ -139,6 +139,7 @@ public class ProductRequestTest {
     }
 
     @Test
+    @DisplayName("GIVEN an empty name WHEN its validated THEN it creates a violation")
     public void nameNotBlankValidatorTest() {
         productRequest.setName("");
         validator.validate(productRequest);
@@ -149,6 +150,7 @@ public class ProductRequestTest {
 
     
     @Test
+    @DisplayName("GIVEN a negative price WHEN its validated THEN it creates a violation")
     public void priceValidatorTest() {
         productRequest.setPrice(-1.0);
         validator.validate(productRequest);
@@ -158,6 +160,7 @@ public class ProductRequestTest {
     }  
     
     @Test
+    @DisplayName("GIVEN a negative stock WHEN its validated THEN it creates a violation")
     public void stockValidatorTest() {
         productRequest.setStock(-1);
         validator.validate(productRequest);
@@ -167,6 +170,7 @@ public class ProductRequestTest {
     }  
 
     @Test
+    @DisplayName("GIVEN a negative stock WHEN its validated THEN it creates a violation")
     public void weightValidatorTest() {
         productRequest.setStock(-1);
         validator.validate(productRequest);

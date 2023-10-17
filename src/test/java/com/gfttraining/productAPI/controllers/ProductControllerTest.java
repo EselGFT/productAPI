@@ -1,15 +1,19 @@
 package com.gfttraining.productAPI.controllers;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import java.util.Optional;
 import java.util.Set;
 
 import java.util.Arrays;
 import java.util.List;
 
+import com.gfttraining.productAPI.exceptions.NonExistingProductException;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -52,9 +56,8 @@ public class ProductControllerTest {
 
     }
 
-
-
     @Test
+    @DisplayName("GIVEN a product's information WHEN the postMapping method from the product controller is called THEN a product is created with the provided information")
     public void postControllerTest(){
 
         String productName = "TestProduct";
@@ -78,6 +81,7 @@ public class ProductControllerTest {
     }
 
     @Test
+    @DisplayName("GIVEN a product's information WHEN the product's controller putUpdate method is called THEN the provided product's information is updated with te new information")
     public void putUpdateControllerTest() {
 
     	String productName = "TestProduct";
@@ -92,15 +96,44 @@ public class ProductControllerTest {
         Mockito.when(productService.updateProduct(id,productRequest)).thenReturn(product);
         ResponseEntity<Product> response = productController.putUpdate(id, productRequest);
 
-
+        verify(productService, times(1)).updateProduct(id,productRequest);
         assertEquals(product, response.getBody());
         assertEquals(HttpStatusCode.valueOf(200),response.getStatusCode());
 
+    }
+
+    @Test
+    @DisplayName("WHEN deleteProduct is executed THEN delete a product object")
+    public void deleteProductsControllerTest () throws NonExistingProductException {
+        Product dictionary = new Product("Dictionary", "A book that defines words", new Category("books", 15.0), 19.89, 13,1.1);
+        int id = 1;
+
+        Mockito.when(productRepository.findById(1)).thenReturn(Optional.of(dictionary));
+        Mockito.doNothing().when(productService).deleteProduct(id);
+        ResponseEntity<?> response = productController.deleteProduct(id);
+        assertEquals(HttpStatusCode.valueOf(200),response.getStatusCode());
 
 
     }
 
     @Test
+    @DisplayName("WHEN deleteProduct is executed THEN delete a product object")
+    public void deleteProductsExceptionControllerTest () throws NonExistingProductException {
+        Product dictionary = new Product("Dictionary", "A book that defines words", new Category("books", 15.0), 19.89, 13,1.1);
+        int id = 1;
+
+        Mockito.doThrow(NonExistingProductException.class).when(productService).deleteProduct(id);
+
+        assertThrows(NonExistingProductException.class, () -> productController.deleteProduct(id));
+
+
+    }
+
+
+
+    @Test
+    @DisplayName("WHEN the product's controller listProducts method is called THEN a list containing all the products in the database is returned")
+
     public void listProductsControllerTest() {
         Product apple = new Product("Apple", "A rounded food object", new Category("food", 25.0), 1.25, 23,1.0);
         Product dictionary = new Product("Dictionary", "A book that defines words", new Category("books", 15.0), 19.89, 13,1.1);
@@ -117,7 +150,40 @@ public class ProductControllerTest {
         assertEquals(HttpStatusCode.valueOf(200), response.getStatusCode());
     }
 
+    // start of listProductById() tests
+
     @Test
+    @DisplayName("WHEN requesting a product GIVEN it's ID THEN the product with the corresponding ID is returned")
+    public void listProductControllerTest() throws NonExistingProductException {
+        Product apple = new Product("Apple", "A rounded food object", new Category("food", 25.0), 1.25, 23,1.0);
+
+        Mockito.when(productService.listProductById(0)).thenReturn(apple);
+
+        ResponseEntity<Product> response = productController.getProductById(0);
+
+        verify(productService, times(1)).listProductById(0);
+
+        assertEquals(apple, response.getBody());
+        assertEquals(HttpStatusCode.valueOf(200), response.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("WHEN requesting a product GIVEN a non existing product ID THEN an instance of NonExistingProductException is thrown")
+    void nonExistingProductListControllerTest() throws NonExistingProductException{
+        Product apple = new Product("Apple", "A rounded food object", new Category("food", 25.0), 1.25, 23,1.0);
+
+        Mockito.when(productService.listProductById(1)).thenReturn(apple);
+        Mockito.when(productService.listProductById(2)).thenThrow(new NonExistingProductException(""));
+
+        assertDoesNotThrow(() -> productController.getProductById(1));
+
+        assertThrows(NonExistingProductException.class, () -> productController.getProductById(2));
+    }
+
+    // end of listProductById() tests
+
+    @Test
+    @DisplayName("GIVEN a product's information that doesn't follow the requirements WHEN creating a product through the controller THEN 1 violation should emerge")
     public void postProductFailedControllerTest(){
         String productName = "TestProduct";
         String productDescription = "TestDescription";
@@ -136,11 +202,10 @@ public class ProductControllerTest {
         verify(productService, times(1)).createProduct(productRequest);
 
         assertEquals(1, violations.size());
-
-
     }
 
     @Test
+    @DisplayName("GIVEN a list of products WHEN the controller's postLoadProducts method is called THEN all products from the list are created")
     public void loadProductsControllerTest(){
         List<ProductRequest> productRequests = Arrays.asList(
             new ProductRequest(

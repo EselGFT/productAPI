@@ -1,7 +1,6 @@
 package com.gfttraining.productAPI.services;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -10,6 +9,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import com.gfttraining.productAPI.exceptions.NonExistingProductException;
+import org.h2.command.dml.MergeUsing;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -100,6 +101,7 @@ public class ProductServiceTest {
     }
     
     @Test
+    @DisplayName("GIVEN a product's updated information WHEN the original its updated THEN the updated product's information should match the given")
     void updateProductsTest () {
     	
     	
@@ -130,10 +132,60 @@ public class ProductServiceTest {
         assertEquals(productAfterUpdate.getStock(),productStock);
         assertEquals(productAfterUpdate.getWeight(), productWeight);
     }
-    
-    
-   
-   
+
+    @Test
+    @DisplayName("WHEN deletepProduct is executed THEN delete a product object")
+    void deleteProductTest () throws NonExistingProductException {
+        int id = 1;
+        Category other = new Category("other", 0.0);
+        Product product = new Product("TestProduct", "TestDescription", other, 10.0, 50,1.0);
+
+        Mockito.when(productRepository.findById(1)).thenReturn(Optional.of(product));
+        Mockito.doNothing().when(productRepository).deleteById(id);
+        productService.deleteProduct(id);
+        verify(productRepository,times(1)).deleteById(id);
+
+
+    }
+
+    @Test
+    @DisplayName("WHEN Non Existing Products is try to delete  THEN NonExistingProductException is thrown")
+    void deleteProductTrhowsExceptionTest () throws NonExistingProductException {
+        int id = 1;
+        Category other = new Category("other", 0.0);
+        Product product = new Product("TestProduct", "TestDescription", other, 10.0, 50,1.0);
+
+        //Mockito.when(productRepository.findById(1)).thenReturn(Optional.of(product));
+        Mockito.doNothing().when(productRepository).deleteById(id);
+        assertThrows(NonExistingProductException.class, () -> productService.deleteProduct(id));
+        verify(productRepository,times(0)).deleteById(id);
+
+
+    }
+
+    // start of listProductById() tests
+
+    @Test
+    @DisplayName("WHEN a product is requested GIVEN its ID THEN the requested product is returned")
+    void listProductTest() throws NonExistingProductException {
+        Product apple = new Product("Apple", "A rounded food object", new Category("food", 25.0), 1.25, 23, 1.1);
+
+        Mockito.when(productRepository.findById(1)).thenReturn(Optional.of(apple));
+
+        Product found = productService.listProductById(1);
+
+        verify(productRepository, times(1)).findById(1);
+
+        assertEquals(apple,found);
+        assertEquals(apple.getName(),found.getName());
+        assertEquals(apple.getCategory().getName(), found.getCategory().getName());
+        assertEquals(apple.getDescription(),found.getDescription());
+        assertEquals(apple.getPrice(), found.getPrice());
+        assertEquals(apple.getStock(),found.getStock());
+        assertEquals(apple.getWeight(), found.getWeight());
+    }
+
+    // end of listProductById() tests
 
     @Test
     @DisplayName("When products are requested to be listed, a list that contains all of them is returned")
@@ -188,8 +240,7 @@ public class ProductServiceTest {
                 other, 
                 10.0, 
                 100,
-                1.0);        
-        
+                1.0);
         
         List<Product> products = Arrays.asList(productTest1, productTest2);
         Mockito.when(categoryRepository.findById("food")).thenReturn(Optional.of(food));
@@ -199,10 +250,6 @@ public class ProductServiceTest {
         Mockito.when(productRepository.save(productTest2)).thenReturn(productTest2);
 
         List<Product> createdProducts = productService.createProducts(productRequests);
-        
-        //verify(categoryRepository, times(1)).findById(categoryName);
-       // verify(categoryRepository, times(1)).findById("other");
-      //  verify(productRepository, times(1)).save(any(Product.class));
 
         assertEquals(products, createdProducts);
     }
