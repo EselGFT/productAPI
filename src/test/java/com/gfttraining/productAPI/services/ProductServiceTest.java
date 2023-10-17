@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.gfttraining.productAPI.exceptions.NonExistingProductException;
+import org.h2.command.dml.MergeUsing;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -128,6 +129,36 @@ public class ProductServiceTest {
         assertEquals(productAfterUpdate.getPrice(), productPrice);
         assertEquals(productAfterUpdate.getStock(),productStock);
         assertEquals(productAfterUpdate.getWeight(), productWeight);
+    }
+
+    @Test
+    @DisplayName("WHEN deletepProduct is executed THEN delete a product object")
+    void deleteProductTest () throws NonExistingProductException {
+        int id = 1;
+        Category other = new Category("other", 0.0);
+        Product product = new Product("TestProduct", "TestDescription", other, 10.0, 50,1.0);
+
+        Mockito.when(productRepository.findById(1)).thenReturn(Optional.of(product));
+        Mockito.doNothing().when(productRepository).deleteById(id);
+        productService.deleteProduct(id);
+        verify(productRepository,times(1)).deleteById(id);
+
+
+    }
+
+    @Test
+    @DisplayName("WHEN Non Existing Products is try to delete  THEN NonExistingProductException is thrown")
+    void deleteProductTrhowsExceptionTest () throws NonExistingProductException {
+        int id = 1;
+        Category other = new Category("other", 0.0);
+        Product product = new Product("TestProduct", "TestDescription", other, 10.0, 50,1.0);
+
+        //Mockito.when(productRepository.findById(1)).thenReturn(Optional.of(product));
+        Mockito.doNothing().when(productRepository).deleteById(id);
+        assertThrows(NonExistingProductException.class, () -> productService.deleteProduct(id));
+        verify(productRepository,times(0)).deleteById(id);
+
+
     }
 
     // start of listProductById() tests

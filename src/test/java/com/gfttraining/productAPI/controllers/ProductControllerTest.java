@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import java.util.Optional;
 import java.util.Set;
 
 import java.util.Arrays;
@@ -102,7 +103,37 @@ public class ProductControllerTest {
     }
 
     @Test
+    @DisplayName("WHEN deleteProduct is executed THEN delete a product object")
+    public void deleteProductsControllerTest () throws NonExistingProductException {
+        Product dictionary = new Product("Dictionary", "A book that defines words", new Category("books", 15.0), 19.89, 13,1.1);
+        int id = 1;
+
+        Mockito.when(productRepository.findById(1)).thenReturn(Optional.of(dictionary));
+        Mockito.doNothing().when(productService).deleteProduct(id);
+        ResponseEntity<?> response = productController.deleteProduct(id);
+        assertEquals(HttpStatusCode.valueOf(200),response.getStatusCode());
+
+
+    }
+
+    @Test
+    @DisplayName("WHEN deleteProduct is executed THEN delete a product object")
+    public void deleteProductsExceptionControllerTest () throws NonExistingProductException {
+        Product dictionary = new Product("Dictionary", "A book that defines words", new Category("books", 15.0), 19.89, 13,1.1);
+        int id = 1;
+
+        Mockito.doThrow(NonExistingProductException.class).when(productService).deleteProduct(id);
+
+        assertThrows(NonExistingProductException.class, () -> productController.deleteProduct(id));
+
+
+    }
+
+
+
+    @Test
     @DisplayName("WHEN the product's controller listProducts method is called THEN a list containing all the products in the database is returned")
+
     public void listProductsControllerTest() {
         Product apple = new Product("Apple", "A rounded food object", new Category("food", 25.0), 1.25, 23,1.0);
         Product dictionary = new Product("Dictionary", "A book that defines words", new Category("books", 15.0), 19.89, 13,1.1);

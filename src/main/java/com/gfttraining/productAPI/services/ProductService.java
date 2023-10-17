@@ -63,14 +63,24 @@ public class ProductService {
         }
     	
     	return productRepository.save(productUpdate);
-    	
-    	
-    	
+    }
+
+    public void deleteProduct (int id) throws NonExistingProductException {
+
+        if (productRepository.findById(id).isEmpty()){
+           throw new NonExistingProductException("The provided ID is non existent");
+         }else {
+            productRepository.deleteById(id);
+         }
+
+
     }
 
     public List<Product> listProducts() {
         return productRepository.findAll();
     }
+
+
 
     public Product listProductById(int id) throws NonExistingProductException {
         return productRepository.findById(id)
