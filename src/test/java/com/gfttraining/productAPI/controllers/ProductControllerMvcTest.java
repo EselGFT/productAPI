@@ -1,5 +1,7 @@
 package com.gfttraining.productAPI.controllers;
 
+import com.gfttraining.productAPI.exceptions.NonExistingProductException;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -80,5 +82,43 @@ public class ProductControllerMvcTest {
             .andExpect(MockMvcResultMatchers.jsonPath("@.[1].name").value("Dictionary"))
             .andExpect(MockMvcResultMatchers.jsonPath("@.[0].category.name").value("food"))
             .andExpect(MockMvcResultMatchers.jsonPath("@.[1].stock").value(13));
+    }
+
+    @Test
+    @DisplayName("WHEN retrieving a product GIVEN its ID THEN the object is returned")
+    void listOneProductTest() throws Exception {
+        Product apple = new Product("Apple", "A rounded food object", new Category("food", 25.0), 1.25, 23 ,1.0);
+
+        Mockito.when(productService.listProductById(0)).thenReturn(apple);
+
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/products/0")
+                .contentType(MediaType.APPLICATION_JSON)
+                .characterEncoding("utf-8"))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.jsonPath("@.name").value("Apple"))
+            .andExpect(MockMvcResultMatchers.jsonPath("@.description").value("A rounded food object"))
+            .andExpect(MockMvcResultMatchers.jsonPath("@.category.name").value("food"))
+            .andExpect(MockMvcResultMatchers.jsonPath("@.category.discount").value(25.0))
+            .andExpect(MockMvcResultMatchers.jsonPath("@.price").value(1.25))
+            .andExpect(MockMvcResultMatchers.jsonPath("@.stock").value(23));
+
+    }
+
+    @Test
+    @DisplayName("WHEN performing a get request for one product GIVEN a non existent ID THEN the exception text is returned")
+    void listOneNonExistentProductTest() throws Exception{
+        Mockito.when(productService.listProductById(1)).thenThrow(new NonExistingProductException("no"));
+
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/products/1")
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.jsonPath("@").value("no"));
+
+    }
+
+    @Test
+    void listOneProductStringTest() {
+
     }
 }

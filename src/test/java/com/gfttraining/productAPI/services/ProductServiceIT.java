@@ -2,6 +2,10 @@ package com.gfttraining.productAPI.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.gfttraining.productAPI.exceptions.NonExistingProductException;
+import com.gfttraining.productAPI.model.Category;
+import com.gfttraining.productAPI.model.Product;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +35,24 @@ public class ProductServiceIT {
         assertEquals(1, newSize);
 
     }
+
+    // start of listProductById() tests
+
+    @Test
+    @DisplayName("WHEN listing a created product GIVEN its ID THEN the created product is returned")
+    public void listProductTest() throws NonExistingProductException {
+
+        productService.createProduct(new ProductRequest("Apple", "A rounded food object", "food", 1.25, 23,1.0));
+
+        int numberOfProducts = productRepository.findAll().size();
+
+        Product found = productService.listProductById(numberOfProducts);
+
+        assertEquals(found.getName(), "Apple");
+        assertEquals(found.getDescription(), "A rounded food object");
+    }
+
+    // end of listProductById() tests
 
     @Test
     void listProductsTest() {
