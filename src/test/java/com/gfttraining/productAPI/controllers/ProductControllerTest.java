@@ -56,9 +56,8 @@ public class ProductControllerTest {
 
     }
 
-
-
     @Test
+    @DisplayName("GIVEN a product's information WHEN the postMapping method from the product controller is called THEN a product is created with the provided information")
     public void postControllerTest(){
 
         String productName = "TestProduct";
@@ -82,6 +81,7 @@ public class ProductControllerTest {
     }
 
     @Test
+    @DisplayName("GIVEN a product's information WHEN the product's controller putUpdate method is called THEN the provided product's information is updated with te new information")
     public void putUpdateControllerTest() {
 
     	String productName = "TestProduct";
@@ -91,6 +91,7 @@ public class ProductControllerTest {
         int productStock = 50;
         Double productWeight = 1.0;
         int id = 1;
+
         ProductRequest productRequest = new ProductRequest(productName, productDescription, categoryName, productPrice, productStock,productWeight);
         Product product = new Product(productName, productDescription, new Category("other",0.0), productPrice, productStock,productWeight);
         Mockito.when(productService.updateProduct(id,productRequest)).thenReturn(product);
@@ -99,8 +100,6 @@ public class ProductControllerTest {
         verify(productService, times(1)).updateProduct(id,productRequest);
         assertEquals(product, response.getBody());
         assertEquals(HttpStatusCode.valueOf(200),response.getStatusCode());
-
-
 
     }
 
@@ -134,6 +133,8 @@ public class ProductControllerTest {
 
 
     @Test
+    @DisplayName("WHEN the product's controller listProducts method is called THEN a list containing all the products in the database is returned")
+
     public void listProductsControllerTest() {
         Product apple = new Product("Apple", "A rounded food object", new Category("food", 25.0), 1.25, 23,1.0);
         Product dictionary = new Product("Dictionary", "A book that defines words", new Category("books", 15.0), 19.89, 13,1.1);
@@ -183,6 +184,7 @@ public class ProductControllerTest {
     // end of listProductById() tests
 
     @Test
+    @DisplayName("GIVEN a product's information that doesn't follow the requirements WHEN creating a product through the controller THEN 1 violation should emerge")
     public void postProductFailedControllerTest(){
         String productName = "TestProduct";
         String productDescription = "TestDescription";
@@ -201,11 +203,10 @@ public class ProductControllerTest {
         verify(productService, times(1)).createProduct(productRequest);
 
         assertEquals(1, violations.size());
-
-
     }
 
     @Test
+    @DisplayName("GIVEN a list of products WHEN the controller's postLoadProducts method is called THEN all products from the list are created")
     public void loadProductsControllerTest(){
         List<ProductRequest> productRequests = Arrays.asList(
             new ProductRequest(

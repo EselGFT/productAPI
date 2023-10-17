@@ -99,6 +99,7 @@ public class ProductServiceTest {
     }
     
     @Test
+    @DisplayName("GIVEN a product's updated information WHEN the original its updated THEN the updated product's information should match the given")
     void updateProductsTest () {
     	
     	
@@ -237,8 +238,7 @@ public class ProductServiceTest {
                 other, 
                 10.0, 
                 100,
-                1.0);        
-        
+                1.0);
         
         List<Product> products = Arrays.asList(productTest1, productTest2);
         Mockito.when(categoryRepository.findById("food")).thenReturn(Optional.of(food));
@@ -248,10 +248,6 @@ public class ProductServiceTest {
         Mockito.when(productRepository.save(productTest2)).thenReturn(productTest2);
 
         List<Product> createdProducts = productService.createProducts(productRequests);
-        
-        //verify(categoryRepository, times(1)).findById(categoryName);
-       // verify(categoryRepository, times(1)).findById("other");
-      //  verify(productRepository, times(1)).save(any(Product.class));
 
         assertEquals(products, createdProducts);
     }
