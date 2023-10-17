@@ -2,6 +2,7 @@ package com.gfttraining.productAPI.services;
 
 import java.util.List;
 
+import com.gfttraining.productAPI.exceptions.NonExistingProductException;
 import org.springframework.stereotype.Service;
 
 import com.gfttraining.productAPI.model.Category;
@@ -69,6 +70,11 @@ public class ProductService {
 
     public List<Product> listProducts() {
         return productRepository.findAll();
+    }
+
+    public Product listProductById(int id) throws NonExistingProductException {
+        return productRepository.findById(id)
+                .orElseThrow(() -> new NonExistingProductException("The provided ID is non existent"));
     }
 
     public List<Product> createProducts(List<ProductRequest> productRequests) {
