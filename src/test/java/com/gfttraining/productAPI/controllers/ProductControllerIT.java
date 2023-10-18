@@ -33,15 +33,15 @@ class ProductControllerIT {
     @BeforeEach
     void setUp () {
         objectMapper = new ObjectMapper();
-        client = WebTestClient.bindToServer()
-                .baseUrl("http://localhost:%d".formatted(port))
-                .build();
+
 
     }
 
     @PostConstruct
     void init() {
-
+        client = WebTestClient.bindToServer()
+                .baseUrl("http://localhost:%d".formatted(port))
+                .build();
     }
     @Test
     @DisplayName("GIVEN a product's information WHEN the product's controller putUpdate method is called THEN the provided product's information is updated with te new information")
