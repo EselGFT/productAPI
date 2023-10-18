@@ -37,7 +37,7 @@ public class ProductService {
         
     }
         
-    public Product updateProduct (Long id, ProductRequest productRequest){
+    public Product updateProduct (Long id, ProductRequest productRequest) {
         
     	    	 
     	Category category = categoryRepository.findById(productRequest.getCategory()).orElse(categoryRepository.findById("other").get());

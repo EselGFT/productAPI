@@ -82,6 +82,10 @@ class ProductControllerIT {
                 });
     }
 
+
+
+
+
     @Test
     @DisplayName("WHEN deleteProduct is executed THEN delete a product object")
     void productDeleteIT() {
@@ -108,5 +112,50 @@ class ProductControllerIT {
                 //.expectBody().isEmpty()
 
     }
+
+    @Test
+    @DisplayName("GIVEN a product's information WHEN the product's controller putUpdate method is called with incorrect Id THEN throws the NonExistingProductException exception")
+    void productDeleteThrowExceptionIT() {
+        //GIVEN
+        ProductRequest productRequestTest = new ProductRequest("TestProduct", "", "TestCategory", 10.0, 50, 2.0);
+
+        client.delete().uri("/products/6")
+                .exchange()
+                .expectStatus().isNotFound() // en el udemy el le pone un no content porque es lo que entiendo tiene el configurado
+                .expectBody()
+                .jsonPath("$").isEqualTo("The provided ID is non existent");
+
+        /*client.put().uri("/products/6")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(productRequestTest)
+                .exchange() // THEN
+
+                .expectBody()
+                .jsonPath("$").isEqualTo("The provided ID is non existent");*/
+
+
+
+    }
+
+
+
+
+    /*@Test
+    @DisplayName("GIVEN2 a product's information WHEN the product's controller putUpdate method is called THEN the provided product's information is updated with te new information")
+    void productUpdateThrowExceptionIT() {
+        //GIVEN
+        ProductRequest productRequestTest = new ProductRequest("TestProduct", "", "TestCategory", 10.0, 50, 2.0);
+
+        client.put().uri("/products/6")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(productRequestTest)
+                .exchange() // THEN
+
+                .expectBody()
+                .jsonPath("$").isEqualTo("The provided ID is non existent");
+
+
+
+    }*/
 
 }
