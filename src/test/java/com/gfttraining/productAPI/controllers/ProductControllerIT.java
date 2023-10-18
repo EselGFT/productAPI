@@ -124,23 +124,12 @@ class ProductControllerIT {
                 .expectStatus().isNotFound() // en el udemy el le pone un no content porque es lo que entiendo tiene el configurado
                 .expectBody()
                 .jsonPath("$").isEqualTo("The provided ID is non existent");
-
-        /*client.put().uri("/products/6")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(productRequestTest)
-                .exchange() // THEN
-
-                .expectBody()
-                .jsonPath("$").isEqualTo("The provided ID is non existent");*/
-
-
-
     }
 
 
 
 
-    /*@Test
+    @Test
     @DisplayName("GIVEN2 a product's information WHEN the product's controller putUpdate method is called THEN the provided product's information is updated with te new information")
     void productUpdateThrowExceptionIT() {
         //GIVEN
@@ -150,12 +139,12 @@ class ProductControllerIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(productRequestTest)
                 .exchange() // THEN
-
+                .expectStatus().isNotFound()
                 .expectBody()
                 .jsonPath("$").isEqualTo("The provided ID is non existent");
 
 
 
-    }*/
+    }
 
 }
