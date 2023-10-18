@@ -36,23 +36,24 @@ public class ProductService {
         return productRepository.save(product);
         
     }
-        
-    public Product updateProduct (Long id, ProductRequest productRequest){
-        
-    	    	 
+
+    public Product updateProduct (Long id, ProductRequest productRequest) throws NonExistingProductException{
+
     	Category category = categoryRepository.findById(productRequest.getCategory()).orElse(categoryRepository.findById("other").get());
-    	
+
     	Product productUpdate = productRepository.findById(id).get();
+        if (productRepository.findById(id).isEmpty()){
+            throw new NonExistingProductException("The provided ID is non existent");
+        }else {
+            productUpdate.setName(productRequest.getName());
+            productUpdate.setDescription(productRequest.getDescription());
+            productUpdate.setCategory(category);
+            productUpdate.setPrice(productRequest.getPrice());
+            productUpdate.setStock(productRequest.getStock());
+            productUpdate.setWeight(productRequest.getWeight());
 
-        productUpdate.setName(productRequest.getName());
-        productUpdate.setDescription(productRequest.getDescription());
-    	productUpdate.setCategory(category);
-    	productUpdate.setPrice(productRequest.getPrice());
-    	productUpdate.setStock(productRequest.getStock());
-    	productUpdate.setWeight(productRequest.getWeight());
-
-    	
-    	return productRepository.save(productUpdate);
+            return productRepository.save(productUpdate);
+        }
     }
 
     public void deleteProduct (long id) throws NonExistingProductException {
@@ -87,12 +88,12 @@ public class ProductService {
         List<Product> foundIds= productRepository.findAllById(ids);
         if(foundIds.size() == ids.size()){
             return foundIds.stream().map(product -> new ProductResponse(product)).toList();
-        }else{           
+        }else{
             List<Long> notFoundIds = ids.stream()
                 .filter(id -> foundIds.stream().noneMatch(product -> product.getId() == id))
                 .toList();
 
-            throw new NotAllProductsFoundException("Product IDs not found: " + notFoundIds);          
+            throw new NotAllProductsFoundException("Product IDs not found: " + notFoundIds);
         }
     }
 
