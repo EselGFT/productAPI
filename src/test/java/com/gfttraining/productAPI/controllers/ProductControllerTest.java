@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.gfttraining.productAPI.exceptions.NonExistingProductException;
-import org.junit.jupiter.api.Assertions;
+import com.gfttraining.productAPI.model.ProductDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,7 +26,6 @@ import com.gfttraining.productAPI.exceptions.NotAllProductsFoundException;
 import com.gfttraining.productAPI.model.Category;
 import com.gfttraining.productAPI.model.Product;
 import com.gfttraining.productAPI.model.ProductRequest;
-import com.gfttraining.productAPI.model.ProductResponse;
 import com.gfttraining.productAPI.repositories.ProductRepository;
 import com.gfttraining.productAPI.services.ProductService;
 
@@ -256,10 +255,10 @@ public class ProductControllerTest {
     @Test
     public void getProductsWithIDsTest() throws NotAllProductsFoundException{
 
-        List<ProductResponse> productsResponses = Arrays.asList(
+        List<ProductDTO> productsResponses = Arrays.asList(
 
-            new ProductResponse(0,BigDecimal.valueOf(10.0),50,1.0),
-            new ProductResponse(0,BigDecimal.valueOf(10.0),50,1.0)
+            new ProductDTO(0,BigDecimal.valueOf(10.0),50,1.0),
+            new ProductDTO(0,BigDecimal.valueOf(10.0),50,1.0)
         );
 
 
@@ -267,7 +266,7 @@ public class ProductControllerTest {
         Mockito.when(productService.createProductResponsesWithProductIDs(idList)).thenReturn(productsResponses);
 
 
-        ResponseEntity<List<ProductResponse>> retrievedProducts = productController.productsWithIDs(idList);
+        ResponseEntity<List<ProductDTO>> retrievedProducts = productController.productsWithIDs(idList);
 
         assertEquals(productsResponses, retrievedProducts.getBody());
 

@@ -5,25 +5,25 @@ import java.math.RoundingMode;
 import java.util.List;
 
 import com.gfttraining.productAPI.exceptions.NonExistingProductException;
+import com.gfttraining.productAPI.model.ProductDTO;
 import org.springframework.stereotype.Service;
 
 import com.gfttraining.productAPI.exceptions.NotAllProductsFoundException;
 import com.gfttraining.productAPI.model.Category;
 import com.gfttraining.productAPI.model.Product;
 import com.gfttraining.productAPI.model.ProductRequest;
-import com.gfttraining.productAPI.model.ProductResponse;
 import com.gfttraining.productAPI.repositories.CategoryRepository;
 import com.gfttraining.productAPI.repositories.ProductRepository;
 
 
 @Service
 public class ProductService {
-    
+
     private final CategoryRepository categoryRepository;
 
     private final ProductRepository productRepository;
 
-    public ProductService(CategoryRepository categoryRepository, ProductRepository productRepository){
+    public ProductService(CategoryRepository categoryRepository, ProductRepository productRepository) {
         this.categoryRepository = categoryRepository;
         this.productRepository = productRepository;
 
@@ -32,38 +32,38 @@ public class ProductService {
     public Product createProduct(ProductRequest productRequest) {
 
         Category category = categoryRepository.findById(productRequest.getCategory()).orElse(categoryRepository.findById("other").get());
-        
+
         Product product = new Product(productRequest.getName(), productRequest.getDescription(), category, productRequest.getPrice(), productRequest.getStock(), productRequest.getWeight());
-        
+
         return productRepository.save(product);
-        
+
     }
-        
-    public Product updateProduct (Long id, ProductRequest productRequest){
-        
-    	    	 
-    	Category category = categoryRepository.findById(productRequest.getCategory()).orElse(categoryRepository.findById("other").get());
-    	
-    	Product productUpdate = productRepository.findById(id).get();
+
+    public Product updateProduct(Long id, ProductRequest productRequest) {
+
+
+        Category category = categoryRepository.findById(productRequest.getCategory()).orElse(categoryRepository.findById("other").get());
+
+        Product productUpdate = productRepository.findById(id).get();
 
         productUpdate.setName(productRequest.getName());
         productUpdate.setDescription(productRequest.getDescription());
-    	productUpdate.setCategory(category);
-    	productUpdate.setPrice(productRequest.getPrice());
-    	productUpdate.setStock(productRequest.getStock());
-    	productUpdate.setWeight(productRequest.getWeight());
+        productUpdate.setCategory(category);
+        productUpdate.setPrice(productRequest.getPrice());
+        productUpdate.setStock(productRequest.getStock());
+        productUpdate.setWeight(productRequest.getWeight());
 
-    	
-    	return productRepository.save(productUpdate);
+
+        return productRepository.save(productUpdate);
     }
 
-    public void deleteProduct (long id) throws NonExistingProductException {
+    public void deleteProduct(long id) throws NonExistingProductException {
 
-        if (productRepository.findById(id).isEmpty()){
-           throw new NonExistingProductException("The provided ID is non existent");
-         }else {
+        if (productRepository.findById(id).isEmpty()) {
+            throw new NonExistingProductException("The provided ID is non existent");
+        } else {
             productRepository.deleteById(id);
-         }
+        }
 
 
     }
@@ -71,7 +71,6 @@ public class ProductService {
     public List<Product> listProducts() {
         return productRepository.findAll();
     }
-
 
 
     public Product listProductById(long id) throws NonExistingProductException {
@@ -85,36 +84,42 @@ public class ProductService {
                 .toList();
     }
 
-    public List<ProductResponse> createProductResponsesWithProductIDs(List<Long> ids) throws NotAllProductsFoundException{
+    public List<ProductDTO> createProductResponsesWithProductIDs(List<Long> ids) throws NotAllProductsFoundException {
         List<Product> products = getProductsWithIDs(ids);
         return createProductsResponses(products);
     }
 
     public List<Product> getProductsWithIDs(List<Long> ids) throws NotAllProductsFoundException {
-        List<Product> foundIds= productRepository.findAllById(ids);
-        if(foundIds.size() == ids.size()){
+        List<Product> foundIds = productRepository.findAllById(ids);
+        if (foundIds.size() == ids.size()) {
             return foundIds;
-        }else{           
+        } else {
             List<Long> notFoundIds = ids.stream()
-                .filter(id -> foundIds.stream().noneMatch(product -> product.getId() == id))
-                .toList();
+                    .filter(id -> foundIds.stream().noneMatch(product -> product.getId() == id))
+                    .toList();
 
-            throw new NotAllProductsFoundException("Product IDs not found: " + notFoundIds);          
+            throw new NotAllProductsFoundException("Product IDs not found: " + notFoundIds);
         }
     }
 
-    public List<ProductResponse> createProductsResponses(List<Product> products) {
-        return products.stream().map(product -> new ProductResponse()).toList();
+    public List<ProductDTO> createProductsResponses(List<Product> products) {
+        return products.stream()
+                .map(product -> {
+                    ProductDTO productDTO = new ProductDTO();
+                    productDTO.setId(product.getId());
+                    productDTO.setPrice(calculateDiscountedPrice(product));
+                    productDTO.setStock(product.getStock());;
+                    productDTO.setWeight(product.getWeight());
+                    return productDTO;
+                })
+                .toList();
     }
 
-    public ProductResponse createProductResponse(Product product) {
-        double priceNotRounded = (1 - product.getCategory().getDiscount()/100) * product.getPrice();
+    public BigDecimal calculateDiscountedPrice(Product product) {
+        double priceNotRounded = (1 - product.getCategory().getDiscount() / 100) * product.getPrice();
         BigDecimal bd = new BigDecimal(priceNotRounded);
         BigDecimal roundedPrice = bd.setScale(2, RoundingMode.CEILING);
-
-        return new ProductResponse(product.getId(), roundedPrice, product.getStock(), product.getWeight());
-
-
-    
+        return roundedPrice;
+    }
 
 }

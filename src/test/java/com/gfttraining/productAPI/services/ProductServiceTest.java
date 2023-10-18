@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Optional;
 
 import com.gfttraining.productAPI.exceptions.NonExistingProductException;
-import org.h2.command.dml.MergeUsing;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,7 +23,7 @@ import com.gfttraining.productAPI.exceptions.NotAllProductsFoundException;
 import com.gfttraining.productAPI.model.Category;
 import com.gfttraining.productAPI.model.Product;
 import com.gfttraining.productAPI.model.ProductRequest;
-import com.gfttraining.productAPI.model.ProductResponse;
+import com.gfttraining.productAPI.model.ProductDTO;
 import com.gfttraining.productAPI.repositories.CategoryRepository;
 import com.gfttraining.productAPI.repositories.ProductRepository;
 
@@ -256,23 +255,6 @@ public class ProductServiceTest {
         assertEquals(products, createdProducts);
     }
 
-    @Test
-    public void createProductResponseTest() {
-        Category food = new Category("food", 25.0);
-        Product product = new Product(
-                "TestProduct1", 
-                "TestDescription1", 
-                food, 
-                10.0, 
-                50,
-                1.0);    
-                
-        BigDecimal bd = new BigDecimal(7.50);
-        BigDecimal roundedPrice = bd.setScale(2, RoundingMode.CEILING);        
-        ProductResponse productResponse = productService.createProductResponse(product);
-        ProductResponse expectedProductResponse = new ProductResponse(0, roundedPrice, 50,1.0 );
-        assertEquals(expectedProductResponse, productResponse);
-    }
     
     @Test
     public void createProductsResponsesTest() {
@@ -287,9 +269,9 @@ public class ProductServiceTest {
                 
         BigDecimal bd = new BigDecimal(7.50);
         BigDecimal roundedPrice = bd.setScale(2, RoundingMode.CEILING);        
-        List<ProductResponse> productsResponses = productService.createProductsResponses(products);
-        List<ProductResponse> expectedProductsResponses = Arrays.asList(new ProductResponse(0, roundedPrice, 50,1.0 ));
-        assertEquals(expectedProductsResponses, productsResponses);
+        List<ProductDTO> productDTOS = productService.createProductsResponses(products);
+        List<ProductDTO> expectedProductsResponses = Arrays.asList(new ProductDTO(0, roundedPrice, 50,1.0 ));
+        assertEquals(expectedProductsResponses, productDTOS);
     }
 
     @Test
