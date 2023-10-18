@@ -8,6 +8,9 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
+import com.gfttraining.productAPI.exceptions.NotAllProductsFoundException;
 
 import jakarta.validation.ConstraintViolationException;
 
@@ -54,7 +57,19 @@ public class ProductControllerAdvice {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<String> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
-         return new ResponseEntity<>("Request parameters have a wrong format, please consult the OpenAPI docu", HttpStatus.BAD_REQUEST);
+         return new ResponseEntity<>("Request parameters have a wrong format, please consult the OpenAPI documentation", HttpStatus.BAD_REQUEST);
+    }
+    
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<String> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex) {
+         return new ResponseEntity<>("Wrong type exception, please consult the OpenAPI documentation", HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(NotAllProductsFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<String> handleNotAllProductsFoundException(NotAllProductsFoundException ex) {
+        String message = ex.getMessage();
+        return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+    }
 }
