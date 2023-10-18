@@ -96,5 +96,7 @@ public class ProductService {
         }
     }
 
-
+    public int getNumberOfProducts() {
+        return productRepository.findAll().size();
+    }
 }

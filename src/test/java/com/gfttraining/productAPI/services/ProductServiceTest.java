@@ -286,4 +286,22 @@ public class ProductServiceTest {
 
     }
 
+    @Test
+    @DisplayName("GIVEN a list of products WHEN the getNumberOfProducts method is called THEN an int representing the ammount of products in the DB is returned")
+    public void getNumberOfProductsTest() {
+
+        Product apple = new Product("Apple", "A rounded food object", new Category("food", 25.0), 1.25, 23, 1.1);
+        Product dictionary = new Product("Dictionary", "A book that defines words", new Category("books", 15.0), 19.89, 13 ,1.0);
+
+        List<Product> products = Arrays.asList(apple, dictionary);
+
+        Mockito.when(productRepository.findAll()).thenReturn(products);
+
+        int numberOfProducts = productService.getNumberOfProducts();
+
+        verify(productRepository, times(1)).findAll();
+
+        assertEquals(2, numberOfProducts);
+    }
+
 }
