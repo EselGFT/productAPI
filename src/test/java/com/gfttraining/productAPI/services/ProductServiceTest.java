@@ -18,9 +18,11 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import com.gfttraining.productAPI.exceptions.NotAllProductsFoundException;
 import com.gfttraining.productAPI.model.Category;
 import com.gfttraining.productAPI.model.Product;
 import com.gfttraining.productAPI.model.ProductRequest;
+import com.gfttraining.productAPI.model.ProductResponse;
 import com.gfttraining.productAPI.repositories.CategoryRepository;
 import com.gfttraining.productAPI.repositories.ProductRepository;
 
@@ -109,13 +111,13 @@ public class ProductServiceTest {
         Double productPrice = 10.0;
         int productStock = 50;
         Double productWeight = 1.0;
-        int id = 1;
+        long id = 1;
         
         Category other = new Category("other", 0.0);
         Product product = new Product(productName, productDescription, other, productPrice, productStock,productWeight);
         ProductRequest productRequest = new ProductRequest(productName, productDescription, categoryName, productPrice, productStock, productWeight);
         Mockito.when(categoryRepository.findById("other")).thenReturn(Optional.of(other));
-        Mockito.when(productRepository.findById(1)).thenReturn(Optional.of(product));
+        Mockito.when(productRepository.findById(id)).thenReturn(Optional.of(product));
         Mockito.when(productRepository.save(product)).thenReturn(product);       
               
         Product productAfterUpdate = productService.updateProduct(id, productRequest);
@@ -134,11 +136,11 @@ public class ProductServiceTest {
     @Test
     @DisplayName("WHEN deletepProduct is executed THEN delete a product object")
     void deleteProductTest () throws NonExistingProductException {
-        int id = 1;
+        long id = 1;
         Category other = new Category("other", 0.0);
         Product product = new Product("TestProduct", "TestDescription", other, 10.0, 50,1.0);
 
-        Mockito.when(productRepository.findById(1)).thenReturn(Optional.of(product));
+        Mockito.when(productRepository.findById(id)).thenReturn(Optional.of(product));
         Mockito.doNothing().when(productRepository).deleteById(id);
         productService.deleteProduct(id);
         verify(productRepository,times(1)).deleteById(id);
@@ -149,7 +151,7 @@ public class ProductServiceTest {
     @Test
     @DisplayName("WHEN Non Existing Products is try to delete  THEN NonExistingProductException is thrown")
     void deleteProductTrhowsExceptionTest () throws NonExistingProductException {
-        int id = 1;
+        long id = 1;
         Category other = new Category("other", 0.0);
         Product product = new Product("TestProduct", "TestDescription", other, 10.0, 50,1.0);
 
@@ -167,12 +169,12 @@ public class ProductServiceTest {
     @DisplayName("WHEN a product is requested GIVEN its ID THEN the requested product is returned")
     void listProductTest() throws NonExistingProductException {
         Product apple = new Product("Apple", "A rounded food object", new Category("food", 25.0), 1.25, 23, 1.1);
-
-        Mockito.when(productRepository.findById(1)).thenReturn(Optional.of(apple));
+        long id = 1;
+        Mockito.when(productRepository.findById(id)).thenReturn(Optional.of(apple));
 
         Product found = productService.listProductById(1);
 
-        verify(productRepository, times(1)).findById(1);
+        verify(productRepository, times(1)).findById(id);
 
         assertEquals(apple,found);
         assertEquals(apple.getName(),found.getName());
@@ -252,5 +254,54 @@ public class ProductServiceTest {
         assertEquals(products, createdProducts);
     }
 
+    @Test
+    public void listProductsWithIDsTest() throws NotAllProductsFoundException{
+
+        Category food = new Category("food", 25.0);
+        Product productTest1 = new Product(
+                "TestProduct1", 
+                "TestDescription1", 
+                food, 
+                10.0, 
+                50,
+                1.0);
+
+        Product productTest2 = new Product(
+                "TestProduct2", 
+                "TestDescription2", 
+                food, 
+                10.0, 
+                100,
+                1.0);        
+        
+        
+        List<Product> products = Arrays.asList(productTest1, productTest2);
+        List<Long> idList = Arrays.asList(Long.valueOf(1),Long.valueOf(2));
+
+        Mockito.when(productRepository.findAllById(idList)).thenReturn(products);
+        List<ProductResponse> productsResponseExpected= Arrays.asList(new ProductResponse(productTest1), new ProductResponse(productTest2));
+        List<ProductResponse> productsRetrievedList = productService.listProductsWithIDs(idList);
+        assertEquals(productsResponseExpected, productsRetrievedList);
+
+
+    }
+
+    @Test
+    @DisplayName("GIVEN a list of products WHEN the getNumberOfProducts method is called THEN an int representing the ammount of products in the DB is returned")
+    public void getNumberOfProductsTest() {
+
+        Product apple = new Product("Apple", "A rounded food object", new Category("food", 25.0), 1.25, 23, 1.1);
+        Product dictionary = new Product("Dictionary", "A book that defines words", new Category("books", 15.0), 19.89, 13 ,1.0);
+
+        List<Product> products = Arrays.asList(apple, dictionary);
+
+        Mockito.when(productRepository.findAll()).thenReturn(products);
+
+        int numberOfProducts = productService.getNumberOfProducts();
+
+        verify(productRepository, times(1)).findAll();
+
+        assertEquals(2, numberOfProducts);
+    }
 
 }

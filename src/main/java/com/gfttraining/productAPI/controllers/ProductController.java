@@ -9,9 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
 
-
+import com.gfttraining.productAPI.exceptions.NotAllProductsFoundException;
 import com.gfttraining.productAPI.model.Product;
 import com.gfttraining.productAPI.model.ProductRequest;
+import com.gfttraining.productAPI.model.ProductResponse;
 import com.gfttraining.productAPI.services.ProductService;
 
 import jakarta.validation.Valid;
@@ -70,12 +71,19 @@ public class ProductController {
     }
 
     @DeleteMapping("/products/{id_product}")
-    public ResponseEntity <?> deleteProduct (@PathVariable int id_product) throws NonExistingProductException  {
+    public ResponseEntity <?> deleteProduct (@PathVariable long id_product) throws NonExistingProductException  {
         productService.deleteProduct(id_product);
         return new ResponseEntity<>(
                 HttpStatus.OK
         );
 
+    }
+    @PostMapping("/productsWithIDs")
+   public ResponseEntity<List<ProductResponse>> productsWithIDs (@RequestBody List<Long> ids) throws NotAllProductsFoundException {
+        return new ResponseEntity<>(
+            productService.listProductsWithIDs(ids),
+            HttpStatus.OK
+        );
     }
 
 }

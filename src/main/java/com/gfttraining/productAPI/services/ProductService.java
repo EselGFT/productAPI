@@ -5,11 +5,14 @@ import java.util.List;
 import com.gfttraining.productAPI.exceptions.NonExistingProductException;
 import org.springframework.stereotype.Service;
 
+import com.gfttraining.productAPI.exceptions.NotAllProductsFoundException;
 import com.gfttraining.productAPI.model.Category;
 import com.gfttraining.productAPI.model.Product;
 import com.gfttraining.productAPI.model.ProductRequest;
+import com.gfttraining.productAPI.model.ProductResponse;
 import com.gfttraining.productAPI.repositories.CategoryRepository;
 import com.gfttraining.productAPI.repositories.ProductRepository;
+
 
 @Service
 public class ProductService {
@@ -33,11 +36,11 @@ public class ProductService {
         return productRepository.save(product);
         
     }
-    
-    public Product updateProduct (int id, ProductRequest productRequest) throws NonExistingProductException{
-        System.out.println(productRequest);
 
-        Category category = categoryRepository.findById(productRequest.getCategory()).orElse(categoryRepository.findById("other").get());
+    public Product updateProduct (Long id, ProductRequest productRequest) throws NonExistingProductException{
+
+    	Category category = categoryRepository.findById(productRequest.getCategory()).orElse(categoryRepository.findById("other").get());
+
     	Product productUpdate = productRepository.findById(id).get();
         if (productRepository.findById(id).isEmpty()){
             throw new NonExistingProductException("The provided ID is non existent");
@@ -53,7 +56,7 @@ public class ProductService {
         }
     }
 
-    public void deleteProduct (int id) throws NonExistingProductException {
+    public void deleteProduct (long id) throws NonExistingProductException {
 
         if (productRepository.findById(id).isEmpty()){
            throw new NonExistingProductException("The provided ID is non existent");
@@ -70,7 +73,7 @@ public class ProductService {
 
 
 
-    public Product listProductById(int id) throws NonExistingProductException {
+    public Product listProductById(long id) throws NonExistingProductException {
         return productRepository.findById(id)
                 .orElseThrow(() -> new NonExistingProductException("The provided ID is non existent"));
     }
@@ -81,5 +84,20 @@ public class ProductService {
                 .toList();
     }
 
+    public List<ProductResponse> listProductsWithIDs(List<Long> ids) throws NotAllProductsFoundException {
+        List<Product> foundIds= productRepository.findAllById(ids);
+        if(foundIds.size() == ids.size()){
+            return foundIds.stream().map(product -> new ProductResponse(product)).toList();
+        }else{
+            List<Long> notFoundIds = ids.stream()
+                .filter(id -> foundIds.stream().noneMatch(product -> product.getId() == id))
+                .toList();
 
+            throw new NotAllProductsFoundException("Product IDs not found: " + notFoundIds);
+        }
+    }
+
+    public int getNumberOfProducts() {
+        return productRepository.findAll().size();
+    }
 }
