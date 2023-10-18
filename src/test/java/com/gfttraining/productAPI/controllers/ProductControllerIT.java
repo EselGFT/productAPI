@@ -1,33 +1,18 @@
 package com.gfttraining.productAPI.controllers;
 
-import com.gfttraining.productAPI.model.Category;
 import com.gfttraining.productAPI.model.ProductRequest;
-import com.gfttraining.productAPI.repositories.CategoryRepository;
-import com.gfttraining.productAPI.repositories.ProductRepository;
 import com.gfttraining.productAPI.services.ProductService;
 import jakarta.annotation.PostConstruct;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gfttraining.productAPI.model.Product;
-import com.gfttraining.productAPI.model.ProductRequest;
-import com.gfttraining.productAPI.repositories.ProductRepository;
-import com.gfttraining.productAPI.services.ProductService;
-import jakarta.annotation.PostConstruct;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.*;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
@@ -121,7 +106,8 @@ public class ProductControllerIT {
 
         client.delete().uri("/products/6")
                 .exchange()
-                .expectStatus().isNotFound() // en el udemy el le pone un no content porque es lo que entiendo tiene el configurado
+                .expectStatus().isNotFound();
+    }// en el udemy el le pone un no content porque es lo que entiendo tiene el configurado
 
     @Test
     void listAllTest() {
@@ -190,7 +176,7 @@ public class ProductControllerIT {
                 .expectBody()
                 .jsonPath("$").isEqualTo("Wrong type exception, please consult the OpenAPI documentation");
     }
-}
+
 
 
 
