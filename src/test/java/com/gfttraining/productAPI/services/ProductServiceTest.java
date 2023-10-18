@@ -100,7 +100,7 @@ public class ProductServiceTest {
     
     @Test
     @DisplayName("GIVEN a product's updated information WHEN the original its updated THEN the updated product's information should match the given")
-    void updateProductsTest () {
+    void updateProductsTest () throws NonExistingProductException {
     	
     	
     	String productName = "TestProduct";

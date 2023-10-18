@@ -34,21 +34,23 @@ public class ProductService {
         
     }
     
-    public Product updateProduct (int id, ProductRequest productRequest){
+    public Product updateProduct (int id, ProductRequest productRequest) throws NonExistingProductException{
         System.out.println(productRequest);
 
         Category category = categoryRepository.findById(productRequest.getCategory()).orElse(categoryRepository.findById("other").get());
     	Product productUpdate = productRepository.findById(id).get();
+        if (productRepository.findById(id).isEmpty()){
+            throw new NonExistingProductException("The provided ID is non existent");
+        }else {
+            productUpdate.setName(productRequest.getName());
+            productUpdate.setDescription(productRequest.getDescription());
+            productUpdate.setCategory(category);
+            productUpdate.setPrice(productRequest.getPrice());
+            productUpdate.setStock(productRequest.getStock());
+            productUpdate.setWeight(productRequest.getWeight());
 
-        productUpdate.setName(productRequest.getName());
-        productUpdate.setDescription(productRequest.getDescription());
-    	productUpdate.setCategory(category);
-    	productUpdate.setPrice(productRequest.getPrice());
-    	productUpdate.setStock(productRequest.getStock());
-    	productUpdate.setWeight(productRequest.getWeight());
-
-    	
-    	return productRepository.save(productUpdate);
+            return productRepository.save(productUpdate);
+        }
     }
 
     public void deleteProduct (int id) throws NonExistingProductException {

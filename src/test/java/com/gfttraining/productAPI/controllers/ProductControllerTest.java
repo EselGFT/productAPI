@@ -82,7 +82,7 @@ public class ProductControllerTest {
 
     @Test
     @DisplayName("GIVEN a product's information WHEN the product's controller putUpdate method is called THEN the provided product's information is updated with te new information")
-    public void putUpdateControllerTest() {
+    public void putUpdateControllerTest() throws NonExistingProductException {
 
     	String productName = "TestProduct";
         String productDescription = "TestDescription";
