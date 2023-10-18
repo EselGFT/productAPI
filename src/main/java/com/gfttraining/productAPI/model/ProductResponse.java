@@ -5,9 +5,13 @@ import java.math.RoundingMode;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Data
+@Data 
+@AllArgsConstructor 
+@NoArgsConstructor
 public class ProductResponse {
     @NotNull(message = "Id should not be null")
     private long id;
@@ -23,16 +27,5 @@ public class ProductResponse {
     @NotNull(message = "Weight should not be null")
     @Min(value = 0, message="Weight should not be less than 0")
     private Double weight;
-
-    public ProductResponse(Product product){
-        double priceNotRounded = (1 - product.getCategory().getDiscount()/100) * product.getPrice();
-        BigDecimal bd = new BigDecimal(priceNotRounded);
-        BigDecimal roundedPrice = bd.setScale(2, RoundingMode.CEILING);
-
-        this.id = product.getId();
-        this.price = roundedPrice;
-        this.stock = product.getStock();
-        this.weight = product.getWeight();
-    }
     
 }

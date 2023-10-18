@@ -7,7 +7,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import com.gfttraining.productAPI.exceptions.NotAllProductsFoundException;
 import com.gfttraining.productAPI.model.Product;
@@ -78,10 +77,11 @@ public class ProductController {
         );
 
     }
+    
     @PostMapping("/productsWithIDs")
    public ResponseEntity<List<ProductResponse>> productsWithIDs (@RequestBody List<Long> ids) throws NotAllProductsFoundException {
         return new ResponseEntity<>(
-            productService.listProductsWithIDs(ids),
+            productService.createProductResponsesWithProductIDs(ids),
             HttpStatus.OK
         );
     }    

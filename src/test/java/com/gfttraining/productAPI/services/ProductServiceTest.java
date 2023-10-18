@@ -5,6 +5,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -255,6 +257,42 @@ public class ProductServiceTest {
     }
 
     @Test
+    public void createProductResponseTest() {
+        Category food = new Category("food", 25.0);
+        Product product = new Product(
+                "TestProduct1", 
+                "TestDescription1", 
+                food, 
+                10.0, 
+                50,
+                1.0);    
+                
+        BigDecimal bd = new BigDecimal(7.50);
+        BigDecimal roundedPrice = bd.setScale(2, RoundingMode.CEILING);        
+        ProductResponse productResponse = productService.createProductResponse(product);
+        ProductResponse expectedProductResponse = new ProductResponse(0, roundedPrice, 50,1.0 );
+        assertEquals(expectedProductResponse, productResponse);
+    }
+    
+    @Test
+    public void createProductsResponsesTest() {
+        Category food = new Category("food", 25.0);
+        List<Product> products = Arrays.asList(new Product(
+                "TestProduct1", 
+                "TestDescription1", 
+                food, 
+                10.0, 
+                50,
+                1.0));    
+                
+        BigDecimal bd = new BigDecimal(7.50);
+        BigDecimal roundedPrice = bd.setScale(2, RoundingMode.CEILING);        
+        List<ProductResponse> productsResponses = productService.createProductsResponses(products);
+        List<ProductResponse> expectedProductsResponses = Arrays.asList(new ProductResponse(0, roundedPrice, 50,1.0 ));
+        assertEquals(expectedProductsResponses, productsResponses);
+    }
+
+    @Test
     public void listProductsWithIDsTest() throws NotAllProductsFoundException{
 
         Category food = new Category("food", 25.0);
@@ -279,9 +317,9 @@ public class ProductServiceTest {
         List<Long> idList = Arrays.asList(Long.valueOf(1),Long.valueOf(2));
 
         Mockito.when(productRepository.findAllById(idList)).thenReturn(products);
-        List<ProductResponse> productsResponseExpected= Arrays.asList(new ProductResponse(productTest1), new ProductResponse(productTest2));
-        List<ProductResponse> productsRetrievedList = productService.listProductsWithIDs(idList);
-        assertEquals(productsResponseExpected, productsRetrievedList);
+        List<Product> productsExpected= Arrays.asList(productTest1, productTest2);
+        List<Product> productsRetrievedList = productService.getProductsWithIDs(idList);
+        assertEquals(productsExpected, productsRetrievedList);
 
 
     }

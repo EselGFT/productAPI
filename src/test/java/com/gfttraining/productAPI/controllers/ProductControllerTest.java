@@ -6,7 +6,7 @@ import static org.mockito.Mockito.verify;
 
 import java.util.Optional;
 import java.util.Set;
-
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
@@ -254,40 +254,24 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void getProductsWithIDs() throws NotAllProductsFoundException{
-        Category category =  new Category("other", 0.0);
-        Product productTest1 = new Product(
-                "TestProduct1",
-                "TestDescription1",
-                category,
-                10.0,
-                50,
-                1.0);
-        
-        Product productTest2 = new Product(
-                "TestProduct2",
-                "TestDescription2",
-                category,
-                10.0,
-                50,
-                1.0);
+    public void getProductsWithIDsTest() throws NotAllProductsFoundException{
 
-        List<ProductResponse> products = Arrays.asList(
+        List<ProductResponse> productsResponses = Arrays.asList(
 
-            new ProductResponse(productTest1),
-            new ProductResponse(productTest2)
+            new ProductResponse(0,BigDecimal.valueOf(10.0),50,1.0),
+            new ProductResponse(0,BigDecimal.valueOf(10.0),50,1.0)
         );
 
 
         List<Long> idList = Arrays.asList(Long.valueOf(1),Long.valueOf(2));
-        Mockito.when(productService.listProductsWithIDs(idList)).thenReturn(products);
+        Mockito.when(productService.createProductResponsesWithProductIDs(idList)).thenReturn(productsResponses);
 
-        //verify(productService, times(1)).listProductsWithIDs(idList);
 
         ResponseEntity<List<ProductResponse>> retrievedProducts = productController.productsWithIDs(idList);
 
-        assertEquals(products, retrievedProducts.getBody());
+        assertEquals(productsResponses, retrievedProducts.getBody());
 
 
     }
+    
 }

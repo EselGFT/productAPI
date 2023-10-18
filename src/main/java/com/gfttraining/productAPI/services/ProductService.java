@@ -1,5 +1,7 @@
 package com.gfttraining.productAPI.services;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 import com.gfttraining.productAPI.exceptions.NonExistingProductException;
@@ -83,10 +85,15 @@ public class ProductService {
                 .toList();
     }
 
-    public List<ProductResponse> listProductsWithIDs(List<Long> ids) throws NotAllProductsFoundException {
+    public List<ProductResponse> createProductResponsesWithProductIDs(List<Long> ids) throws NotAllProductsFoundException{
+        List<Product> products = getProductsWithIDs(ids);
+        return createProductsResponses(products);
+    }
+
+    public List<Product> getProductsWithIDs(List<Long> ids) throws NotAllProductsFoundException {
         List<Product> foundIds= productRepository.findAllById(ids);
         if(foundIds.size() == ids.size()){
-            return foundIds.stream().map(product -> new ProductResponse(product)).toList();
+            return foundIds;
         }else{           
             List<Long> notFoundIds = ids.stream()
                 .filter(id -> foundIds.stream().noneMatch(product -> product.getId() == id))
@@ -96,5 +103,18 @@ public class ProductService {
         }
     }
 
+    public List<ProductResponse> createProductsResponses(List<Product> products) {
+        return products.stream().map(product -> new ProductResponse()).toList();
+    }
+
+    public ProductResponse createProductResponse(Product product) {
+        double priceNotRounded = (1 - product.getCategory().getDiscount()/100) * product.getPrice();
+        BigDecimal bd = new BigDecimal(priceNotRounded);
+        BigDecimal roundedPrice = bd.setScale(2, RoundingMode.CEILING);
+
+        return new ProductResponse(product.getId(), roundedPrice, product.getStock(), product.getWeight());
+
+
+    
 
 }
