@@ -92,6 +92,7 @@ public class ProductControllerTest {
         Double productWeight = 1.0;
         int id = 1;
 
+
         ProductRequest productRequest = new ProductRequest(productName, productDescription, categoryName, productPrice, productStock,productWeight);
         Product product = new Product(productName, productDescription, new Category("other",0.0), productPrice, productStock,productWeight);
         Mockito.when(productService.updateProduct(id,productRequest)).thenReturn(product);
