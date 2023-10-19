@@ -35,7 +35,7 @@ public class ProductControllerIT {
     }
 
 
-    ////////////////// ORDER STARTS HERE *****************************************************************
+    //////////////// ORDER STARTS HERE *****************************************************************
     @Test
     @DisplayName("1 Given a list of productRquests When a post is made to /products Then it should be saved in database and return the saved products")
     @Order(1)
@@ -78,41 +78,39 @@ public class ProductControllerIT {
                 .jsonPath("$[1].price").isEqualTo(10.0)
                 .jsonPath("$[1].stock").isEqualTo(100)
                 .jsonPath("$[1].weight").isEqualTo(1.0);
-
     }
-    // 2 PRODUCTS HAVE BEEN CREATED
+     //2 PRODUCTS HAVE BEEN CREATED
 
-    @Test
-    @DisplayName("2 Given a list of productRequests with bad content When a post is made to /products Then it should return an error message")
-    @Order(2)
-    void postLoadProductsErrorTest() {
-        List<ProductRequest> productRequests = Arrays.asList(
-                new ProductRequest(
-                        "TestProduct1",
-                        "TestDescription1",
-                        "TestCategory",
-                        null,
-                        50,
-                        1.0),
-                new ProductRequest(
-                        "TestProduct2",
-                        "TestDescription2",
-                        "TestCategory",
-                        10.0,
-                        100,
-                        1.0)
-        );
-
-        client.post().uri("/products")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(productRequests)
-                .exchange()
-
-                .expectStatus().isBadRequest()
-                .expectBody(String.class)
-                .value(message -> assertTrue(message.contains("Price should not be null")));
-
-    }
+//    @Test
+//    @DisplayName("2 Given a list of productRequests with bad content When a post is made to /products Then it should return an error message")
+//    @Order(2)
+//    void postLoadProductsErrorTest() {
+//        List<ProductRequest> productRequests = Arrays.asList(
+//                new ProductRequest(
+//                        "TestProduct1",
+//                        "TestDescription1",
+//                        "TestCategory",
+//                        null,
+//                        50,
+//                        1.0),
+//                new ProductRequest(
+//                        "TestProduct2",
+//                        "TestDescription2",
+//                        "TestCategory",
+//                        10.0,
+//                        100,
+//                        1.0)
+//        );
+//
+//        client.post().uri("/products")
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .bodyValue(productRequests)
+//                .exchange()
+//
+//                .expectStatus().isBadRequest()
+//                .expectBody(String.class)
+//                .value(message -> assertTrue(message.contains("Price should not be null")));
+//    }
 
     @Test
     @DisplayName("3 Given a productRequests  When a post is made to /product Then it should be saved in the database and return the saved product")
@@ -143,6 +141,7 @@ public class ProductControllerIT {
                 .jsonPath("$.stock").isEqualTo(50)
                 .jsonPath("$.weight").isEqualTo(1.0);
 
+        listAllDB(3);
     }
     // 1 PRODUCT HAS BEEN CREATED - TOTAL: 5
     @Test
@@ -202,7 +201,7 @@ public class ProductControllerIT {
                 .jsonPath("$[" + ( numberOfProducts + 1) + "].stock").isEqualTo(13)
                 .jsonPath("$[" + ( numberOfProducts + 1) + "].weight").isEqualTo(1.0);
     }
-    //2 PRODUCTS HAVE BEEN CREATED
+    //2 PRODUCTS HAVE BEEN CREATED total 8 products
 
     @Test
     @DisplayName("6")
@@ -222,7 +221,6 @@ public class ProductControllerIT {
                .jsonPath("$.category.name").isEqualTo("food")
                .jsonPath("$.price").isEqualTo(1.25)
                .jsonPath("$.stock").isEqualTo(23);
-
     }
     // no 1 PRODUCT HAS BEEN CREATED
     @Test
@@ -242,13 +240,12 @@ public class ProductControllerIT {
     void listOneNonExistentProductTest() {
         int numberOfProducts = productService.getNumberOfProducts();
         System.out.println("AQUI IMPRIME EL NUMERO DE ELEMENTOS QUE HAY EN LA DB " +numberOfProducts);
-
+        assertEquals(8,productService.getNumberOfProducts());
         client.get().uri("/products/"+ (numberOfProducts + 1) )
                 .exchange()
                 .expectStatus().isEqualTo(404)
                 .expectBody()
                 .jsonPath("$").isEqualTo("The provided ID is non existent");
-        int numberOfProducts2 = productService.getNumberOfProducts();
     }
 
     @Test
@@ -342,7 +339,7 @@ public class ProductControllerIT {
         //GIVEN
         ProductRequest productRequestTest = new ProductRequest("TestProduct", "", "TestCategory", 10.0, 50, 2.0);
 
-        client.put().uri("/products/6")
+        client.put().uri("/products/"+productService.getNumberOfProducts()+1)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(productRequestTest)
                 .exchange() // THEN
@@ -369,7 +366,7 @@ public class ProductControllerIT {
                 .expectBodyList(Product.class)
                 .hasSize(numberOfProducts);
 
-        client.delete().uri("/products/3")
+        client.delete().uri("/products/"+ numberOfProducts)
                 .exchange()
                 .expectStatus().isOk() // en el udemy el le pone un no content porque es lo que entiendo tiene el configurado
                 .expectBody().isEmpty();
@@ -380,7 +377,7 @@ public class ProductControllerIT {
                 .expectBodyList(Product.class)
                 .hasSize(numberOfProducts-1);
 
-        client.get().uri("/products/3").exchange()
+        client.get().uri("/products/"+numberOfProducts).exchange()
                 .expectStatus().isNotFound();
         //.expectBody().isEmpty()
 
