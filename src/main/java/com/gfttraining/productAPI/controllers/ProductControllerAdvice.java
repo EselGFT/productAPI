@@ -70,6 +70,6 @@ public class ProductControllerAdvice {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<String> handleNotAllProductsFoundException(NotAllProductsFoundException ex) {
         String message = ex.getMessage();
-        return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
     }
 }
