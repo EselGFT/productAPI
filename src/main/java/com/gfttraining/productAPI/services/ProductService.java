@@ -37,14 +37,15 @@ public class ProductService {
         
     }
 
-    public Product updateProduct (Long id, ProductRequest productRequest) throws NonExistingProductException{
+    public Product updateProduct (long id, ProductRequest productRequest) throws NonExistingProductException{
 
     	Category category = categoryRepository.findById(productRequest.getCategory()).orElse(categoryRepository.findById("other").get());
 
-    	Product productUpdate = productRepository.findById(id).get();
+
         if (productRepository.findById(id).isEmpty()){
             throw new NonExistingProductException("The provided ID is non existent");
         }else {
+            Product productUpdate = productRepository.findById(id).get();
             productUpdate.setName(productRequest.getName());
             productUpdate.setDescription(productRequest.getDescription());
             productUpdate.setCategory(category);

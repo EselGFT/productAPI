@@ -3,6 +3,7 @@ package com.gfttraining.productAPI.controllers;
 import com.gfttraining.productAPI.model.ProductRequest;
 import com.gfttraining.productAPI.services.ProductService;
 import jakarta.annotation.PostConstruct;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -67,11 +68,8 @@ public class ProductControllerIT {
                 });
     }
 
-
-
-
-
     @Test
+    //
     @DisplayName("WHEN deleteProduct is executed THEN delete a product object")
     void productDeleteIT() {
 
@@ -79,7 +77,7 @@ public class ProductControllerIT {
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBodyList(Product.class)
-                .hasSize(3);
+                .hasSize(6);
 
         client.delete().uri("/products/3")
                 .exchange()
@@ -90,7 +88,7 @@ public class ProductControllerIT {
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBodyList(Product.class)
-                .hasSize(2);
+                .hasSize(5);
 
         client.get().uri("/products/3").exchange()
                 .expectStatus().isNotFound();
@@ -102,12 +100,14 @@ public class ProductControllerIT {
     @DisplayName("GIVEN a product's information WHEN the product's controller putUpdate method is called with incorrect Id THEN throws the NonExistingProductException exception")
     void productDeleteThrowExceptionIT() {
         //GIVEN
-        ProductRequest productRequestTest = new ProductRequest("TestProduct", "", "TestCategory", 10.0, 50, 2.0);
+        //ProductRequest productRequestTest = new ProductRequest("TestProduct", "", "TestCategory", 10.0, 50, 2.0);
 
-        client.delete().uri("/products/6")
+        client.delete().uri("/products/10")
                 .exchange()
-                .expectStatus().isNotFound();
-    }// en el udemy el le pone un no content porque es lo que entiendo tiene el configurado
+                .expectStatus().isNotFound()
+                .expectBody()
+                .jsonPath("$").isEqualTo("The provided ID is non existent");;
+    }
 
     @Test
     void listAllTest() {
@@ -191,9 +191,10 @@ public class ProductControllerIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(productRequestTest)
                 .exchange() // THEN
-                .expectStatus().isNotFound()
+                .expectStatus().isEqualTo(404)
                 .expectBody()
                 .jsonPath("$").isEqualTo("The provided ID is non existent");
+
 
 
 
