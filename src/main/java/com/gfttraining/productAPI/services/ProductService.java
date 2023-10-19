@@ -89,7 +89,7 @@ public class ProductService {
 
     public List<ProductDTO> createProductResponsesWithProductIDs(List<Long> ids) throws NotAllProductsFoundException {
         List<Product> products = getProductsWithIDs(ids);
-        return createProductsResponses(products);
+        return buildProductsDTOs(products);
     }
 
     public List<Product> getProductsWithIDs(List<Long> ids) throws NotAllProductsFoundException {
@@ -108,7 +108,7 @@ public class ProductService {
     public int getNumberOfProducts() {
         return productRepository.findAll().size();
     }
-    public List<ProductDTO> createProductsResponses(List<Product> products) {
+    public List<ProductDTO> buildProductsDTOs(List<Product> products) {
         return products.stream()
                 .map(product -> {
                     ProductDTO productDTO = new ProductDTO();

@@ -13,7 +13,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.*;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
@@ -141,7 +145,7 @@ public class ProductControllerIT {
     @Test
     void listOneProductByIDTest() {
         //Apple
-        productService.createProduct(new ProductRequest("Apple", "A rounded food object", "food", 1.25, 23,1.0));
+        productService.createProduct(new ProductRequest("Apple", "A rounded food object", "food", 1.25, 23, 1.0));
 
         int appleID = productService.getNumberOfProducts();
 
@@ -153,29 +157,8 @@ public class ProductControllerIT {
                 .jsonPath("$.description").isEqualTo("A rounded food object")
                 .jsonPath("$.category.name").isEqualTo("food")
                 .jsonPath("$.price").isEqualTo(1.25)
-                .jsonPath("$.stock").isEqualTo(23)
-import jakarta.validation.constraints.AssertTrue;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.web.server.ResponseStatusException;
-
-import java.util.Arrays;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class ProductControllerIT {
-
-    @Autowired
-    private WebTestClient client;
+                .jsonPath("$.stock").isEqualTo(23);
+    }
 
 
     @Test
@@ -201,6 +184,7 @@ public class ProductControllerIT {
                 .jsonPath("$[1].stock").isEqualTo(20)
                 .jsonPath("$[1].weight").isEqualTo(1.0);
     }
+
     @Test
     @DisplayName("Given a list of IDs When a post is made to /productsWithIDs Then it should return the ProductDTO of the found IDs")
     void productsWithIDsErrorTest() {
@@ -365,7 +349,7 @@ public class ProductControllerIT {
 
     }
 
-}
+
     @DisplayName("Given a productRequest with bad content When a post is made to /product Then it should return an error message")
     void postLoadProductErrorTest() {
 
