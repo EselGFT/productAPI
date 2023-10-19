@@ -269,7 +269,7 @@ public class ProductServiceTest {
                 
         BigDecimal bd = new BigDecimal(7.50);
         BigDecimal roundedPrice = bd.setScale(2, RoundingMode.CEILING);        
-        List<ProductDTO> productDTOS = productService.createProductsResponses(products);
+        List<ProductDTO> productDTOS = productService.buildProductsDTOs(products);
         List<ProductDTO> expectedProductsResponses = Arrays.asList(new ProductDTO(0, roundedPrice, 50,1.0 ));
         assertEquals(expectedProductsResponses, productDTOS);
     }
