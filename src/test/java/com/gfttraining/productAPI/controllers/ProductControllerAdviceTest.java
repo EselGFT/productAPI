@@ -92,6 +92,6 @@ public class ProductControllerAdviceTest {
         NotAllProductsFoundException ex = new NotAllProductsFoundException("Product IDs not found: [1]");
         ResponseEntity<String> response = productControllerAdvice.handleNotAllProductsFoundException(ex);
         assertEquals("Product IDs not found: [1]", response.getBody());
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 }
