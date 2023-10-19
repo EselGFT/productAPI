@@ -73,6 +73,7 @@ public class ProductControllerIT {
     @DisplayName("WHEN deleteProduct is executed THEN delete a product object")
     void productDeleteIT() {
 
+
         client.get().uri("/products").exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
