@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import com.gfttraining.productAPI.exceptions.NotAllProductsFoundException;
-
 import jakarta.validation.ConstraintViolationException;
 
 @RestControllerAdvice
@@ -66,10 +64,4 @@ public class ProductControllerAdvice {
          return new ResponseEntity<>("Wrong type exception, please consult the OpenAPI documentation", HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(NotAllProductsFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<String> handleNotAllProductsFoundException(NotAllProductsFoundException ex) {
-        String message = ex.getMessage();
-        return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
-    }
 }

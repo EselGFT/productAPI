@@ -19,7 +19,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import com.gfttraining.productAPI.exceptions.NotAllProductsFoundException;
 import com.gfttraining.productAPI.model.Category;
 import com.gfttraining.productAPI.model.Product;
 import com.gfttraining.productAPI.model.ProductRequest;
@@ -326,7 +325,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    public void listProductsWithIDsTest() throws NotAllProductsFoundException{
+    public void listProductsWithIDsTest() throws NonExistingProductException {
 
         Category food = new Category("food", 25.0);
         Product productTest1 = new Product(

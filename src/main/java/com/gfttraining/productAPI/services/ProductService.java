@@ -8,7 +8,6 @@ import com.gfttraining.productAPI.exceptions.NonExistingProductException;
 import com.gfttraining.productAPI.model.ProductDTO;
 import org.springframework.stereotype.Service;
 
-import com.gfttraining.productAPI.exceptions.NotAllProductsFoundException;
 import com.gfttraining.productAPI.model.Category;
 import com.gfttraining.productAPI.model.Product;
 import com.gfttraining.productAPI.model.ProductRequest;
@@ -79,7 +78,7 @@ public class ProductService {
 
     public Product listProductById(long id) throws NonExistingProductException {
         return productRepository.findById(id)
-                .orElseThrow(() -> new NonExistingProductException("The provided ID is non existent"));
+                .orElseThrow(() -> new NonExistingProductException("Product IDs not found: " + id));
     }
 
     public List<Product> createProducts(List<ProductRequest> productRequests) {
@@ -88,12 +87,12 @@ public class ProductService {
                 .toList();
     }
 
-    public List<ProductDTO> createProductResponsesWithProductIDs(List<Long> ids) throws NotAllProductsFoundException {
+    public List<ProductDTO> createProductResponsesWithProductIDs(List<Long> ids) throws NonExistingProductException {
         List<Product> products = getProductsWithIDs(ids);
         return buildProductsDTOs(products);
     }
 
-    public List<Product> getProductsWithIDs(List<Long> ids) throws NotAllProductsFoundException {
+    public List<Product> getProductsWithIDs(List<Long> ids) throws NonExistingProductException {
         List<Product> foundIds = productRepository.findAllById(ids);
         if (foundIds.size() == ids.size()) {
             return foundIds;
@@ -102,7 +101,7 @@ public class ProductService {
                     .filter(id -> foundIds.stream().noneMatch(product -> product.getId() == id))
                     .toList();
 
-            throw new NotAllProductsFoundException("Product IDs not found: " + notFoundIds);
+            throw new NonExistingProductException("Product IDs not found: " + notFoundIds);
         }
     }
 

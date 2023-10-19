@@ -23,7 +23,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 
-import com.gfttraining.productAPI.exceptions.NotAllProductsFoundException;
 import com.gfttraining.productAPI.model.Category;
 import com.gfttraining.productAPI.model.Product;
 import com.gfttraining.productAPI.model.ProductRequest;
@@ -303,7 +302,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void getProductsWithIDsTest() throws NotAllProductsFoundException{
+    public void getProductsWithIDsTest() throws NonExistingProductException{
 
         List<ProductDTO> productsResponses = Arrays.asList(
 
