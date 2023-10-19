@@ -25,13 +25,13 @@ public class ProductServiceIT {
     @DisplayName("GIVEN an initial amount of products WHEN a new one is created THEN the number of products increases by 1")
     public void productCreationTest() {
     
-        int size = productRepository.findByName("paper").size();
+        int size = productRepository.findByNameIgnoreCaseContaining("paper").size();
 
         assertEquals(0, size);
 
         productService.createProduct(new ProductRequest("paper", "sheet of paper", "office", 4.99, 10, 1.0));
 
-        int newSize = productRepository.findByName("paper").size();
+        int newSize = productRepository.findByNameIgnoreCaseContaining("paper").size();
 
         assertEquals(1, newSize);
 
