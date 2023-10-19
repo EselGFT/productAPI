@@ -1,6 +1,7 @@
 package com.gfttraining.productAPI.controllers;
 
 import com.gfttraining.productAPI.exceptions.NonExistingProductException;
+import com.gfttraining.productAPI.exceptions.NotEnoughStockException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -71,5 +72,12 @@ public class ProductControllerAdvice {
     public ResponseEntity<String> handleNotAllProductsFoundException(NotAllProductsFoundException ex) {
         String message = ex.getMessage();
         return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(NotEnoughStockException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<String> handleNotEnoughStockException(NotEnoughStockException ex) {
+        String message = ex.getMessage();
+        return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
     }
 }

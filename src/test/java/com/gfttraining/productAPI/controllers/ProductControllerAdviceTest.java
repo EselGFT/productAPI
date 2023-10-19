@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import java.util.Set;
 
+import com.gfttraining.productAPI.exceptions.NotEnoughStockException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -92,6 +93,14 @@ public class ProductControllerAdviceTest {
         NotAllProductsFoundException ex = new NotAllProductsFoundException("Product IDs not found: [1]");
         ResponseEntity<String> response = productControllerAdvice.handleNotAllProductsFoundException(ex);
         assertEquals("Product IDs not found: [1]", response.getBody());
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    void testNotEnoughStockException() {
+        NotEnoughStockException ex = new NotEnoughStockException("Product IDs without required stock: [1]");
+        ResponseEntity<String> response = productControllerAdvice.handleNotEnoughStockException(ex);
+        assertEquals("Product IDs without required stock: [1]", response.getBody());
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 }

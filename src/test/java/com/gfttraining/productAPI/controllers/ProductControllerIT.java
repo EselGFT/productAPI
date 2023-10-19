@@ -183,6 +183,7 @@ public class ProductControllerIT {
                 .jsonPath("$[1].price").isEqualTo(4.25)
                 .jsonPath("$[1].stock").isEqualTo(20)
                 .jsonPath("$[1].weight").isEqualTo(1.0);
+
     }
 
     @Test

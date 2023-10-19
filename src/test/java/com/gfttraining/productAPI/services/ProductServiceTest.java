@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Optional;
 
 import com.gfttraining.productAPI.exceptions.NonExistingProductException;
+import com.gfttraining.productAPI.exceptions.NotEnoughStockException;
+import com.gfttraining.productAPI.model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,10 +22,6 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import com.gfttraining.productAPI.exceptions.NotAllProductsFoundException;
-import com.gfttraining.productAPI.model.Category;
-import com.gfttraining.productAPI.model.Product;
-import com.gfttraining.productAPI.model.ProductRequest;
-import com.gfttraining.productAPI.model.ProductDTO;
 import com.gfttraining.productAPI.repositories.CategoryRepository;
 import com.gfttraining.productAPI.repositories.ProductRepository;
 
@@ -323,5 +321,275 @@ public class ProductServiceTest {
 
         assertEquals(2, numberOfProducts);
     }
+    @Test
+    public void checkIfProductsCanBeSubmittedAndSubmitTest() throws NotAllProductsFoundException, NotEnoughStockException {
+        Category other = new Category("other", 0.0);
+        List<ProductToSubmit> productsToSubmit = Arrays.asList(
+                new ProductToSubmit(1L,5),
+                new ProductToSubmit(2L,5)
+        );
+        List<Long> idList = Arrays.asList(1L,2L);
+
+        Product product1 = new Product(
+                "TestProduct1",
+                "TestDescription1",
+                other,
+                10.00,
+                50,
+                1.0);
+        product1.setId(1L);
+        Product product2 = new Product(
+                "TestProduct2",
+                "TestDescription2",
+                other,
+                10.00,
+                50,
+                1.0);
+        product2.setId(2L);
+
+        BigDecimal bd = new BigDecimal(10);
+        BigDecimal roundedPrice = bd.setScale(2, RoundingMode.CEILING);
+
+        List<Product> checkedProducts = Arrays.asList(product1,product2);
+
+        List<ProductDTO> submittedProductDTOs = Arrays.asList(
+
+                new ProductDTO(1,roundedPrice,45,1.0),
+                new ProductDTO(2,roundedPrice,45,1.0)
+        );
+
+        Mockito.when(productRepository.findAllById(idList)).thenReturn(checkedProducts);
+        Mockito.when(productRepository.save(product1)).thenReturn(product1);
+        Mockito.when(productRepository.save(product2)).thenReturn(product2);
+
+        List<ProductDTO> retrievedProductDTOs = productService.checkIfProductsCanBeSubmittedAndSubmit(productsToSubmit);
+
+        assertEquals(submittedProductDTOs, retrievedProductDTOs);
+    }
+
+    @Test
+    void getProductsWithProductsToSubmitIDsTest() throws NotAllProductsFoundException {
+        Category other = new Category("other", 0.0);
+        List<ProductToSubmit> productsToSubmit = Arrays.asList(
+                new ProductToSubmit(1L,5),
+                new ProductToSubmit(2L,5)
+        );
+        Product product1 = new Product(
+                "TestProduct1",
+                "TestDescription1",
+                other,
+                10.00,
+                50,
+                1.0);
+        product1.setId(1L);
+        Product product2 = new Product(
+                "TestProduct2",
+                "TestDescription2",
+                other,
+                10.00,
+                50,
+                1.0);
+        product2.setId(2L);
+        List<Long> idList = Arrays.asList(1L,2L);
+        List<Product> checkedProducts = Arrays.asList(product1,product2);
+
+        Mockito.when(productRepository.findAllById(idList)).thenReturn(checkedProducts);
+
+        List<Product> productsRetrieved = productService.getProductsWithProductsToSubmitIDs(productsToSubmit);
+
+        assertEquals(checkedProducts,productsRetrieved);
+    }
+
+
+    @Test
+    void getProductsWithEnoughStock() throws NotEnoughStockException {
+        Category other = new Category("other", 0.0);
+        List<ProductToSubmit> productsToSubmit = Arrays.asList(
+                new ProductToSubmit(1L,5),
+                new ProductToSubmit(2L,5)
+        );
+        Product product1 = new Product(
+                "TestProduct1",
+                "TestDescription1",
+                other,
+                10.00,
+                50,
+                1.0);
+        product1.setId(1L);
+        Product product2 = new Product(
+                "TestProduct2",
+                "TestDescription2",
+                other,
+                10.00,
+                50,
+                1.0);
+        product2.setId(2L);
+        List<Long> idList = Arrays.asList(1L,2L);
+        List<Product> checkedProducts = Arrays.asList(product1,product2);
+
+
+        List<Product> productsRetrieved = productService.getProductsWithEnoughStock(checkedProducts,productsToSubmit);
+
+        assertEquals(checkedProducts,productsRetrieved);
+    }
+    @Test
+    void getProductsWithNotEnoughStockTest(){
+        Category other = new Category("other", 0.0);
+        List<ProductToSubmit> productsToSubmit = Arrays.asList(
+                new ProductToSubmit(1L,5),
+                new ProductToSubmit(2L,5)
+        );
+        Product product1 = new Product(
+                "TestProduct1",
+                "TestDescription1",
+                other,
+                10.00,
+                3,
+                1.0);
+        product1.setId(1L);
+        Product product2 = new Product(
+                "TestProduct2",
+                "TestDescription2",
+                other,
+                10.00,
+                50,
+                1.0);
+        product2.setId(2L);
+        List<Long> idList = Arrays.asList(1L,2L);
+        List<Product> checkedProducts = Arrays.asList(product1,product2);
+
+
+        assertThrows(NotEnoughStockException.class , () -> productService.getProductsWithEnoughStock(checkedProducts,productsToSubmit));
+
+    }
+    @Test
+    void isStockEnoughtTest(){
+        Category other = new Category("other", 0.0);
+        Product product1 = new Product(
+                "TestProduct1",
+                "TestDescription1",
+                other,
+                10.00,
+                50,
+                1.0);
+        product1.setId(1L);
+        List<ProductToSubmit> productsToSubmit = Arrays.asList(
+                new ProductToSubmit(1L,5),
+                new ProductToSubmit(2L,5)
+        );
+
+
+
+
+        assertTrue(productService.isStockEnough(product1,productsToSubmit));
+    }
+    @Test
+    void isNotStockEnoughtTest(){
+        Category other = new Category("other", 0.0);
+        Product product1 = new Product(
+                "TestProduct1",
+                "TestDescription1",
+                other,
+                10.00,
+                4,
+                1.0);
+        product1.setId(1L);
+        List<ProductToSubmit> productsToSubmit = Arrays.asList(
+                new ProductToSubmit(1L,5),
+                new ProductToSubmit(2L,5)
+        );
+
+
+
+
+        assertFalse(productService.isStockEnough(product1,productsToSubmit));
+    }
+
+    @Test
+    void subtractStockWithProductToSubmit() throws NotEnoughStockException {
+        Category other = new Category("other", 0.0);
+        List<ProductToSubmit> productsToSubmit = Arrays.asList(
+                new ProductToSubmit(1L,5),
+                new ProductToSubmit(2L,5)
+        );
+        Product product1 = new Product(
+                "TestProduct1",
+                "TestDescription1",
+                other,
+                10.00,
+                50,
+                1.0);
+        product1.setId(1L);
+        Product product2 = new Product(
+                "TestProduct2",
+                "TestDescription2",
+                other,
+                10.00,
+                50,
+                1.0);
+        product2.setId(2L);
+
+        List<Long> idList = Arrays.asList(1L,2L);
+
+        List<Product> productsAvailable = Arrays.asList(product1,product2);
+
+
+        Product product1Modified = new Product(
+                "TestProduct1",
+                "TestDescription1",
+                other,
+                10.00,
+                50,
+                1.0);
+        product1Modified.setId(1L);
+        Product product2Modified = new Product(
+                "TestProduct2",
+                "TestDescription2",
+                other,
+                10.00,
+                50,
+                1.0);
+        product2Modified.setId(2L);
+
+        List<Product> productsModified= Arrays.asList(product1Modified,product2Modified);
+
+        List<Product> productsRetrieved = productService.getProductsWithEnoughStock(productsAvailable,productsToSubmit);
+
+        assertEquals(productsModified,productsRetrieved);
+    }
+
+    @Test
+    void substractSotckTest(){
+        Category other = new Category("other", 0.0);
+        Product product1 = new Product(
+                "TestProduct1",
+                "TestDescription1",
+                other,
+                10.00,
+                50,
+                1.0);
+        product1.setId(1L);
+        List<ProductToSubmit> productsToSubmit = Arrays.asList(
+                new ProductToSubmit(1L,5),
+                new ProductToSubmit(2L,5)
+        );
+
+        Product product1Modified = new Product(
+                "TestProduct1",
+                "TestDescription1",
+                other,
+                10.00,
+                45,
+                1.0);
+        product1Modified.setId(1L);
+
+        Mockito.when(productRepository.save(product1Modified)).thenReturn(product1Modified);
+
+        Product productRetrieved = productService.subtractStock(product1, productsToSubmit);
+
+        assertEquals(product1Modified,productRetrieved);
+
+    }
+
 
 }
