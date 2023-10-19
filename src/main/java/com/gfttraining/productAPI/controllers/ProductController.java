@@ -61,7 +61,7 @@ public class ProductController {
     }
 
     @PutMapping("/products/{id_product}")
-    public ResponseEntity<Product> putUpdate (@PathVariable Long id_product,  @RequestBody ProductRequest updateProductRequest) {
+    public ResponseEntity<Product> putUpdate (@PathVariable long id_product,  @RequestBody @Valid ProductRequest updateProductRequest) throws NonExistingProductException {
         return new ResponseEntity<>(
             productService.updateProduct(id_product, updateProductRequest),
             HttpStatus.OK
@@ -83,6 +83,6 @@ public class ProductController {
             productService.createProductResponsesWithProductIDs(ids),
             HttpStatus.OK
         );
-    }    
+    }
 
 }

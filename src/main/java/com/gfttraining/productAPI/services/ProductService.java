@@ -39,31 +39,33 @@ public class ProductService {
 
     }
 
-    public Product updateProduct(Long id, ProductRequest productRequest) {
+    public Product updateProduct (long id, ProductRequest productRequest) throws NonExistingProductException{
+
+    	Category category = categoryRepository.findById(productRequest.getCategory()).orElse(categoryRepository.findById("other").get());
 
 
-        Category category = categoryRepository.findById(productRequest.getCategory()).orElse(categoryRepository.findById("other").get());
+        if (productRepository.findById(id).isEmpty()){
+            throw new NonExistingProductException("The provided ID is non existent");
+        }else {
+            Product productUpdate = productRepository.findById(id).get();
+            productUpdate.setName(productRequest.getName());
+            productUpdate.setDescription(productRequest.getDescription());
+            productUpdate.setCategory(category);
+            productUpdate.setPrice(productRequest.getPrice());
+            productUpdate.setStock(productRequest.getStock());
+            productUpdate.setWeight(productRequest.getWeight());
 
-        Product productUpdate = productRepository.findById(id).get();
-
-        productUpdate.setName(productRequest.getName());
-        productUpdate.setDescription(productRequest.getDescription());
-        productUpdate.setCategory(category);
-        productUpdate.setPrice(productRequest.getPrice());
-        productUpdate.setStock(productRequest.getStock());
-        productUpdate.setWeight(productRequest.getWeight());
-
-
-        return productRepository.save(productUpdate);
+            return productRepository.save(productUpdate);
+        }
     }
 
-    public void deleteProduct(long id) throws NonExistingProductException {
+    public void deleteProduct (long id) throws NonExistingProductException {
 
-        if (productRepository.findById(id).isEmpty()) {
-            throw new NonExistingProductException("The provided ID is non existent");
-        } else {
+        if (productRepository.findById(id).isEmpty()){
+           throw new NonExistingProductException("The provided ID is non existent");
+         }else {
             productRepository.deleteById(id);
-        }
+         }
 
 
     }
@@ -71,6 +73,7 @@ public class ProductService {
     public List<Product> listProducts() {
         return productRepository.findAll();
     }
+
 
 
     public Product listProductById(long id) throws NonExistingProductException {
@@ -102,6 +105,9 @@ public class ProductService {
         }
     }
 
+    public int getNumberOfProducts() {
+        return productRepository.findAll().size();
+    }
     public List<ProductDTO> createProductsResponses(List<Product> products) {
         return products.stream()
                 .map(product -> {
