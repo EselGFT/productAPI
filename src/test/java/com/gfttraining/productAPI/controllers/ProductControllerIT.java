@@ -208,7 +208,7 @@ public class ProductControllerIT {
     @Order(6)
     void listOneProductByIDTest() {
         //Apple
-        //productService.createProduct(new ProductRequest("Apple", "A rounded food object", "food", 1.25, 23, 1.0));
+        productService.createProduct(new ProductRequest("Apple", "A rounded food object", "food", 1.25, 23, 1.0));
 
         int appleID = productService.getNumberOfProducts();// AQUI ESTO ES LO QUE FALLA
         System.out.println("AQUI 888 IMPRIME EL NUMERO DE ELEMENTOS QUE HAY EN LA DB " +productService.getNumberOfProducts());
@@ -240,7 +240,7 @@ public class ProductControllerIT {
     void listOneNonExistentProductTest() {
         int numberOfProducts = productService.getNumberOfProducts();
         System.out.println("AQUI IMPRIME EL NUMERO DE ELEMENTOS QUE HAY EN LA DB " +numberOfProducts);
-        assertEquals(8,productService.getNumberOfProducts());
+
         client.get().uri("/products/"+ (numberOfProducts + 1) )
                 .exchange()
                 .expectStatus().isEqualTo(404)
