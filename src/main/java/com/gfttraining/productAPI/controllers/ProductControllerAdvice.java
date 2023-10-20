@@ -1,6 +1,7 @@
 package com.gfttraining.productAPI.controllers;
 
 import com.gfttraining.productAPI.exceptions.NonExistingProductException;
+import com.gfttraining.productAPI.exceptions.NotEnoughStockException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -63,5 +64,10 @@ public class ProductControllerAdvice {
     public ResponseEntity<String> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex) {
          return new ResponseEntity<>("Wrong type exception, please consult the OpenAPI documentation", HttpStatus.BAD_REQUEST);
     }
-
+    @ExceptionHandler(NotEnoughStockException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<String> handleNotEnoughStockException(NotEnoughStockException ex) {
+        String message = ex.getMessage();
+        return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+    }
 }

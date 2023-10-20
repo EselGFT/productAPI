@@ -11,7 +11,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.gfttraining.productAPI.exceptions.NonExistingProductException;
-import com.gfttraining.productAPI.model.ProductDTO;
+import com.gfttraining.productAPI.exceptions.NotEnoughStockException;
+import com.gfttraining.productAPI.model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
@@ -304,7 +305,7 @@ public class ProductControllerTest {
     @Test
     public void getProductsWithIDsTest() throws NonExistingProductException{
 
-        List<ProductDTO> productsResponses = Arrays.asList(
+        List<ProductDTO> productDTOs = Arrays.asList(
 
             new ProductDTO(0,BigDecimal.valueOf(10.0),50,1.0),
             new ProductDTO(0,BigDecimal.valueOf(10.0),50,1.0)
@@ -312,12 +313,35 @@ public class ProductControllerTest {
 
 
         List<Long> idList = Arrays.asList(Long.valueOf(1),Long.valueOf(2));
-        Mockito.when(productService.createProductResponsesWithProductIDs(idList)).thenReturn(productsResponses);
+        Mockito.when(productService.createProductResponsesWithProductIDs(idList)).thenReturn(productDTOs);
 
 
         ResponseEntity<List<ProductDTO>> retrievedProducts = productController.productsWithIDs(idList);
 
-        assertEquals(productsResponses, retrievedProducts.getBody());
+        assertEquals(productDTOs, retrievedProducts.getBody());
+
+
+    }
+    @Test
+    public void ProductsToSubmitTest() throws NonExistingProductException, NotEnoughStockException {
+
+        List<ProductToSubmit> productsToSubmit = Arrays.asList(
+                new ProductToSubmit(1L,5),
+                new ProductToSubmit(2L,5)
+        );
+
+        List<ProductDTO> productDTOs = Arrays.asList(
+
+                new ProductDTO(1,BigDecimal.valueOf(10.0),45,1.0),
+                new ProductDTO(2,BigDecimal.valueOf(10.0),45,1.0)
+        );
+
+        Mockito.when(productService.checkIfProductsCanBeSubmittedAndSubmit(productsToSubmit)).thenReturn(productDTOs);
+
+
+        ResponseEntity<List<ProductDTO>> retrievedProducts = productController.submitProducts(productsToSubmit);
+
+        assertEquals(productDTOs, retrievedProducts.getBody());
 
 
     }

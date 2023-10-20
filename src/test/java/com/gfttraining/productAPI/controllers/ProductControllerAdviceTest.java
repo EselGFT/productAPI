@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.gfttraining.productAPI.exceptions.NonExistingProductException;
+import com.gfttraining.productAPI.exceptions.NotEnoughStockException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -67,6 +68,15 @@ public class ProductControllerAdviceTest {
     }
 
     @Test
+    void testHandleNumberFormatException() {
+
+        NumberFormatException ex = new NumberFormatException();
+        ResponseEntity<String> response = productControllerAdvice.handleNumberFormatException(ex);
+        assertEquals("Your input does not match the one required by the endpoint, please refer to the OpenAPI documentation", response.getBody());
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    }
+
+    @Test
     void testHandleMethodArgumentNotValidException() {
         FieldError fieldError = new FieldError("objectName", "fieldName", "error message");
         when(bindingResult.getAllErrors()).thenReturn(List.of(fieldError));
@@ -92,5 +102,13 @@ public class ProductControllerAdviceTest {
         ResponseEntity<String> response = productControllerAdvice.handleNonExistingProductException(ex);
         assertEquals("Product IDs not found: [1]", response.getBody());
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    void testNotEnoughStockException() {
+        NotEnoughStockException ex = new NotEnoughStockException("Product IDs without required stock: [1]");
+        ResponseEntity<String> response = productControllerAdvice.handleNotEnoughStockException(ex);
+        assertEquals("Product IDs without required stock: [1]", response.getBody());
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 }

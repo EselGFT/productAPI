@@ -1,6 +1,7 @@
 package com.gfttraining.productAPI.controllers;
 
 import com.gfttraining.productAPI.model.ProductRequest;
+import com.gfttraining.productAPI.model.ProductToSubmit;
 import com.gfttraining.productAPI.services.ProductService;
 import jakarta.annotation.PostConstruct;
 import org.junit.jupiter.api.*;
@@ -455,6 +456,29 @@ public class ProductControllerIT {
         ;
     }
 
+    @Test
+    @DisplayName("Given a list of products to submit, When they are submitted, Then it should return the products with the modified stock")
+    @Order(18)
+    void submitProductsIT() {
 
-    //////////////////////////////////////// ORDER ENDS HERE ///////////////////////////////////////////
+        client.get().uri("/products/1").exchange()
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.stock").isEqualTo(10);
+
+        List<ProductToSubmit> productsToSubmit = List.of(
+                new ProductToSubmit(1L, 5)
+        );
+
+        client.post().uri("/submitProducts")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(productsToSubmit)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$[0].stock").isEqualTo(5);
+
+    }
+
 }

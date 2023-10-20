@@ -3,6 +3,8 @@ package com.gfttraining.productAPI.controllers;
 import java.util.List;
 
 import com.gfttraining.productAPI.exceptions.NonExistingProductException;
+import com.gfttraining.productAPI.exceptions.NotEnoughStockException;
+import com.gfttraining.productAPI.model.ProductToSubmit;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -63,7 +65,7 @@ public class ProductController {
 
 
     @PostMapping("/products")
-    public ResponseEntity<List<Product>> postLoadProducts(@RequestBody @Valid List<ProductRequest> productRequests) {
+    public ResponseEntity<List<Product>> postLoadProducts(@RequestBody  List<@Valid ProductRequest> productRequests) {
         return new ResponseEntity<>(
             productService.createProducts(productRequests),
             HttpStatus.OK
@@ -94,5 +96,11 @@ public class ProductController {
             HttpStatus.OK
         );
     }
-
+    @PostMapping("/submitProducts")
+    public ResponseEntity<List<ProductDTO>> submitProducts(@RequestBody List<ProductToSubmit> productsToSubmit) throws NonExistingProductException, NotEnoughStockException {
+        return new ResponseEntity<>(
+                productService.checkIfProductsCanBeSubmittedAndSubmit(productsToSubmit),
+                HttpStatus.OK
+        );
+    }
 }
