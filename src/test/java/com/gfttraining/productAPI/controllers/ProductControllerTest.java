@@ -27,7 +27,6 @@ import org.springframework.http.ResponseEntity;
 import com.gfttraining.productAPI.model.Category;
 import com.gfttraining.productAPI.model.Product;
 import com.gfttraining.productAPI.model.ProductRequest;
-import com.gfttraining.productAPI.exceptions.NotAllProductsFoundException;
 import com.gfttraining.productAPI.repositories.ProductRepository;
 import com.gfttraining.productAPI.services.ProductService;
 
@@ -324,7 +323,7 @@ public class ProductControllerTest {
 
     }
     @Test
-    public void ProductsToSubmitTest() throws NotAllProductsFoundException, NotEnoughStockException {
+    public void ProductsToSubmitTest() throws NonExistingProductException, NotEnoughStockException {
 
         List<ProductToSubmit> productsToSubmit = Arrays.asList(
                 new ProductToSubmit(1L,5),

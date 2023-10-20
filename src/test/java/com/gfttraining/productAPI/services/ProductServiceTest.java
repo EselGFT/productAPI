@@ -21,7 +21,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import com.gfttraining.productAPI.exceptions.NotAllProductsFoundException;
+
 import com.gfttraining.productAPI.model.Category;
 import com.gfttraining.productAPI.model.Product;
 import com.gfttraining.productAPI.model.ProductRequest;
@@ -376,7 +376,8 @@ public class ProductServiceTest {
         assertEquals(2, numberOfProducts);
     }
     @Test
-    public void checkIfProductsCanBeSubmittedAndSubmitTest() throws NotAllProductsFoundException, NotEnoughStockException {
+    @DisplayName("Given valid products, when checking if they can be submitted and submitting, then expect submitted ProductDTOs")
+    public void checkIfProductsCanBeSubmittedAndSubmitTest() throws NonExistingProductException, NotEnoughStockException {
         Category other = new Category("other", 0.0);
         List<ProductToSubmit> productsToSubmit = Arrays.asList(
                 new ProductToSubmit(1L,5),
@@ -422,7 +423,8 @@ public class ProductServiceTest {
     }
 
     @Test
-    void getProductsWithProductsToSubmitIDsTest() throws NotAllProductsFoundException {
+    @DisplayName("Given products to submit IDs, when getting products, then expect checked products")
+    void getProductsWithProductsToSubmitIDsTest() throws NonExistingProductException {
         Category other = new Category("other", 0.0);
         List<ProductToSubmit> productsToSubmit = Arrays.asList(
                 new ProductToSubmit(1L,5),
@@ -456,6 +458,7 @@ public class ProductServiceTest {
 
 
     @Test
+    @DisplayName("Given products and products to submit, when checking if stock is enough, then expect checked products")
     void getProductsWithEnoughStock() throws NotEnoughStockException {
         Category other = new Category("other", 0.0);
         List<ProductToSubmit> productsToSubmit = Arrays.asList(
@@ -487,6 +490,7 @@ public class ProductServiceTest {
         assertEquals(checkedProducts,productsRetrieved);
     }
     @Test
+    @DisplayName("Given insufficient stock, when checking if stock is enough, then expect NotEnoughStockException")
     void getProductsWithNotEnoughStockTest(){
         Category other = new Category("other", 0.0);
         List<ProductToSubmit> productsToSubmit = Arrays.asList(
@@ -517,6 +521,7 @@ public class ProductServiceTest {
 
     }
     @Test
+    @DisplayName("Given a product and products to submit, when checking if stock is enough, then expect true")
     void isStockEnoughtTest(){
         Category other = new Category("other", 0.0);
         Product product1 = new Product(
@@ -538,6 +543,7 @@ public class ProductServiceTest {
         assertTrue(productService.isStockEnough(product1,productsToSubmit));
     }
     @Test
+    @DisplayName("Given a product with insufficient stock and products to submit, when checking if stock is enough, then expect false")
     void isNotStockEnoughtTest(){
         Category other = new Category("other", 0.0);
         Product product1 = new Product(
@@ -560,6 +566,7 @@ public class ProductServiceTest {
     }
 
     @Test
+    @DisplayName("Given products and products to submit, when subtracting stock, then expect modified product")
     void subtractStockWithProductToSubmit() throws NotEnoughStockException {
         Category other = new Category("other", 0.0);
         List<ProductToSubmit> productsToSubmit = Arrays.asList(
@@ -613,7 +620,8 @@ public class ProductServiceTest {
     }
 
     @Test
-    void substractSotckTest(){
+    @DisplayName("Given a product and products to submit, when subtracting stock, then expect modified product")
+    void substractStockTest(){
         Category other = new Category("other", 0.0);
         Product product1 = new Product(
                 "TestProduct1",

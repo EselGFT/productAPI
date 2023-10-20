@@ -9,7 +9,6 @@ import com.gfttraining.productAPI.exceptions.NotEnoughStockException;
 import com.gfttraining.productAPI.model.*;
 import org.springframework.stereotype.Service;
 
-import com.gfttraining.productAPI.exceptions.NotAllProductsFoundException;
 import com.gfttraining.productAPI.model.Category;
 import com.gfttraining.productAPI.model.Product;
 import com.gfttraining.productAPI.model.ProductRequest;
@@ -130,7 +129,7 @@ public class ProductService {
         return roundedPrice;
     }
 
-    public List<ProductDTO> checkIfProductsCanBeSubmittedAndSubmit(List<ProductToSubmit> productsToSubmit) throws NotAllProductsFoundException, NotEnoughStockException {
+    public List<ProductDTO> checkIfProductsCanBeSubmittedAndSubmit(List<ProductToSubmit> productsToSubmit) throws NonExistingProductException, NotEnoughStockException {
         List<Product> productsFound = getProductsWithProductsToSubmitIDs(productsToSubmit);
         List<Product> productsAvailable = getProductsWithEnoughStock(productsFound, productsToSubmit);
         List<Product> productsWithModifiedStock = subtractStockWithProductToSubmit(productsAvailable, productsToSubmit);
@@ -153,7 +152,7 @@ public class ProductService {
     }
 
 
-    public List<Product> getProductsWithProductsToSubmitIDs(List<ProductToSubmit> productsToSubmit) throws NotAllProductsFoundException {
+    public List<Product> getProductsWithProductsToSubmitIDs(List<ProductToSubmit> productsToSubmit) throws NonExistingProductException {
         return getProductsWithIDs(productsToSubmit.stream()
                 .map(ProductToSubmit::getId)
                 .toList());

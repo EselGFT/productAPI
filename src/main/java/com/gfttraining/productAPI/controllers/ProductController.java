@@ -96,7 +96,7 @@ public class ProductController {
         );
     }
     @PostMapping("/submitProducts")
-    public ResponseEntity<List<ProductDTO>> submitProducts(@RequestBody List<ProductToSubmit> productsToSubmit) throws NotAllProductsFoundException, NotEnoughStockException {
+    public ResponseEntity<List<ProductDTO>> submitProducts(@RequestBody List<ProductToSubmit> productsToSubmit) throws NonExistingProductException, NotEnoughStockException {
         return new ResponseEntity<>(
                 productService.checkIfProductsCanBeSubmittedAndSubmit(productsToSubmit),
                 HttpStatus.OK
