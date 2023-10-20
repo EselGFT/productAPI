@@ -18,6 +18,7 @@ import com.gfttraining.productAPI.services.ProductService;
 import jakarta.validation.Valid;
 
 @RestController
+@Validated
 public class ProductController {
 
     
