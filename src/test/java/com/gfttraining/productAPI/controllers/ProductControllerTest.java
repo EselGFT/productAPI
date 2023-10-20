@@ -21,10 +21,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 
+import com.gfttraining.productAPI.model.Category;
+import com.gfttraining.productAPI.model.Product;
+import com.gfttraining.productAPI.model.ProductRequest;
 import com.gfttraining.productAPI.exceptions.NotAllProductsFoundException;
 import com.gfttraining.productAPI.repositories.ProductRepository;
 import com.gfttraining.productAPI.services.ProductService;
@@ -302,7 +304,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void getProductsWithIDsTest() throws NotAllProductsFoundException{
+    public void getProductsWithIDsTest() throws NonExistingProductException{
 
         List<ProductDTO> productDTOs = Arrays.asList(
 
@@ -334,7 +336,7 @@ public class ProductControllerTest {
                 new ProductDTO(1,BigDecimal.valueOf(10.0),45,1.0),
                 new ProductDTO(2,BigDecimal.valueOf(10.0),45,1.0)
         );
-        
+
         Mockito.when(productService.checkIfProductsCanBeSubmittedAndSubmit(productsToSubmit)).thenReturn(productDTOs);
 
 

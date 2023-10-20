@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import java.util.Set;
 
+import com.gfttraining.productAPI.exceptions.NonExistingProductException;
 import com.gfttraining.productAPI.exceptions.NotEnoughStockException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,8 +21,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-
-import com.gfttraining.productAPI.exceptions.NotAllProductsFoundException;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -89,9 +88,9 @@ public class ProductControllerAdviceTest {
     }
 
     @Test
-    void testHandleNotAllProductsFoundException() {
-        NotAllProductsFoundException ex = new NotAllProductsFoundException("Product IDs not found: [1]");
-        ResponseEntity<String> response = productControllerAdvice.handleNotAllProductsFoundException(ex);
+    void testHandleNonExistingProductException() {
+        NonExistingProductException ex = new NonExistingProductException("Product IDs not found: [1]");
+        ResponseEntity<String> response = productControllerAdvice.handleNonExistingProductException(ex);
         assertEquals("Product IDs not found: [1]", response.getBody());
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }

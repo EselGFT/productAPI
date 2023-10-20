@@ -22,6 +22,10 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import com.gfttraining.productAPI.exceptions.NotAllProductsFoundException;
+import com.gfttraining.productAPI.model.Category;
+import com.gfttraining.productAPI.model.Product;
+import com.gfttraining.productAPI.model.ProductRequest;
+import com.gfttraining.productAPI.model.ProductDTO;
 import com.gfttraining.productAPI.repositories.CategoryRepository;
 import com.gfttraining.productAPI.repositories.ProductRepository;
 
@@ -324,7 +328,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    public void listProductsWithIDsTest() throws NotAllProductsFoundException{
+    public void listProductsWithIDsTest() throws NonExistingProductException {
 
         Category food = new Category("food", 25.0);
         Product productTest1 = new Product(
