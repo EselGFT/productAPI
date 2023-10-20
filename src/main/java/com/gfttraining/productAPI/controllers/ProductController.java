@@ -5,6 +5,7 @@ import java.util.List;
 import com.gfttraining.productAPI.exceptions.NonExistingProductException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import com.gfttraining.productAPI.exceptions.NotAllProductsFoundException;
@@ -16,6 +17,7 @@ import com.gfttraining.productAPI.services.ProductService;
 import jakarta.validation.Valid;
 
 @RestController
+@Validated
 public class ProductController {
 
     

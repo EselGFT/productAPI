@@ -81,36 +81,36 @@ public class ProductControllerIT {
     }
      //2 PRODUCTS HAVE BEEN CREATED
 
-//    @Test
-//    @DisplayName("2 Given a list of productRequests with bad content When a post is made to /products Then it should return an error message")
-//    @Order(2)
-//    void postLoadProductsErrorTest() {
-//        List<ProductRequest> productRequests = Arrays.asList(
-//                new ProductRequest(
-//                        "TestProduct1",
-//                        "TestDescription1",
-//                        "TestCategory",
-//                        null,
-//                        50,
-//                        1.0),
-//                new ProductRequest(
-//                        "TestProduct2",
-//                        "TestDescription2",
-//                        "TestCategory",
-//                        10.0,
-//                        100,
-//                        1.0)
-//        );
-//
-//        client.post().uri("/products")
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .bodyValue(productRequests)
-//                .exchange()
-//
-//                .expectStatus().isBadRequest()
-//                .expectBody(String.class)
-//                .value(message -> assertTrue(message.contains("Price should not be null")));
-//    }
+    @Test
+    @DisplayName("2 Given a list of productRequests with bad content When a post is made to /products Then it should return an error message")
+    @Order(2)
+    void postLoadProductsErrorTest() {
+        List<ProductRequest> productRequests = Arrays.asList(
+                new ProductRequest(
+                        "TestProduct1",
+                        "TestDescription1",
+                        "TestCategory",
+                        null,
+                        50,
+                        1.0),
+                new ProductRequest(
+                        "TestProduct2",
+                        "TestDescription2",
+                        "TestCategory",
+                        10.0,
+                        100,
+                        1.0)
+        );
+
+        client.post().uri("/products")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(productRequests)
+                .exchange()
+
+                .expectStatus().isBadRequest()
+                .expectBody(String.class)
+                .value(message -> assertTrue(message.contains("Price should not be null")));
+    }
 
     @Test
     @DisplayName("3 Given a productRequests  When a post is made to /product Then it should be saved in the database and return the saved product")
@@ -141,7 +141,7 @@ public class ProductControllerIT {
                 .jsonPath("$.stock").isEqualTo(50)
                 .jsonPath("$.weight").isEqualTo(1.0);
 
-        listAllDB(3);
+
     }
     // 1 PRODUCT HAS BEEN CREATED - TOTAL: 5
     @Test
@@ -166,8 +166,7 @@ public class ProductControllerIT {
                 .expectStatus().isBadRequest()
                 .expectBody(String.class)
                 .value(message -> assertTrue(message.contains("Price should not be null")));
-        int numberOfProducts = productService.getNumberOfProducts();
-        System.out.println("AQUI IMPRIME EL NUMERO DE ELEMENTOS QUE HAY EN LA DB " +numberOfProducts);
+
     }
 
     @Test
@@ -176,8 +175,6 @@ public class ProductControllerIT {
     void listAllTest() {
 
         int numberOfProducts = productService.getNumberOfProducts();
-        System.out.println("AQUI IMPRIME EL NUMERO DE ELEMENTOS QUE HAY EN LA DB " +numberOfProducts);
-
         //Apple
         productService.createProduct(new ProductRequest("Apple", "A rounded food object", "food", 1.25, 23,1.0));
 
@@ -211,7 +208,7 @@ public class ProductControllerIT {
         productService.createProduct(new ProductRequest("Apple", "A rounded food object", "food", 1.25, 23, 1.0));
 
         int appleID = productService.getNumberOfProducts();// AQUI ESTO ES LO QUE FALLA
-        System.out.println("AQUI 888 IMPRIME EL NUMERO DE ELEMENTOS QUE HAY EN LA DB " +productService.getNumberOfProducts());
+
         client.get().uri("/products/" + appleID)
                .exchange()
                .expectStatus().isOk()
@@ -239,7 +236,6 @@ public class ProductControllerIT {
     @Order(8)
     void listOneNonExistentProductTest() {
         int numberOfProducts = productService.getNumberOfProducts();
-        System.out.println("AQUI IMPRIME EL NUMERO DE ELEMENTOS QUE HAY EN LA DB " +numberOfProducts);
 
         client.get().uri("/products/"+ (numberOfProducts + 1) )
                 .exchange()
@@ -358,7 +354,7 @@ public class ProductControllerIT {
     void productDeleteIT() {
 
         int numberOfProducts = productService.getNumberOfProducts();
-        System.out.println("AQUI IMPRIME EL NUMERO DE ELEMENTOS QUE HAY EN LA DB " +numberOfProducts);
+
 
         client.get().uri("/products").exchange()
                 .expectStatus().isOk()
