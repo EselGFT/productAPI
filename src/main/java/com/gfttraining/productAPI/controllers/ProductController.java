@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.gfttraining.productAPI.exceptions.NotAllProductsFoundException;
 import com.gfttraining.productAPI.model.Product;
 import com.gfttraining.productAPI.model.ProductRequest;
 import com.gfttraining.productAPI.model.ProductDTO;
@@ -87,7 +86,7 @@ public class ProductController {
     }
 
     @PostMapping("/productsWithIDs")
-   public ResponseEntity<List<ProductDTO>> productsWithIDs (@RequestBody List<Long> ids) throws NotAllProductsFoundException {
+   public ResponseEntity<List<ProductDTO>> productsWithIDs (@RequestBody List<Long> ids) throws NonExistingProductException {
         return new ResponseEntity<>(
             productService.createProductResponsesWithProductIDs(ids),
             HttpStatus.OK
