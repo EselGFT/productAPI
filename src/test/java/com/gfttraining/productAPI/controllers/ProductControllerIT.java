@@ -29,6 +29,7 @@ public class ProductControllerIT {
     @Autowired
     private ProductService productService;
 
+    //Initiate the web client
     @PostConstruct
     void init() {
         client = WebTestClient.bindToServer()
@@ -39,7 +40,7 @@ public class ProductControllerIT {
 
     //////////////// ORDER STARTS HERE *****************************************************************
     @Test
-    @DisplayName("1 Given a list of productRquests When a post is made to /products Then it should be saved in database and return the saved products")
+    @DisplayName("Given a list of productRquests When a post is made to /products Then it should be saved in database and return the saved products")
     @Order(1)
     void postLoadProductsTest() {
         List<ProductRequest> productRequests = Arrays.asList(
@@ -81,10 +82,9 @@ public class ProductControllerIT {
                 .jsonPath("$[1].stock").isEqualTo(100)
                 .jsonPath("$[1].weight").isEqualTo(1.0);
     }
-    //2 PRODUCTS HAVE BEEN CREATED
 
     @Test
-    @DisplayName("2 Given a list of productRequests with bad content When a post is made to /products Then it should return an error message")
+    @DisplayName("Given a list of productRequests with bad content When a post is made to /products Then it should return an error message")
     @Order(2)
     void postLoadProductsErrorTest() {
         List<ProductRequest> productRequests = Arrays.asList(
@@ -115,7 +115,7 @@ public class ProductControllerIT {
     }
 
     @Test
-    @DisplayName("3 Given a productRequests  When a post is made to /product Then it should be saved in the database and return the saved product")
+    @DisplayName("Given a productRequests  When a post is made to /product Then it should be saved in the database and return the saved product")
     @Order(3)
     void postLoadProductTest() {
 
@@ -146,9 +146,8 @@ public class ProductControllerIT {
 
     }
 
-    // 1 PRODUCT HAS BEEN CREATED - TOTAL: 5
     @Test
-    @DisplayName("4 Given a productRequest with bad content When a post is made to /product Then it should return an error message")
+    @DisplayName("Given a productRequest with bad content When a post is made to /product Then it should return an error message")
     @Order(4)
     void postLoadProductErrorTest() {
 
@@ -174,7 +173,7 @@ public class ProductControllerIT {
 
     @Test
     @Order(5)
-    @DisplayName("5")
+    @DisplayName("WHEN trying to list all products THEN a list containing all of them must be returned")
     void listAllTest() {
 
         int numberOfProducts = productService.getNumberOfProducts();
@@ -201,16 +200,15 @@ public class ProductControllerIT {
                 .jsonPath("$[" + (numberOfProducts + 1) + "].stock").isEqualTo(13)
                 .jsonPath("$[" + (numberOfProducts + 1) + "].weight").isEqualTo(1.0);
     }
-    //2 PRODUCTS HAVE BEEN CREATED total 8 products
 
     @Test
-    @DisplayName("6")
+    @DisplayName("GIVEN a valid product ID WHEN trying to list it THEN the corresponding product should be listed")
     @Order(6)
     void listOneProductByIDTest() {
         //Apple
         productService.createProduct(new ProductRequest("Apple", "A rounded food object", "food", 1.25, 23, 1.0));
 
-        int appleID = productService.getNumberOfProducts();// AQUI ESTO ES LO QUE FALLA
+        int appleID = productService.getNumberOfProducts();
 
         client.get().uri("/products/" + appleID)
                 .exchange()
@@ -223,9 +221,8 @@ public class ProductControllerIT {
                 .jsonPath("$.stock").isEqualTo(23);
     }
 
-    // no 1 PRODUCT HAS BEEN CREATED
     @Test
-    @DisplayName("7")
+    @DisplayName("GIVEN a stirng product ID WHEN tying to list it THEN an error should be invoked")
     @Order(7)
     void listOneProductWithStringIDTest() {
         client.get().uri("/products/str")
@@ -236,7 +233,7 @@ public class ProductControllerIT {
     }
 
     @Test
-    @DisplayName("8")
+    @DisplayName("GIVEN a non existing product ID WHEN trying to list it THEN an error should be found")
     @Order(8)
     void listOneNonExistentProductTest() {
         int numberOfProducts = productService.getNumberOfProducts();
@@ -249,7 +246,7 @@ public class ProductControllerIT {
     }
 
     @Test
-    @DisplayName("9 Given a list of IDs When a post is made to /productsWithIDs Then it should return the ProductDTO of the found IDs")
+    @DisplayName("Given a list of IDs When a post is made to /productsWithIDs Then it should return the ProductDTO of the found IDs")
     @Order(9)
     void productsWithIDsTest() {
         long id1 = 1;
@@ -274,7 +271,7 @@ public class ProductControllerIT {
     }
 
     @Test
-    @DisplayName("10 Given a list of IDs When a post is made to /productsWithIDs Then it should return the ProductDTO of the found IDs")
+    @DisplayName("Given a list of IDs When a post is made to /productsWithIDs Then it should return the ProductDTO of the found IDs")
     @Order(10)
     void productsWithIDsErrorTest() {
         long id1 = 1;
@@ -293,8 +290,71 @@ public class ProductControllerIT {
     }
 
     @Test
-    @DisplayName("11 GIVEN a product's information WHEN the product's controller putUpdate method is called THEN the provided product's information is updated with te new information")
     @Order(11)
+    @DisplayName("GIVEN two products that contain ouch WHEN searching that query THEN both are returned")
+    void searchProductMultipleResultsTest() {
+
+        productService.createProduct(new ProductRequest("CoUcH", "To sit", "other", 100.0, 2, 58.0));
+        productService.createProduct(new ProductRequest("POUCH", "To store", "other", 10.0, 20, 10.0));
+
+        client.get().uri("/products/search/ouch")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.[0]").isNotEmpty()
+                .jsonPath("$.[0].name").isEqualTo("CoUcH")
+                .jsonPath("$.[0].description").isEqualTo("To sit")
+                .jsonPath("$.[0].category.name").isEqualTo("other")
+                .jsonPath("$.[0].price").isEqualTo(100.0)
+                .jsonPath("$.[0].stock").isEqualTo(2)
+                .jsonPath("$.[0].weight").isEqualTo(58.0)
+                .jsonPath("$.[1]").isNotEmpty()
+                .jsonPath("$.[1].name").isEqualTo("POUCH")
+                .jsonPath("$.[1].description").isEqualTo("To store")
+                .jsonPath("$.[1].category.name").isEqualTo("other")
+                .jsonPath("$.[1].price").isEqualTo(10.0)
+                .jsonPath("$.[1].stock").isEqualTo(20)
+                .jsonPath("$.[1].weight").isEqualTo(10.0)
+                .jsonPath("$.[2]").doesNotExist();
+    }
+
+    @Test
+    @Order(12)
+    @DisplayName("GIVEN a name that only corresponds to 1 product WHEN searching by it THEN only that product is returned")
+    void searchProductOneResultTest() {
+
+        productService.createProduct(new ProductRequest("department", "A house", "other", 1000.0, 2, 109.0));
+
+        client.get().uri("/products/search/DEPARTMENT")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.[0]").isNotEmpty()
+                .jsonPath("$.[0].name").isEqualTo("department")
+                .jsonPath("$.[0].description").isEqualTo("A house")
+                .jsonPath("$.[0].category.name").isEqualTo("other")
+                .jsonPath("$.[0].price").isEqualTo(1000.0)
+                .jsonPath("$.[0].stock").isEqualTo(2)
+                .jsonPath("$.[0].weight").isEqualTo(109.0)
+                .jsonPath("$.[1]").doesNotExist();
+    }
+
+    @Test
+    @Order(13)
+    @DisplayName("GIVEN a name that only corresponds no products WHEN searching by it THEN no products are returned")
+    void searchProductNoResultTest() {
+
+        client.get().uri("/products/search/bananana")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$")
+                .isEmpty();
+    }
+
+    @Test
+    @DisplayName("GIVEN a product's information WHEN the product's controller putUpdate method is called THEN the provided product's information is updated with te new information")
+    @Order(14)
     void productUpdateIT() {
         //GIVEN
         ProductRequest productRequestTest = new ProductRequest("TestProduct", "", "TestCategory", 10.0, 50, 2.0);
@@ -333,8 +393,8 @@ public class ProductControllerIT {
     }
 
     @Test
-    @DisplayName(" 12 GIVEN2 a product's information WHEN the product's controller putUpdate method is called THEN the provided product's information is updated with te new information")
-    @Order(12)
+    @DisplayName("GIVEN a product's information WHEN the product's controller putUpdate method is called THEN the provided product's information is updated with the new information")
+    @Order(15)
     void productUpdateThrowExceptionIT() {
         //GIVEN
         ProductRequest productRequestTest = new ProductRequest("TestProduct", "", "TestCategory", 10.0, 50, 2.0);
@@ -351,8 +411,8 @@ public class ProductControllerIT {
     }
 
     @Test
-    @DisplayName("13 WHEN deleteProduct is executed THEN delete a product object")
-    @Order(13)
+    @DisplayName("WHEN deleteProduct is executed THEN delete a product object")
+    @Order(16)
     void productDeleteIT() {
 
         int numberOfProducts = productService.getNumberOfProducts();
@@ -382,8 +442,8 @@ public class ProductControllerIT {
     }
 
     @Test
-    @DisplayName("14 GIVEN a product's information WHEN the product's controller putUpdate method is called with incorrect Id THEN throws the NonExistingProductException exception")
-    @Order(14)
+    @DisplayName("GIVEN a product's information WHEN the product's controller putUpdate method is called with incorrect Id THEN throws the NonExistingProductException exception")
+    @Order(17)
     void productDeleteThrowExceptionIT() {
         //GIVEN
 
