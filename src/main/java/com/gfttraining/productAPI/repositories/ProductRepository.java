@@ -10,6 +10,6 @@ import com.gfttraining.productAPI.model.Product;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product,Long>{
-    List<Product> findByName(String name);
+    List<Product> findByNameIgnoreCaseContaining(String name);
     
 }

@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import com.gfttraining.productAPI.exceptions.NotAllProductsFoundException;
 import com.gfttraining.productAPI.model.Product;
 import com.gfttraining.productAPI.model.ProductRequest;
 import com.gfttraining.productAPI.model.ProductDTO;
@@ -40,6 +39,15 @@ public class ProductController {
 
         return new ResponseEntity<>(
                 productService.listProductById(id_product),
+                HttpStatus.OK
+        );
+    }
+
+    @GetMapping("/products/search/{product_name}")
+    public ResponseEntity<List<Product>> searchProducts(@PathVariable String product_name) {
+
+        return new ResponseEntity<>(
+                productService.listProductsByNameContainsIgnoreCase(product_name),
                 HttpStatus.OK
         );
     }
@@ -78,9 +86,9 @@ public class ProductController {
         );
 
     }
-    
+
     @PostMapping("/productsWithIDs")
-   public ResponseEntity<List<ProductDTO>> productsWithIDs (@RequestBody List<Long> ids) throws NotAllProductsFoundException {
+   public ResponseEntity<List<ProductDTO>> productsWithIDs (@RequestBody List<Long> ids) throws NonExistingProductException {
         return new ResponseEntity<>(
             productService.createProductResponsesWithProductIDs(ids),
             HttpStatus.OK

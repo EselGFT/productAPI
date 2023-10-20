@@ -14,6 +14,7 @@ import com.gfttraining.productAPI.exceptions.NonExistingProductException;
 import com.gfttraining.productAPI.model.ProductDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -22,7 +23,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 
-import com.gfttraining.productAPI.exceptions.NotAllProductsFoundException;
 import com.gfttraining.productAPI.model.Category;
 import com.gfttraining.productAPI.model.Product;
 import com.gfttraining.productAPI.model.ProductRequest;
@@ -180,6 +180,55 @@ public class ProductControllerTest {
     }
 
     // end of listProductById() tests
+    
+    // start of searchProducts() tests
+
+    @Test
+    @DisplayName("GIVEN two products that contain ap WHEN the method is called with that input THEN a list containing both is returned")
+    void searchMultipleProductsTest() {
+        Product apple = new Product("Apple", "A rounded food object", new Category("food", 25.0), 1.25, 23, 1.1);
+        Product apartment = new Product("Apartment", "A penthouse", new Category("other", 0.0), 12000.0, 1, 1000.1);
+
+        List<Product> fullList = List.of(apple, apartment);
+
+        Mockito.when(productService.listProductsByNameContainsIgnoreCase("ap")).thenReturn(fullList);
+
+        ResponseEntity<List<Product>> apQuery = productController.searchProducts("ap");
+
+        verify(productService, times(1)).listProductsByNameContainsIgnoreCase("ap");
+
+        assertEquals(fullList, apQuery.getBody());
+    }
+
+    @Test
+    void searchOneProductTest() {
+        Product apple = new Product("Apple", "A rounded food object", new Category("food", 25.0), 1.25, 23, 1.1);
+
+        List<Product> appleList = List.of(apple);
+
+        Mockito.when(productService.listProductsByNameContainsIgnoreCase("APPLE")).thenReturn(appleList);
+
+        ResponseEntity<List<Product>> appleQuery = productController.searchProducts("APPLE");
+
+        verify(productService, times(1)).listProductsByNameContainsIgnoreCase("APPLE");
+
+        assertEquals(appleList, appleQuery.getBody());
+    }
+
+    @Test
+    void noResultsProductSearchTest() {
+        List<Product> emptyList = List.of();
+
+        Mockito.when(productService.listProductsByNameContainsIgnoreCase("butter")).thenReturn(emptyList);
+
+        ResponseEntity<List<Product>> butterQuery = productController.searchProducts("butter");
+
+        verify(productService, times(1)).listProductsByNameContainsIgnoreCase("butter");
+
+        assertEquals(emptyList, butterQuery.getBody());
+    }
+
+    // end of searchProducts() tests
 
     @Test
     @DisplayName("GIVEN a product's information that doesn't follow the requirements WHEN creating a product through the controller THEN 1 violation should emerge")
@@ -253,7 +302,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void getProductsWithIDsTest() throws NotAllProductsFoundException{
+    public void getProductsWithIDsTest() throws NonExistingProductException{
 
         List<ProductDTO> productsResponses = Arrays.asList(
 

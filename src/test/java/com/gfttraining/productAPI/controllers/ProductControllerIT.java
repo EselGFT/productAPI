@@ -23,9 +23,11 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 public class ProductControllerIT {
 
-    @LocalServerPort private int port;
+    @LocalServerPort
+    private int port;
     private WebTestClient client;
-    @Autowired private ProductService productService;
+    @Autowired
+    private ProductService productService;
 
     @PostConstruct
     void init() {
@@ -79,7 +81,7 @@ public class ProductControllerIT {
                 .jsonPath("$[1].stock").isEqualTo(100)
                 .jsonPath("$[1].weight").isEqualTo(1.0);
     }
-     //2 PRODUCTS HAVE BEEN CREATED
+    //2 PRODUCTS HAVE BEEN CREATED
 
     @Test
     @DisplayName("2 Given a list of productRequests with bad content When a post is made to /products Then it should return an error message")
@@ -143,6 +145,7 @@ public class ProductControllerIT {
 
 
     }
+
     // 1 PRODUCT HAS BEEN CREATED - TOTAL: 5
     @Test
     @DisplayName("4 Given a productRequest with bad content When a post is made to /product Then it should return an error message")
@@ -176,10 +179,10 @@ public class ProductControllerIT {
 
         int numberOfProducts = productService.getNumberOfProducts();
         //Apple
-        productService.createProduct(new ProductRequest("Apple", "A rounded food object", "food", 1.25, 23,1.0));
+        productService.createProduct(new ProductRequest("Apple", "A rounded food object", "food", 1.25, 23, 1.0));
 
         //Dictionary
-        productService.createProduct(new ProductRequest("Dictionary", "A book that defines words", "books", 19.89, 13 ,1.0));
+        productService.createProduct(new ProductRequest("Dictionary", "A book that defines words", "books", 19.89, 13, 1.0));
 
         client.get().uri("/products")
                 .exchange()
@@ -191,12 +194,12 @@ public class ProductControllerIT {
                 .jsonPath("$[" + numberOfProducts + "].price").isEqualTo(1.25)
                 .jsonPath("$[" + numberOfProducts + "].stock").isEqualTo(23)
                 .jsonPath("$[" + numberOfProducts + "].weight").isEqualTo(1.0)
-                .jsonPath("$[" + ( numberOfProducts + 1) + "].name").isEqualTo("Dictionary")
-                .jsonPath("$[" + ( numberOfProducts + 1) + "].description").isEqualTo("A book that defines words")
-                .jsonPath("$[" + ( numberOfProducts + 1) + "].category.name").isEqualTo("books")
-                .jsonPath("$[" + ( numberOfProducts + 1) + "].price").isEqualTo(19.89)
-                .jsonPath("$[" + ( numberOfProducts + 1) + "].stock").isEqualTo(13)
-                .jsonPath("$[" + ( numberOfProducts + 1) + "].weight").isEqualTo(1.0);
+                .jsonPath("$[" + (numberOfProducts + 1) + "].name").isEqualTo("Dictionary")
+                .jsonPath("$[" + (numberOfProducts + 1) + "].description").isEqualTo("A book that defines words")
+                .jsonPath("$[" + (numberOfProducts + 1) + "].category.name").isEqualTo("books")
+                .jsonPath("$[" + (numberOfProducts + 1) + "].price").isEqualTo(19.89)
+                .jsonPath("$[" + (numberOfProducts + 1) + "].stock").isEqualTo(13)
+                .jsonPath("$[" + (numberOfProducts + 1) + "].weight").isEqualTo(1.0);
     }
     //2 PRODUCTS HAVE BEEN CREATED total 8 products
 
@@ -210,15 +213,16 @@ public class ProductControllerIT {
         int appleID = productService.getNumberOfProducts();// AQUI ESTO ES LO QUE FALLA
 
         client.get().uri("/products/" + appleID)
-               .exchange()
-               .expectStatus().isOk()
-              .expectBody()
-               .jsonPath("$.name").isEqualTo("Apple")
-               .jsonPath("$.description").isEqualTo("A rounded food object")
-               .jsonPath("$.category.name").isEqualTo("food")
-               .jsonPath("$.price").isEqualTo(1.25)
-               .jsonPath("$.stock").isEqualTo(23);
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.name").isEqualTo("Apple")
+                .jsonPath("$.description").isEqualTo("A rounded food object")
+                .jsonPath("$.category.name").isEqualTo("food")
+                .jsonPath("$.price").isEqualTo(1.25)
+                .jsonPath("$.stock").isEqualTo(23);
     }
+
     // no 1 PRODUCT HAS BEEN CREATED
     @Test
     @DisplayName("7")
@@ -237,11 +241,11 @@ public class ProductControllerIT {
     void listOneNonExistentProductTest() {
         int numberOfProducts = productService.getNumberOfProducts();
 
-        client.get().uri("/products/"+ (numberOfProducts + 1) )
+        client.get().uri("/products/" + (numberOfProducts + 1))
                 .exchange()
                 .expectStatus().isEqualTo(404)
                 .expectBody()
-                .jsonPath("$").isEqualTo("The provided ID is non existent");
+                .jsonPath("$").isEqualTo("Product IDs not found: 10");
     }
 
     @Test
@@ -301,12 +305,12 @@ public class ProductControllerIT {
                 .expectBody(Product.class)
                 .consumeWith(response -> {
                     Product product = response.getResponseBody();
-                    assertEquals("books",product.getCategory().getName());
-                    assertEquals("Small book",product.getDescription());
-                    assertEquals("Book",product.getName());
-                    assertEquals(5.0,product.getPrice());
-                    assertEquals(20,product.getStock());
-                    assertEquals(1.0,product.getWeight());
+                    assertEquals("books", product.getCategory().getName());
+                    assertEquals("Small book", product.getDescription());
+                    assertEquals("Book", product.getName());
+                    assertEquals(5.0, product.getPrice());
+                    assertEquals(20, product.getStock());
+                    assertEquals(1.0, product.getWeight());
                 });
 
         client.put().uri("/products/2")
@@ -318,12 +322,12 @@ public class ProductControllerIT {
                 .expectBody(Product.class)
                 .consumeWith(response -> {
                     Product afterUpdateProduct = response.getResponseBody();
-                    assertEquals("TestProduct",afterUpdateProduct.getName());
-                    assertEquals("",afterUpdateProduct.getDescription());
-                    assertEquals("other",afterUpdateProduct.getCategory().getName());
-                    assertEquals(10.0,afterUpdateProduct.getPrice());
-                    assertEquals(50,afterUpdateProduct.getStock());
-                    assertEquals(2.0,afterUpdateProduct.getWeight());
+                    assertEquals("TestProduct", afterUpdateProduct.getName());
+                    assertEquals("", afterUpdateProduct.getDescription());
+                    assertEquals("other", afterUpdateProduct.getCategory().getName());
+                    assertEquals(10.0, afterUpdateProduct.getPrice());
+                    assertEquals(50, afterUpdateProduct.getStock());
+                    assertEquals(2.0, afterUpdateProduct.getWeight());
 
                 });
     }
@@ -335,15 +339,13 @@ public class ProductControllerIT {
         //GIVEN
         ProductRequest productRequestTest = new ProductRequest("TestProduct", "", "TestCategory", 10.0, 50, 2.0);
 
-        client.put().uri("/products/"+productService.getNumberOfProducts()+1)
+        client.put().uri("/products/" + productService.getNumberOfProducts() + 1)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(productRequestTest)
                 .exchange() // THEN
                 .expectStatus().isEqualTo(404)
                 .expectBody()
                 .jsonPath("$").isEqualTo("The provided ID is non existent");
-
-
 
 
     }
@@ -362,7 +364,7 @@ public class ProductControllerIT {
                 .expectBodyList(Product.class)
                 .hasSize(numberOfProducts);
 
-        client.delete().uri("/products/"+ numberOfProducts)
+        client.delete().uri("/products/" + numberOfProducts)
                 .exchange()
                 .expectStatus().isOk() // en el udemy el le pone un no content porque es lo que entiendo tiene el configurado
                 .expectBody().isEmpty();
@@ -371,9 +373,9 @@ public class ProductControllerIT {
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBodyList(Product.class)
-                .hasSize(numberOfProducts-1);
+                .hasSize(numberOfProducts - 1);
 
-        client.get().uri("/products/"+numberOfProducts).exchange()
+        client.get().uri("/products/" + numberOfProducts).exchange()
                 .expectStatus().isNotFound();
         //.expectBody().isEmpty()
 
@@ -384,60 +386,15 @@ public class ProductControllerIT {
     @Order(14)
     void productDeleteThrowExceptionIT() {
         //GIVEN
-        //ProductRequest productRequestTest = new ProductRequest("TestProduct", "", "TestCategory", 10.0, 50, 2.0);
-        //int numberOfProducts = productService.getNumberOfProducts();
-        System.out.println("AQUI 888 IMPRIME EL NUMERO DE ELEMENTOS QUE HAY EN LA DB " +productService.getNumberOfProducts());
-        client.delete().uri("/products/"+(productService.getNumberOfProducts()+1))
+
+        client.delete().uri("/products/" + (productService.getNumberOfProducts() + 1))
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody()
-                .jsonPath("$").isEqualTo("The provided ID is non existent");;
+                .jsonPath("$").isEqualTo("The provided ID is non existent");
+        ;
     }
 
 
     //////////////////////////////////////// ORDER ENDS HERE ///////////////////////////////////////////
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
