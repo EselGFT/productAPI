@@ -68,6 +68,15 @@ public class ProductControllerAdviceTest {
     }
 
     @Test
+    void testHandleNumberFormatException() {
+
+        NumberFormatException ex = new NumberFormatException();
+        ResponseEntity<String> response = productControllerAdvice.handleNumberFormatException(ex);
+        assertEquals("Your input does not match the one required by the endpoint, please refer to the OpenAPI documentation", response.getBody());
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    }
+
+    @Test
     void testHandleMethodArgumentNotValidException() {
         FieldError fieldError = new FieldError("objectName", "fieldName", "error message");
         when(bindingResult.getAllErrors()).thenReturn(List.of(fieldError));

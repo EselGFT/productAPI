@@ -29,7 +29,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Product'
+              $ref: '#/components/schemas/ProductRequest'
       responses:
         200:
           description: Products added succesfully
@@ -38,7 +38,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ProductDTO'
+                  $ref: '#/components/schemas/Product'
         500:
           description: Internal server error
 
@@ -55,14 +55,14 @@ paths:
           description: Product retrieved succesfully
           content:
             application/json:
-              
+
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Product'
         404:
           description: Product not found
-        
+
         500:
           description: Internal server error
 
@@ -80,7 +80,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: '#/components/schemas/Product'
+                $ref: '#/components/schemas/ProductRequest'
 
       responses:
         200:
@@ -90,7 +90,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ProductDTO'
+                  $ref: '#/components/schemas/Product'
         404:
           description: Product not found
 
@@ -121,11 +121,11 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ProductDTO'
-        
+                  $ref: '#/components/schemas/Product'
+
         404:
           description: Product not found
-        
+
         500:
           description: Internal server error
 
@@ -148,15 +148,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Product'
+              $ref: '#/components/schemas/ProductRequest'
 
       responses:
         200:
           description: Product modified succesfully
-        
+
         404:
           description: Product not found
-        
+
         500:
           description: Internal server error
 
@@ -183,7 +183,7 @@ paths:
                 id: 10239
         404:
           description: Product not found
-        
+
         500:
           description: Internal server error
 
@@ -209,11 +209,77 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ProductDTO'
+                  $ref: '#/components/schemas/Product'
 
         500:
           description: Internal server error
+  /productsWithIDs:
+    post:
+      tags:
+        - Product
+      summary: Retrieves the list of products given a list of IDs
+      description: Retrieves the list of products given a list of IDs
+      operationId: productWithIDs
+      requestBody:
+        description: Json list of IDs
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: integer
+            example: [0]
 
+
+      responses:
+        200:
+          description: Products retrieved succesfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductDTO'
+        404:
+          description: Product not found
+
+        500:
+          description: Internal server error
+  /submitProducts:
+    post:
+      tags:
+        - Product
+      summary: Update stock of product
+      description: Update stock of product
+      operationId: submitProducts
+      requestBody:
+        description: Json list of the products to submit
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProductToSubmit'
+
+
+      responses:
+        200:
+          description: Products retrieved succesfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductDTO'
+        400:
+          description: Not enought stock
+        404:
+          description: Product not found
+
+        500:
+          description: Internal server error
 
 components:
   schemas:
@@ -232,7 +298,7 @@ components:
           maximum: 100.0
           example: 15.0
 
-    Product:
+    ProductRequest:
       type: object
       required:
         - name
@@ -263,11 +329,14 @@ components:
           format: double
           example: 1.0
 
-    ProductDTO:
+    Product:
       type: object
+      required:
+        - name
+        - price
+        - stock
+        - weight
       properties:
-        id:
-          type: number
         name:
           type: string
           example: Galleta María
@@ -275,9 +344,15 @@ components:
           type: string
           example: Chocolate cookies
         category:
-          type: string
-          format: object
-          example: Food
+          type: object
+          properties:
+            name:
+              type: string
+              example: Food
+
+            discount:
+              type: number
+              example: 25.0
         price:
           type: number
           format: double
@@ -289,5 +364,37 @@ components:
         weight:
           type: number
           format: double
-          example: 1.0  
+          example: 1.0
+
+    ProductDTO:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 0
+        price:
+          type: number
+          format: double
+          example: 9.99
+        stock:
+          type: number
+          format: double
+          example: 5
+        weight:
+          type: number
+          format: double
+          example: 1.0
+
+    ProductToSubmit:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 0
+        stock:
+          type: number
+          format: double
+          example: 5
+
+
         
