@@ -1,22 +1,22 @@
 openapi: 3.0.0
 info:
   title: Product API
-  description: Documentation of Product API 
+  description: Documentation of Product API
   version: 1.0.0
   contact:
     name: Product team
 
-  
-  
-tags:
-- name: "Product"
-  description: "Everything about your products"
 
-   
-paths: 
+
+tags:
+  - name: "Product"
+    description: "Everything about your products"
+
+
+paths:
   
   /product:
-  
+
     post:
       tags:
         - Product
@@ -29,7 +29,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Product'  
+              $ref: '#/components/schemas/Product'
       responses:
         200:
           description: Products added succesfully
@@ -41,9 +41,9 @@ paths:
                   $ref: '#/components/schemas/ProductDTO'
         500:
           description: Internal server error
-          
+
   /products:
-  
+
     get:
       tags:
         - Product
@@ -59,29 +59,29 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Product'  
+                  $ref: '#/components/schemas/Product'
         404:
           description: Product not found
         
         500:
-          description: Internal server error  
-          
+          description: Internal server error
+
     post:
       tags:
-          - Product
+        - Product
       summary: Adds products in block to the catalog
       description: Adds products in block to the catalog
       operationId: postProducts
       requestBody:
         description: Json list of products to add
         required: true
-        content: 
+        content:
           application/json:
             schema:
               type: array
               items:
                 $ref: '#/components/schemas/Product'
-        
+
       responses:
         200:
           description: Products added succesfully
@@ -93,17 +93,17 @@ paths:
                   $ref: '#/components/schemas/ProductDTO'
         404:
           description: Product not found
-          
+
         500:
-          description: Internal server error  
-          
-          
+          description: Internal server error
+
+
   /products/{id_product}:
     get:
       tags:
         - Product
       summary: Gets a catalog product
-      description: Get the specified catalog product 
+      description: Get the specified catalog product
       operationId: getProduct
       parameters:
         - name: id_product
@@ -127,8 +127,8 @@ paths:
           description: Product not found
         
         500:
-          description: Internal server error  
-          
+          description: Internal server error
+
     put:
       tags:
         - Product
@@ -145,9 +145,9 @@ paths:
       requestBody:
         description: Required product data to modify a catalog product
         required: true
-        content: 
+        content:
           application/json:
-            schema: 
+            schema:
               $ref: '#/components/schemas/Product'
 
       responses:
@@ -158,9 +158,9 @@ paths:
           description: Product not found
         
         500:
-          description: Internal server error 
-          
-          
+          description: Internal server error
+
+
     delete:
       tags:
         - Product
@@ -180,19 +180,46 @@ paths:
           content:
             application/json:
               example:
-                id: 10239       
+                id: 10239
         404:
           description: Product not found
         
         500:
           description: Internal server error
-          
-          
+
+  /products/search/{product_name}:
+    get:
+      tags:
+        - Product
+      summary: Gets catalogs products by their name
+      description: Get the specified catalog products based on their name, its case insensitive.
+      operationId: searchProducts
+      parameters:
+        - name: product_name
+          in: path
+          required: true
+          schema:
+            type: string
+
+      responses:
+        200:
+          description: Products retrieved succesfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductDTO'
+
+        500:
+          description: Internal server error
+
+
 components:
   schemas:
     Category:
       type: object
-      required: 
+      required:
         - name
       properties:
         name:
@@ -204,10 +231,10 @@ components:
           minimum: 0.0
           maximum: 100.0
           example: 15.0
-          
+
     Product:
       type: object
-      required: 
+      required:
         - name
         - price
         - stock
@@ -235,11 +262,11 @@ components:
           type: number
           format: double
           example: 1.0
-          
-    ProductResponse:
+
+    ProductDTO:
       type: object
       properties:
-        id: 
+        id:
           type: number
         name:
           type: string

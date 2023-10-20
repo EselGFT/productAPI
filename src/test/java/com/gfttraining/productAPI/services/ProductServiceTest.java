@@ -186,6 +186,57 @@ public class ProductServiceTest {
 
     // end of listProductById() tests
 
+    // start of listProductsByNameContainsIgnoreCase() tests
+
+    @Test
+    @DisplayName("GIVEN two products that contain ap WHEN the method is called with that input THEN a list containing both is returned")
+    void ListProductsByNameIgnoreCaseMultipleProductsTest() {
+        Product apple = new Product("Apple", "A rounded food object", new Category("food", 25.0), 1.25, 23, 1.1);
+        Product apartment = new Product("Apartment", "A penthouse", new Category("other", 0.0), 12000.0, 1, 1000.1);
+
+        List<Product> fullList = List.of(apple, apartment);
+
+        Mockito.when(productRepository.findByNameIgnoreCaseContaining("ap")).thenReturn(fullList);
+
+        List<Product> apQuery = productService.listProductsByNameContainsIgnoreCase("ap");
+
+        verify(productRepository, times(1)).findByNameIgnoreCaseContaining("ap");
+
+        assertEquals(apQuery, fullList);
+    }
+
+    @Test
+    @DisplayName("GIVEN a product with a camel case name WHEN the method is called with the name in caps THEN a list containing the product is returned")
+    void ListProductsByNameIgnoreCaseUpperCaseTest() {
+        Product apple = new Product("Apple", "A rounded food object", new Category("food", 25.0), 1.25, 23, 1.1);
+
+        List<Product> appleList = List.of(apple);
+
+        Mockito.when(productRepository.findByNameIgnoreCaseContaining("APPLE")).thenReturn(appleList);
+
+        List<Product> appleQuery = productService.listProductsByNameContainsIgnoreCase("APPLE");
+
+        verify(productRepository, times(1)).findByNameIgnoreCaseContaining("APPLE");
+
+        assertEquals(appleQuery, appleList);
+    }
+
+    @Test
+    @DisplayName("GIVEN an input that doesn't correspond with any product WHEN the method is called with that input THEN an empty list is returned")
+    void ListProductsByNameIgnoreCaseNonExistentTest() {
+        List<Product> emptyList = List.of();
+
+        Mockito.when(productRepository.findByNameIgnoreCaseContaining("Butter")).thenReturn(emptyList);
+
+        List<Product> butterQuery = productService.listProductsByNameContainsIgnoreCase("Butter");
+
+        verify(productRepository, times(1)).findByNameIgnoreCaseContaining("Butter");
+
+        assertEquals(butterQuery, emptyList);
+    }
+
+    // end of listProductsByNameContainsIgnoreCase() tests
+
     @Test
     @DisplayName("When products are requested to be listed, a list that contains all of them is returned")
     void listProductsTest() {
@@ -300,7 +351,6 @@ public class ProductServiceTest {
         List<Product> productsExpected= Arrays.asList(productTest1, productTest2);
         List<Product> productsRetrievedList = productService.getProductsWithIDs(idList);
         assertEquals(productsExpected, productsRetrievedList);
-
 
     }
 
@@ -589,6 +639,17 @@ public class ProductServiceTest {
 
         assertEquals(product1Modified,productRetrieved);
 
+    }
+
+
+    @Test
+    @DisplayName("GIVEN a product WHEN the discounted price is calculated THEN the precise amount should be returned")
+    public void calculateDiscountedPriceTest() {
+        Product apple = new Product("Apple", "A rounded food object", new Category("food", 25.0), 1.25, 23, 1.1);
+
+        BigDecimal discountedPrice = productService.calculateDiscountedPrice(apple);
+
+        assertEquals(new BigDecimal("0.94"), discountedPrice);
     }
 
 

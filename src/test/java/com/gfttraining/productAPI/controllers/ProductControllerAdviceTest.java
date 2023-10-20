@@ -102,5 +102,6 @@ public class ProductControllerAdviceTest {
         ResponseEntity<String> response = productControllerAdvice.handleNotEnoughStockException(ex);
         assertEquals("Product IDs without required stock: [1]", response.getBody());
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 }

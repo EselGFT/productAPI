@@ -45,6 +45,15 @@ public class ProductController {
         );
     }
 
+    @GetMapping("/products/search/{product_name}")
+    public ResponseEntity<List<Product>> searchProducts(@PathVariable String product_name) {
+
+        return new ResponseEntity<>(
+                productService.listProductsByNameContainsIgnoreCase(product_name),
+                HttpStatus.OK
+        );
+    }
+
     @PostMapping("/product")
     public ResponseEntity<Product> postMapping(@RequestBody @Valid ProductRequest productRequest)
     {
@@ -79,7 +88,7 @@ public class ProductController {
         );
 
     }
-    
+
     @PostMapping("/productsWithIDs")
    public ResponseEntity<List<ProductDTO>> productsWithIDs (@RequestBody List<Long> ids) throws NotAllProductsFoundException {
         return new ResponseEntity<>(

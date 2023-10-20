@@ -73,7 +73,6 @@ public class ProductControllerIT {
     }
 
     @Test
-    //
     @DisplayName("WHEN deleteProduct is executed THEN delete a product object")
     void productDeleteIT() {
 
@@ -110,7 +109,7 @@ public class ProductControllerIT {
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody()
-                .jsonPath("$").isEqualTo("The provided ID is non existent");;
+                .jsonPath("$").isEqualTo("The provided ID is non existent");
     }
 
     @Test
@@ -159,6 +158,73 @@ public class ProductControllerIT {
                 .jsonPath("$.price").isEqualTo(1.25)
                 .jsonPath("$.stock").isEqualTo(23);
     }
+
+    // start of searchProducts() tests
+
+    @Test
+    @Order(1)
+    @DisplayName("GIVEN two products that contain ouch WHEN searching that query THEN both are returned")
+    void searchProductMultipleResultsTest() {
+
+        productService.createProduct(new ProductRequest("CoUcH", "To sit", "other", 100.0, 2, 58.0));
+        productService.createProduct(new ProductRequest("POUCH", "To store", "other", 10.0, 20, 10.0));
+
+        client.get().uri("/products/search/ouch")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.[0]").isNotEmpty()
+                .jsonPath("$.[0].name").isEqualTo("CoUcH")
+                .jsonPath("$.[0].description").isEqualTo("To sit")
+                .jsonPath("$.[0].category.name").isEqualTo("other")
+                .jsonPath("$.[0].price").isEqualTo(100.0)
+                .jsonPath("$.[0].stock").isEqualTo(2)
+                .jsonPath("$.[0].weight").isEqualTo(58.0)
+                .jsonPath("$.[1]").isNotEmpty()
+                .jsonPath("$.[1].name").isEqualTo("POUCH")
+                .jsonPath("$.[1].description").isEqualTo("To store")
+                .jsonPath("$.[1].category.name").isEqualTo("other")
+                .jsonPath("$.[1].price").isEqualTo(10.0)
+                .jsonPath("$.[1].stock").isEqualTo(20)
+                .jsonPath("$.[1].weight").isEqualTo(10.0)
+                .jsonPath("$.[2]").doesNotExist();
+    }
+
+    @Test
+    @Order(2)
+    @DisplayName("GIVEN a name that only corresponds to 1 product WHEN searching by it THEN only that product is returned")
+    void searchProductOneResultTest() {
+
+        productService.createProduct(new ProductRequest("department", "A house", "other", 1000.0, 2, 109.0));
+
+        client.get().uri("/products/search/DEPARTMENT")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.[0]").isNotEmpty()
+                .jsonPath("$.[0].name").isEqualTo("department")
+                .jsonPath("$.[0].description").isEqualTo("A house")
+                .jsonPath("$.[0].category.name").isEqualTo("other")
+                .jsonPath("$.[0].price").isEqualTo(1000.0)
+                .jsonPath("$.[0].stock").isEqualTo(2)
+                .jsonPath("$.[0].weight").isEqualTo(109.0)
+                .jsonPath("$.[1]").doesNotExist();
+    }
+
+    @Test
+    @Order(3)
+    @DisplayName("GIVEN a name that only corresponds no products WHEN searching by it THEN no products are returned")
+    void searchProductNoResultTest() {
+
+        client.get().uri("/products/search/bananana")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$")
+                .isEmpty();
+    }
+
+    // end of searchProducts() tests
 
 
     @Test
@@ -326,10 +392,6 @@ public class ProductControllerIT {
                 .expectBody()
                 .jsonPath("$").isEqualTo("Wrong type exception, please consult the OpenAPI documentation");
     }
-
-
-
-
 
     @Test
     @DisplayName("GIVEN2 a product's information WHEN the product's controller putUpdate method is called THEN the provided product's information is updated with te new information")

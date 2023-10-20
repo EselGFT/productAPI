@@ -37,7 +37,7 @@ public class ProductService {
 
     }
 
-    public Product updateProduct (long id, ProductRequest productRequest) throws NonExistingProductException{
+    public Product updateProduct (long id, ProductRequest productRequest) throws NonExistingProductException {
 
     	Category category = categoryRepository.findById(productRequest.getCategory()).orElse(categoryRepository.findById("other").get());
 
@@ -65,14 +65,15 @@ public class ProductService {
             productRepository.deleteById(id);
          }
 
-
     }
 
     public List<Product> listProducts() {
         return productRepository.findAll();
     }
 
-
+    public List<Product> listProductsByNameContainsIgnoreCase(String name) {
+        return productRepository.findByNameIgnoreCaseContaining(name);
+    }
 
     public Product listProductById(long id) throws NonExistingProductException {
         return productRepository.findById(id)
