@@ -44,13 +44,12 @@ public class ProductControllerMvcTest {
         int productStock = 50;    
         Double productWeight = 1.0;
 
-
-        Product product = new Product(productName, productDescription, new Category("other",0.0), productPrice, productStock, productWeight);
         ProductRequest productRequest = new ProductRequest(productName, productDescription, categoryName, productPrice, productStock, productWeight);
+        Product product = new Product(productRequest, new Category("other", 0.0));
         Mockito.when(productService.createProduct(productRequest)).thenReturn(product);
 
         mockMvc.perform(MockMvcRequestBuilders
-                .post("/product")
+                .post("/products")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(new ObjectMapper().writeValueAsString(productRequest))
                 .characterEncoding("utf-8"))

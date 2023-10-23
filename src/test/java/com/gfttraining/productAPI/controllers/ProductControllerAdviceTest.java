@@ -13,14 +13,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -29,9 +26,6 @@ public class ProductControllerAdviceTest {
 
     @Mock
     private ConstraintViolation<?> constraintViolation;
-
-    @Mock 
-    private MethodParameter methodParameter;
 
     @Mock
     private BindingResult bindingResult;
@@ -60,18 +54,14 @@ public class ProductControllerAdviceTest {
 
     @Test
     void testHandleHttpMessageNotReadableException() {
-        
-        HttpMessageNotReadableException ex = new HttpMessageNotReadableException(null, null, null);
-        ResponseEntity<String> response = productControllerAdvice.handleHttpMessageNotReadableException(ex);
+        ResponseEntity<String> response = productControllerAdvice.handleHttpMessageNotReadableException();
         assertEquals("Request parameters have a wrong format, please consult the OpenAPI documentation", response.getBody());
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
     @Test
     void testHandleNumberFormatException() {
-
-        NumberFormatException ex = new NumberFormatException();
-        ResponseEntity<String> response = productControllerAdvice.handleNumberFormatException(ex);
+        ResponseEntity<String> response = productControllerAdvice.handleNumberFormatException();
         assertEquals("Your input does not match the one required by the endpoint, please refer to the OpenAPI documentation", response.getBody());
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
@@ -90,8 +80,7 @@ public class ProductControllerAdviceTest {
 
     @Test
     void testHandleMethodArgumentTypeMismatchException() {
-        MethodArgumentTypeMismatchException ex = new MethodArgumentTypeMismatchException(null, null, null, null, null);
-        ResponseEntity<String> response = productControllerAdvice.handleMethodArgumentTypeMismatchException(ex);
+        ResponseEntity<String> response = productControllerAdvice.handleMethodArgumentTypeMismatchException();
         assertEquals("Wrong type exception, please consult the OpenAPI documentation", response.getBody());
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }

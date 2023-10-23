@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import java.util.Optional;
 import java.util.Set;
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -15,7 +14,6 @@ import com.gfttraining.productAPI.exceptions.NotEnoughStockException;
 import com.gfttraining.productAPI.model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -27,7 +25,6 @@ import org.springframework.http.ResponseEntity;
 import com.gfttraining.productAPI.model.Category;
 import com.gfttraining.productAPI.model.Product;
 import com.gfttraining.productAPI.model.ProductRequest;
-import com.gfttraining.productAPI.repositories.ProductRepository;
 import com.gfttraining.productAPI.services.ProductService;
 
 import jakarta.validation.ConstraintViolation;
@@ -40,8 +37,6 @@ public class ProductControllerTest {
 
     @Mock
     ProductService productService;
-    @Mock
-    ProductRepository productRepository;
 
     @InjectMocks
     ProductController productController;
@@ -53,11 +48,10 @@ public class ProductControllerTest {
         MockitoAnnotations.openMocks(this);
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
-
     }
 
     @Test
-    @DisplayName("GIVEN a product's information WHEN the postMapping method from the product controller is called THEN a product is created with the provided information")
+    @DisplayName("GIVEN a product's information WHEN the createProduct method from the product controller is called THEN a product is created with the provided information")
     public void postControllerTest(){
 
         String productName = "TestProduct";
@@ -71,7 +65,7 @@ public class ProductControllerTest {
         ProductRequest productRequest = new ProductRequest(productName, productDescription, categoryName, productPrice, productStock, productWeight);
         Mockito.when(productService.createProduct(productRequest)).thenReturn(product);
         
-        ResponseEntity<Product> response = productController.postMapping(productRequest);
+        ResponseEntity<Product> response = productController.createProduct(productRequest);
 
         verify(productService, times(1)).createProduct(productRequest);
         
@@ -81,7 +75,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("GIVEN a product's information WHEN the product's controller putUpdate method is called THEN the provided product's information is updated with te new information")
+    @DisplayName("GIVEN a product's information WHEN the product's controller updateProduct method is called THEN the provided product's information is updated with te new information")
     public void putUpdateControllerTest() throws NonExistingProductException {
 
     	String productName = "TestProduct";
@@ -91,49 +85,44 @@ public class ProductControllerTest {
         int productStock = 50;
         Double productWeight = 1.0;
         long  id = 1;
+
         ProductRequest productRequest = new ProductRequest(productName, productDescription, categoryName, productPrice, productStock,productWeight);
-        Product product = new Product(productName, productDescription, new Category("other",0.0), productPrice, productStock,productWeight);
+        Product product = new Product(productRequest, new Category("other",0.0));
+
         Mockito.when(productService.updateProduct(id,productRequest)).thenReturn(product);
-        ResponseEntity<Product> response = productController.putUpdate(id, productRequest);
+
+        ResponseEntity<Product> response = productController.updateProduct(id, productRequest);
 
         verify(productService, times(1)).updateProduct(id,productRequest);
+
         assertEquals(product, response.getBody());
         assertEquals(HttpStatusCode.valueOf(200),response.getStatusCode());
-
     }
 
     @Test
-    @DisplayName("WHEN deleteProduct is executed THEN delete a product object")
+    @DisplayName("GIVEN an existing product ID WHEN the deleteProduct method is executed THEN the product is deleted")
     public void deleteProductsControllerTest () throws NonExistingProductException {
-        Product dictionary = new Product("Dictionary", "A book that defines words", new Category("books", 15.0), 19.89, 13,1.1);
         long id = 1;
 
-        Mockito.when(productRepository.findById(id)).thenReturn(Optional.of(dictionary));
         Mockito.doNothing().when(productService).deleteProduct(id);
+
         ResponseEntity<?> response = productController.deleteProduct(id);
+
         assertEquals(HttpStatusCode.valueOf(200),response.getStatusCode());
-
-
     }
 
     @Test
-    @DisplayName("WHEN deleteProduct is executed THEN delete a product object")
+    @DisplayName("GIVEN a non existent product ID WHEN the deleteProduct method is executed THEN an exception is thrown")
     public void deleteProductsExceptionControllerTest () throws NonExistingProductException {
-        Product dictionary = new Product("Dictionary", "A book that defines words", new Category("books", 15.0), 19.89, 13,1.1);
-        int id = 1;
+        int id = 100;
 
         Mockito.doThrow(NonExistingProductException.class).when(productService).deleteProduct(id);
 
         assertThrows(NonExistingProductException.class, () -> productController.deleteProduct(id));
-
-
     }
-
-
 
     @Test
     @DisplayName("WHEN the product's controller listProducts method is called THEN a list containing all the products in the database is returned")
-
     public void listProductsControllerTest() {
         Product apple = new Product("Apple", "A rounded food object", new Category("food", 25.0), 1.25, 23,1.0);
         Product dictionary = new Product("Dictionary", "A book that defines words", new Category("books", 15.0), 19.89, 13,1.1);
@@ -245,7 +234,7 @@ public class ProductControllerTest {
         ProductRequest productRequest = new ProductRequest(productName, productDescription, categoryName, productPrice, productStock, productWeight);
         Mockito.when(productService.createProduct(productRequest)).thenReturn(product);
 
-        ResponseEntity<Product> response = productController.postMapping(productRequest);
+        ResponseEntity<Product> response = productController.createProduct(productRequest);
         Set<ConstraintViolation<ProductRequest>> violations = validator.validate(productRequest);
 
         verify(productService, times(1)).createProduct(productRequest);
@@ -254,7 +243,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("GIVEN a list of products WHEN the controller's postLoadProducts method is called THEN all products from the list are created")
+    @DisplayName("GIVEN a list of products WHEN the controller's bulkCreateProducts method is called THEN all products from the list are created")
     public void loadProductsControllerTest(){
         List<ProductRequest> productRequests = Arrays.asList(
             new ProductRequest(
@@ -294,37 +283,30 @@ public class ProductControllerTest {
 
         Mockito.when(productService.createProducts(productRequests)).thenReturn(products);
 
-        ResponseEntity<List<Product>> response = productController.postLoadProducts(productRequests);
+        ResponseEntity<List<Product>> response = productController.bulkCreateProducts(productRequests);
 
         assertEquals(products, response.getBody());
         assertEquals(HttpStatusCode.valueOf(200),response.getStatusCode());
-
-
     }
 
     @Test
     public void getProductsWithIDsTest() throws NonExistingProductException{
-
         List<ProductDTO> productDTOs = Arrays.asList(
 
             new ProductDTO(0,BigDecimal.valueOf(10.0),50,1.0),
             new ProductDTO(0,BigDecimal.valueOf(10.0),50,1.0)
         );
 
-
-        List<Long> idList = Arrays.asList(Long.valueOf(1),Long.valueOf(2));
+        List<Long> idList = Arrays.asList(1L, 2L);
         Mockito.when(productService.createProductResponsesWithProductIDs(idList)).thenReturn(productDTOs);
 
-
-        ResponseEntity<List<ProductDTO>> retrievedProducts = productController.productsWithIDs(idList);
+        ResponseEntity<List<ProductDTO>> retrievedProducts = productController.getProductsBasicInfo(idList);
 
         assertEquals(productDTOs, retrievedProducts.getBody());
-
-
     }
+
     @Test
     public void ProductsToSubmitTest() throws NonExistingProductException, NotEnoughStockException {
-
         List<ProductToSubmit> productsToSubmit = Arrays.asList(
                 new ProductToSubmit(1L,5),
                 new ProductToSubmit(2L,5)
@@ -336,15 +318,12 @@ public class ProductControllerTest {
                 new ProductDTO(2,BigDecimal.valueOf(10.0),45,1.0)
         );
 
-        Mockito.when(productService.checkIfProductsCanBeSubmittedAndSubmit(productsToSubmit)).thenReturn(productDTOs);
+        Mockito.when(productService.checkIfEnoughStockAndSubtract(productsToSubmit)).thenReturn(productDTOs);
 
 
-        ResponseEntity<List<ProductDTO>> retrievedProducts = productController.submitProducts(productsToSubmit);
+        ResponseEntity<List<ProductDTO>> retrievedProducts = productController.reduceStock(productsToSubmit);
 
         assertEquals(productDTOs, retrievedProducts.getBody());
-
-
     }
-
 
 }

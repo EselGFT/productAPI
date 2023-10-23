@@ -8,6 +8,4 @@ import lombok.Data;
 public class ProductToSubmit {
     private long id;
     private Integer stock;
-
-
 }

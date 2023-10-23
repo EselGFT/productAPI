@@ -28,6 +28,7 @@ public class ProductController {
         this.productService = productService;
     }
 
+    // start of /products root uri
     @GetMapping("/products")
     public ResponseEntity<List<Product>> listProducts() {
         return new ResponseEntity<>(
@@ -36,71 +37,71 @@ public class ProductController {
         );
     }
 
-    @GetMapping("/products/{id_product}")
-    public ResponseEntity<Product> getProductById(@PathVariable int id_product) throws NonExistingProductException {
+    @PostMapping("/products")
+    public ResponseEntity<Product> createProduct(@RequestBody @Valid ProductRequest productRequest) {
+        return new ResponseEntity<>(
+                productService.createProduct(productRequest),
+                HttpStatus.OK
+        );
+    }
+
+    @GetMapping("/products/{product_id}")
+    public ResponseEntity<Product> getProductById(@PathVariable int product_id) throws NonExistingProductException {
 
         return new ResponseEntity<>(
-                productService.listProductById(id_product),
+                productService.listProductById(product_id),
+                HttpStatus.OK
+        );
+    }
+
+    @PutMapping("/products/{product_id}")
+    public ResponseEntity<Product> updateProduct(@PathVariable long product_id, @RequestBody @Valid ProductRequest updateProductRequest) throws NonExistingProductException {
+        return new ResponseEntity<>(
+                productService.updateProduct(product_id, updateProductRequest),
+                HttpStatus.OK
+        );
+    }
+
+    @DeleteMapping("/products/{product_id}")
+    public ResponseEntity <?> deleteProduct(@PathVariable long product_id) throws NonExistingProductException  {
+        productService.deleteProduct(product_id);
+
+        return new ResponseEntity<>(
+                HttpStatus.OK
+        );
+    }
+
+    @PostMapping("/products/bulkCreate")
+    public ResponseEntity<List<Product>> bulkCreateProducts(@RequestBody  List<@Valid ProductRequest> productRequests) {
+        return new ResponseEntity<>(
+                productService.createProducts(productRequests),
+                HttpStatus.OK
+        );
+    }
+
+    @PostMapping("/products/getBasicInfo")
+    public ResponseEntity<List<ProductDTO>> getProductsBasicInfo(@RequestBody List<Long> ids) throws NonExistingProductException {
+        return new ResponseEntity<>(
+                productService.createProductResponsesWithProductIDs(ids),
+                HttpStatus.OK
+        );
+    }
+
+    @PostMapping("/products/reduceStock")
+    public ResponseEntity<List<ProductDTO>> reduceStock(@RequestBody List<ProductToSubmit> productsToSubmit) throws NonExistingProductException, NotEnoughStockException {
+        return new ResponseEntity<>(
+                productService.checkIfEnoughStockAndSubtract(productsToSubmit),
                 HttpStatus.OK
         );
     }
 
     @GetMapping("/products/search/{product_name}")
     public ResponseEntity<List<Product>> searchProducts(@PathVariable String product_name) {
-
         return new ResponseEntity<>(
                 productService.listProductsByNameContainsIgnoreCase(product_name),
                 HttpStatus.OK
         );
     }
 
-    @PostMapping("/product")
-    public ResponseEntity<Product> postMapping(@RequestBody @Valid ProductRequest productRequest)
-    {
-        return new ResponseEntity<>( 
-                productService.createProduct(productRequest),
-                HttpStatus.OK
-            );        
-    }
-
-
-    @PostMapping("/products")
-    public ResponseEntity<List<Product>> postLoadProducts(@RequestBody  List<@Valid ProductRequest> productRequests) {
-        return new ResponseEntity<>(
-            productService.createProducts(productRequests),
-            HttpStatus.OK
-        );
-    }
-
-    @PutMapping("/products/{id_product}")
-    public ResponseEntity<Product> putUpdate (@PathVariable long id_product,  @RequestBody @Valid ProductRequest updateProductRequest) throws NonExistingProductException {
-        return new ResponseEntity<>(
-            productService.updateProduct(id_product, updateProductRequest),
-            HttpStatus.OK
-            );
-    }
-
-    @DeleteMapping("/products/{id_product}")
-    public ResponseEntity <?> deleteProduct (@PathVariable long id_product) throws NonExistingProductException  {
-        productService.deleteProduct(id_product);
-        return new ResponseEntity<>(
-                HttpStatus.OK
-        );
-
-    }
-
-    @PostMapping("/productsWithIDs")
-   public ResponseEntity<List<ProductDTO>> productsWithIDs (@RequestBody List<Long> ids) throws NonExistingProductException {
-        return new ResponseEntity<>(
-            productService.createProductResponsesWithProductIDs(ids),
-            HttpStatus.OK
-        );
-    }
-    @PostMapping("/submitProducts")
-    public ResponseEntity<List<ProductDTO>> submitProducts(@RequestBody List<ProductToSubmit> productsToSubmit) throws NonExistingProductException, NotEnoughStockException {
-        return new ResponseEntity<>(
-                productService.checkIfProductsCanBeSubmittedAndSubmit(productsToSubmit),
-                HttpStatus.OK
-        );
-    }
+    // end of /products root uri
 }
