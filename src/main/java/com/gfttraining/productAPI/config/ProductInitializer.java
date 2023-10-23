@@ -2,7 +2,6 @@ package com.gfttraining.productAPI.config;
 
 
 import java.util.Arrays;
-import java.util.List;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
