@@ -13,17 +13,17 @@ import com.gfttraining.productAPI.repositories.CategoryRepository;
 
 @Component
 public class CategoryInitializer implements CommandLineRunner{
-
    
-    private final  CategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepository;
 
     public CategoryInitializer(CategoryRepository categoryRepository) {
         this.categoryRepository = categoryRepository;
     }
 
     @Override
-    public void run(String... args) throws Exception {
-        List<Category> categories = new ArrayList<Category>(
+    public void run(String... args) {
+        
+        categoryRepository.saveAll(
             Arrays.asList(
                 new Category("toys", 20.0),
                 new Category("books", 15.0),
@@ -31,11 +31,8 @@ public class CategoryInitializer implements CommandLineRunner{
                 new Category("food", 25.0),
                 new Category("clothes", 35.0),
                 new Category("other", 0.0)
-                )
-            
+            )
         );
-        
-        categoryRepository.saveAll(categories);
     }
     
 }
