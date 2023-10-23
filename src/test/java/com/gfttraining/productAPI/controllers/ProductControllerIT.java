@@ -427,7 +427,7 @@ public class ProductControllerIT {
 
         client.delete().uri("/products/" + numberOfProducts)
                 .exchange()
-                .expectStatus().isOk() // en el udemy el le pone un no content porque es lo que entiendo tiene el configurado
+                .expectStatus().isOk()
                 .expectBody().isEmpty();
 
         client.get().uri("/products").exchange()
@@ -480,5 +480,55 @@ public class ProductControllerIT {
                 .jsonPath("$[0].stock").isEqualTo(5);
 
     }
+
+    @Test
+    @DisplayName("Given a list of products to submit with incorrect IDs, When they are submitted, Then it should return the exception")
+    @Order(19)
+    void submitProductsIDsNotFoundIT() {
+
+        client.get().uri("/products/1").exchange()
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.stock").isEqualTo(5);
+
+        List<ProductToSubmit> productsToSubmit = List.of(
+                new ProductToSubmit(99999L, 5)
+        );
+
+        client.post().uri("/submitProducts")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(productsToSubmit)
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody()
+                .jsonPath("$").isEqualTo("Product IDs not found: [99999]");
+
+    }
+    @Test
+    @DisplayName("Given a list of products to submit with not enough stock, When they are submitted, Then it should return the exception")
+    @Order(20)
+    void submitProductsNotEnoughStockIT() {
+
+        client.get().uri("/products/1").exchange()
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.stock").isEqualTo(5);
+
+        List<ProductToSubmit> productsToSubmit = List.of(
+                new ProductToSubmit(1L, 15)
+        );
+
+        client.post().uri("/submitProducts")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(productsToSubmit)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody()
+                .jsonPath("$").isEqualTo("Product IDs without required stock: [1]");
+    }
+
+
 
 }
