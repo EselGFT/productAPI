@@ -13,12 +13,12 @@ import lombok.Data;
 public class Category {
 
     @Id
-    @NotBlank(message = "Name should not be blank")
+    @NotBlank(message = "The category name cannot be blank")
     private String name;
 
-    @NotNull(message = "Discount should not be null")
-    @Min(value = 0, message ="Discount should not be less than 0")
-    @Max(value = 100, message= "Discount should not be more than 100")
+    @NotNull(message = "The discount cannot be null")
+    @Min(value = 0, message ="Discount can't be less than 0%")
+    @Max(value = 100, message= "Discount can't be more than 100%")
     private double discount;
 
     public Category() {}

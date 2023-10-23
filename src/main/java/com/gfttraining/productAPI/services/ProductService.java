@@ -26,14 +26,14 @@ public class ProductService {
     public ProductService(CategoryRepository categoryRepository, ProductRepository productRepository) {
         this.categoryRepository = categoryRepository;
         this.productRepository = productRepository;
-
     }
 
     public Product createProduct(ProductRequest productRequest) {
 
-        Category category = categoryRepository.findById(productRequest.getCategory()).orElse(categoryRepository.findById("other").get());
+        Category category = categoryRepository.findById(productRequest.getCategory())
+                .orElse(categoryRepository.findById("other").get());
 
-        Product product = new Product(productRequest.getName(), productRequest.getDescription(), category, productRequest.getPrice(), productRequest.getStock(), productRequest.getWeight());
+        Product product = new Product(productRequest, category);
 
         return productRepository.save(product);
 
@@ -42,7 +42,6 @@ public class ProductService {
     public Product updateProduct (long id, ProductRequest productRequest) throws NonExistingProductException {
 
     	Category category = categoryRepository.findById(productRequest.getCategory()).orElse(categoryRepository.findById("other").get());
-
 
         if (productRepository.findById(id).isEmpty()){
             throw new NonExistingProductException("The provided ID is non existent");
