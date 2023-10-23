@@ -45,26 +45,26 @@ public class ProductController {
         );
     }
 
-    @GetMapping("/products/{id_product}")
-    public ResponseEntity<Product> getProductById(@PathVariable int id_product) throws NonExistingProductException {
+    @GetMapping("/products/{product_id}")
+    public ResponseEntity<Product> getProductById(@PathVariable int product_id) throws NonExistingProductException {
 
         return new ResponseEntity<>(
-                productService.listProductById(id_product),
+                productService.listProductById(product_id),
                 HttpStatus.OK
         );
     }
 
-    @PutMapping("/products/{id_product}")
-    public ResponseEntity<Product> updateProduct(@PathVariable long id_product, @RequestBody @Valid ProductRequest updateProductRequest) throws NonExistingProductException {
+    @PutMapping("/products/{product_id}")
+    public ResponseEntity<Product> updateProduct(@PathVariable long product_id, @RequestBody @Valid ProductRequest updateProductRequest) throws NonExistingProductException {
         return new ResponseEntity<>(
-                productService.updateProduct(id_product, updateProductRequest),
+                productService.updateProduct(product_id, updateProductRequest),
                 HttpStatus.OK
         );
     }
 
-    @DeleteMapping("/products/{id_product}")
-    public ResponseEntity <?> deleteProduct(@PathVariable long id_product) throws NonExistingProductException  {
-        productService.deleteProduct(id_product);
+    @DeleteMapping("/products/{product_id}")
+    public ResponseEntity <?> deleteProduct(@PathVariable long product_id) throws NonExistingProductException  {
+        productService.deleteProduct(product_id);
 
         return new ResponseEntity<>(
                 HttpStatus.OK

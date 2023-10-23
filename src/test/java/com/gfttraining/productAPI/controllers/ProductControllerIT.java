@@ -447,7 +447,6 @@ public class ProductControllerIT {
                 .expectStatus().isNotFound()
                 .expectBody()
                 .jsonPath("$").isEqualTo("The provided ID is non existent");
-        ;
     }
 
     @Test

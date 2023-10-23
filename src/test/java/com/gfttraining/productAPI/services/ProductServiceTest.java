@@ -481,8 +481,6 @@ public class ProductServiceTest {
 
         product2.setId(2L);
 
-        List<Long> idList = Arrays.asList(1L,2L);
-
         List<Product> checkedProducts = Arrays.asList(product1,product2);
 
         List<Product> productsRetrieved = productService.getProductsWithEnoughStock(checkedProducts,productsToSubmit);
@@ -517,8 +515,6 @@ public class ProductServiceTest {
                 1.0);
 
         product2.setId(2L);
-
-        List<Long> idList = Arrays.asList(1L,2L);
 
         List<Product> checkedProducts = Arrays.asList(product1,product2);
 
@@ -593,8 +589,6 @@ public class ProductServiceTest {
                 50,
                 1.0);
         product2.setId(2L);
-
-        List<Long> idList = Arrays.asList(1L,2L);
 
         List<Product> productsAvailable = Arrays.asList(product1,product2);
 

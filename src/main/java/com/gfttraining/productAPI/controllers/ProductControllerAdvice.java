@@ -22,7 +22,7 @@ public class ProductControllerAdvice {
     
         StringBuilder errorMessage = new StringBuilder("Validation error(s):\n");
         ex.getConstraintViolations().forEach(violation ->
-                errorMessage.append("\s").append(violation.getMessage()).append(";\n")
+                errorMessage.append(" ").append(violation.getMessage()).append(";\n")
         );
 
         return new ResponseEntity<>(errorMessage.toString(), HttpStatus.BAD_REQUEST);
@@ -33,29 +33,26 @@ public class ProductControllerAdvice {
     public ResponseEntity<String> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
 
         StringBuilder errorMessage = new StringBuilder("Validation error(s):\n");
-        ex.getBindingResult().getAllErrors().forEach(error -> {
-            
-            errorMessage.append("\s").append(error.getDefaultMessage()).append(";\n");
-        });
+        ex.getBindingResult().getAllErrors().forEach(error -> errorMessage.append(" ").append(error.getDefaultMessage()).append(";\n"));
 
         return new ResponseEntity<>(errorMessage.toString(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(NumberFormatException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<String> handleNumberFormatException(NumberFormatException ex) {
+    public ResponseEntity<String> handleNumberFormatException() {
         return new ResponseEntity<>("Your input does not match the one required by the endpoint, " +
                 "please refer to the OpenAPI documentation", HttpStatus.BAD_REQUEST);
     }
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<String> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+    public ResponseEntity<String> handleHttpMessageNotReadableException() {
          return new ResponseEntity<>("Request parameters have a wrong format, please consult the OpenAPI documentation", HttpStatus.BAD_REQUEST);
     }
     
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<String> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex) {
+    public ResponseEntity<String> handleMethodArgumentTypeMismatchException() {
          return new ResponseEntity<>("Wrong type exception, please consult the OpenAPI documentation", HttpStatus.BAD_REQUEST);
     }
     @ExceptionHandler(NotEnoughStockException.class)

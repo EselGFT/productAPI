@@ -27,7 +27,7 @@ public class CategoryServiceTest {
     }
 
     @Test
-    @DisplayName("")
+    @DisplayName("GIVEN an existing category name WHEN the getCategoryByName method is invoked THEN that category is returned")
     void getCategoryByNameTest() {
         Category food = new Category("food", 25.0);
         Category other = new Category("other", 0.0);
@@ -43,7 +43,7 @@ public class CategoryServiceTest {
     }
 
     @Test
-    @DisplayName("")
+    @DisplayName("GIVEN an non existing category name WHEN the getCategoryByName method is invoked THEN the Other category is returned")
     void getNonExistentCategoryByNameTest() {
         Category other = new Category("other", 0.0);
 

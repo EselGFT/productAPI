@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import java.util.Optional;
 import java.util.Set;
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -39,8 +38,6 @@ public class ProductControllerTest {
 
     @Mock
     ProductService productService;
-    @Mock
-    ProductRepository productRepository;
 
     @InjectMocks
     ProductController productController;
@@ -301,9 +298,8 @@ public class ProductControllerTest {
             new ProductDTO(0,BigDecimal.valueOf(10.0),50,1.0)
         );
 
-        List<Long> idList = Arrays.asList(Long.valueOf(1),Long.valueOf(2));
+        List<Long> idList = Arrays.asList(1L, 2L);
         Mockito.when(productService.createProductResponsesWithProductIDs(idList)).thenReturn(productDTOs);
-
 
         ResponseEntity<List<ProductDTO>> retrievedProducts = productController.getProductsBasicInfo(idList);
 
