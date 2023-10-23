@@ -2,11 +2,14 @@ package com.gfttraining.productAPI.services;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.List;
 
+import com.gfttraining.productAPI.exceptions.InvalidCartConnectionException;
 import com.gfttraining.productAPI.exceptions.NonExistingProductException;
 import com.gfttraining.productAPI.exceptions.NotEnoughStockException;
 import com.gfttraining.productAPI.model.*;
+import com.gfttraining.productAPI.repositories.CartRepository;
 import org.springframework.stereotype.Service;
 
 import com.gfttraining.productAPI.model.Category;
@@ -23,9 +26,12 @@ public class ProductService {
 
     private final ProductRepository productRepository;
 
-    public ProductService(CategoryRepository categoryRepository, ProductRepository productRepository) {
+    private final CartRepository cartRepository;
+
+    public ProductService(CategoryRepository categoryRepository, ProductRepository productRepository, CartRepository cartRepository) {
         this.categoryRepository = categoryRepository;
         this.productRepository = productRepository;
+        this.cartRepository = cartRepository;
 
     }
 
@@ -39,7 +45,7 @@ public class ProductService {
 
     }
 
-    public Product updateProduct (long id, ProductRequest productRequest) throws NonExistingProductException {
+    public Product updateProduct (long id, ProductRequest productRequest) throws NonExistingProductException, InvalidCartConnectionException {
 
     	Category category = categoryRepository.findById(productRequest.getCategory()).orElse(categoryRepository.findById("other").get());
 
@@ -55,10 +61,18 @@ public class ProductService {
             productUpdate.setStock(productRequest.getStock());
             productUpdate.setWeight(productRequest.getWeight());
 
-            return productRepository.save(productUpdate);
+            Product product = productRepository.save(productUpdate);
+            sendModifiedDataToCart(product);
+            return product;
         }
     }
 
+    public Product sendModifiedDataToCart (Product product) throws InvalidCartConnectionException {
+        ProductDTO productDTO = buildProductDTO(product);
+        cartRepository.updateProduct(productDTO);
+        return product;
+
+    }
     public void deleteProduct (long id) throws NonExistingProductException {
 
         if (productRepository.findById(id).isEmpty()){
@@ -109,16 +123,19 @@ public class ProductService {
     public int getNumberOfProducts() {
         return productRepository.findAll().size();
     }
+
+    public ProductDTO buildProductDTO(Product product) {
+        ProductDTO productDTO = new ProductDTO();
+        productDTO.setId(product.getId());
+        productDTO.setPrice(calculateDiscountedPrice(product));
+        productDTO.setStock(product.getStock());;
+        productDTO.setWeight(product.getWeight());
+        return productDTO;
+    }
+
     public List<ProductDTO> buildProductsDTOs(List<Product> products) {
         return products.stream()
-                .map(product -> {
-                    ProductDTO productDTO = new ProductDTO();
-                    productDTO.setId(product.getId());
-                    productDTO.setPrice(calculateDiscountedPrice(product));
-                    productDTO.setStock(product.getStock());;
-                    productDTO.setWeight(product.getWeight());
-                    return productDTO;
-                })
+                .map(this::buildProductDTO)
                 .toList();
     }
 

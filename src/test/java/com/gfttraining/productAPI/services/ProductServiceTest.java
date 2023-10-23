@@ -11,9 +11,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import com.gfttraining.productAPI.exceptions.InvalidCartConnectionException;
 import com.gfttraining.productAPI.exceptions.NonExistingProductException;
 import com.gfttraining.productAPI.exceptions.NotEnoughStockException;
 import com.gfttraining.productAPI.model.*;
+import com.gfttraining.productAPI.repositories.CartRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,13 +40,15 @@ public class ProductServiceTest {
     @Mock
     private ProductRepository productRepository;
 
+    @Mock
+    private CartRepository cartRepository;
     
     private ProductService productService;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        productService = new ProductService(categoryRepository, productRepository);
+        productService = new ProductService(categoryRepository, productRepository, cartRepository);
     }
 
     @Test
@@ -105,7 +109,7 @@ public class ProductServiceTest {
     
     @Test
     @DisplayName("GIVEN a product's updated information WHEN the original its updated THEN the updated product's information should match the given")
-    void updateProductsTest () throws NonExistingProductException {
+    void updateProductsTest () throws NonExistingProductException, InvalidCartConnectionException {
     	
     	
     	String productName = "TestProduct";
@@ -662,6 +666,60 @@ public class ProductServiceTest {
         BigDecimal discountedPrice = productService.calculateDiscountedPrice(apple);
 
         assertEquals(new BigDecimal("0.94"), discountedPrice);
+    }
+
+
+    @Test
+    public void buildProductDTOTest() {
+        Category other = new Category("other", 0.0);
+        Product product = new Product(
+                "TestProduct1",
+                "TestDescription1",
+                other,
+                10.00,
+                50,
+                1.0);
+        product.setId(1L);
+
+        BigDecimal bd = new BigDecimal("10.00");
+        BigDecimal roundedPrice = bd.setScale(2, RoundingMode.CEILING);
+        ProductDTO productDTO = new ProductDTO(
+                1L,
+                roundedPrice,
+                50,
+                1.0
+        );
+        ProductDTO productDTORetrieved = productService.buildProductDTO(product);
+
+        assertEquals(productDTO, productDTORetrieved);
+    }
+    @Test
+    public void sendModifiedDataToCartTest() throws InvalidCartConnectionException {
+        Category other = new Category("other", 0.0);
+        Product product = new Product(
+                "TestProduct1",
+                "TestDescription1",
+                other,
+                10.00,
+                50,
+                1.0);
+        product.setId(1L);
+
+        BigDecimal bd = new BigDecimal("10.00");
+        BigDecimal roundedPrice = bd.setScale(2, RoundingMode.CEILING);
+        ProductDTO productDTO = new ProductDTO(
+                1L,
+                roundedPrice,
+                50,
+                1.0
+        );
+
+        Mockito.when(cartRepository.updateProduct(productDTO)).thenReturn(productDTO);
+
+        Product productRetrieved = productService.sendModifiedDataToCart(product);
+
+
+        assertEquals(product, productRetrieved);
     }
 
 

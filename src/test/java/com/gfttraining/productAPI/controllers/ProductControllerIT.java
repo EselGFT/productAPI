@@ -3,7 +3,9 @@ package com.gfttraining.productAPI.controllers;
 import com.gfttraining.productAPI.model.ProductRequest;
 import com.gfttraining.productAPI.model.ProductToSubmit;
 import com.gfttraining.productAPI.services.ProductService;
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import jakarta.annotation.PostConstruct;
+import org.junit.Rule;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,6 +17,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.*;
@@ -24,6 +27,9 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 public class ProductControllerIT {
 
+
+    @Rule
+    public WireMockRule wireMockRule = new WireMockRule(8081);
     @LocalServerPort
     private int port;
     private WebTestClient client;
@@ -357,6 +363,11 @@ public class ProductControllerIT {
     @DisplayName("GIVEN a product's information WHEN the product's controller putUpdate method is called THEN the provided product's information is updated with te new information")
     @Order(14)
     void productUpdateIT() {
+        stubFor(put(urlPathMatching("http://default/carts/updateStock/"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("\"testing-library\": \"WireMock\"")));
         //GIVEN
         ProductRequest productRequestTest = new ProductRequest("TestProduct", "", "TestCategory", 10.0, 50, 2.0);
 
@@ -528,6 +539,7 @@ public class ProductControllerIT {
                 .expectBody()
                 .jsonPath("$").isEqualTo("Product IDs without required stock: [1]");
     }
+
 
 
 
