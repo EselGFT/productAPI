@@ -3,10 +3,16 @@ package com.gfttraining.productAPI.controllers;
 import com.gfttraining.productAPI.model.ProductRequest;
 import com.gfttraining.productAPI.model.ProductToSubmit;
 import com.gfttraining.productAPI.services.ProductService;
+import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
+import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
+import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import jakarta.annotation.PostConstruct;
-import org.junit.Rule;
+
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -18,24 +24,38 @@ import java.util.Arrays;
 import java.util.List;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.*;
 
-
+@WireMockTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 public class ProductControllerIT {
-
-
-    @Rule
-    public WireMockRule wireMockRule = new WireMockRule(8081);
     @LocalServerPort
     private int port;
     private WebTestClient client;
     @Autowired
     private ProductService productService;
 
+    public static WireMockServer wireMockServer = new WireMockServer(8887);
+
+
+    @BeforeAll
+    static void setUp() {
+        wireMockServer.start();
+    }
+
+    @AfterAll
+    static void tearDown() {
+        wireMockServer.stop();
+    }
+
+    @AfterEach
+    void resetAll() {
+        wireMockServer.resetAll();
+    }
     //Initiate the web client
     @PostConstruct
     void init() {
@@ -363,12 +383,10 @@ public class ProductControllerIT {
     @DisplayName("GIVEN a product's information WHEN the product's controller putUpdate method is called THEN the provided product's information is updated with te new information")
     @Order(14)
     void productUpdateIT() {
-        stubFor(put(urlPathMatching("http://default/carts/updateStock/"))
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
-                        .withBody("\"testing-library\": \"WireMock\"")));
-        //GIVEN
+
+        wireMockServer.stubFor(WireMock.put(WireMock.urlMatching("/carts"))
+                .willReturn(aResponse().withBody("test").withStatus(200)));
+
         ProductRequest productRequestTest = new ProductRequest("TestProduct", "", "TestCategory", 10.0, 50, 2.0);
 
         client.get().uri("/products/2").exchange()

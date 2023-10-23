@@ -29,8 +29,8 @@ public class CartRepository {
         HttpEntity<ProductDTO> requestEntity = new HttpEntity<>(productDTO, headers);
 
         ResponseEntity<Void> responseEntity = restTemplate.exchange(
-                externalServiceUrl + "/carts/updateStock/",
-                HttpMethod.POST,
+                 "http://localhost:8887/carts",
+                HttpMethod.PUT,
                 requestEntity,
                 Void.class
         );
