@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import com.gfttraining.productAPI.exceptions.InvalidCartConnectionException;
 import com.gfttraining.productAPI.exceptions.NonExistingProductException;
 import com.gfttraining.productAPI.exceptions.NotEnoughStockException;
 import com.gfttraining.productAPI.model.*;
@@ -28,27 +27,26 @@ import com.gfttraining.productAPI.model.Category;
 import com.gfttraining.productAPI.model.Product;
 import com.gfttraining.productAPI.model.ProductRequest;
 import com.gfttraining.productAPI.model.ProductDTO;
-import com.gfttraining.productAPI.repositories.CategoryRepository;
 import com.gfttraining.productAPI.repositories.ProductRepository;
 
 
 public class ProductServiceTest {
     
     @Mock
-    private CategoryRepository categoryRepository;
+    private CategoryService categoryService;
 
     @Mock
     private ProductRepository productRepository;
 
     @Mock
     private CartRepository cartRepository;
-    
+
     private ProductService productService;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        productService = new ProductService(categoryRepository, productRepository, cartRepository);
+        productService = new ProductService(categoryService, productRepository, cartRepository);
     }
 
     @Test
@@ -61,22 +59,19 @@ public class ProductServiceTest {
         int productStock = 50;
         Double productWeight = 1.0;
 
-        Category testCategory = new Category("TestCategory", 30.0);// poridamos porner aqui category name no?
-        Category other = new Category("other", 0.0);
-        Product product = new Product(productName, productDescription, testCategory, productPrice, productStock, productWeight);
+        Category testCategory = new Category("TestCategory", 30.0);
         ProductRequest productRequest = new ProductRequest(productName, productDescription, categoryName, productPrice, productStock, productWeight);
+        Product product = new Product(productRequest, testCategory);
 
-        Mockito.when(categoryRepository.findById(categoryName)).thenReturn(Optional.of(testCategory));
-        Mockito.when(categoryRepository.findById("other")).thenReturn(Optional.of(other));
+        Mockito.when(categoryService.getCategoryByName(categoryName)).thenReturn(testCategory);
         Mockito.when(productRepository.save(product)).thenReturn(product);
 
         Product createdProduct = productService.createProduct(productRequest);
         
-        verify(categoryRepository, times(1)).findById(categoryName);
-        verify(categoryRepository, times(1)).findById("other");
+        verify(categoryService, times(1)).getCategoryByName(categoryName);
         verify(productRepository, times(1)).save(any(Product.class));
 
-        assertEquals(testCategory, createdProduct.getCategory());
+        assertEquals(testCategory.getName(), createdProduct.getCategory().getName());
         
     }
 
@@ -92,26 +87,25 @@ public class ProductServiceTest {
         Double productWeight = 1.0;
 
         Category other = new Category("other", 0.0);
-        Product product = new Product(productName, productDescription, other, productPrice, productStock, productWeight);
         ProductRequest productRequest = new ProductRequest(productName, productDescription, categoryName, productPrice, productStock, productWeight);
+        Product product = new Product(productRequest, other);
 
-        Mockito.when(categoryRepository.findById("other")).thenReturn(Optional.of(other));
+        Mockito.when(categoryService.getCategoryByName(categoryName)).thenReturn(other);
         Mockito.when(productRepository.save(product)).thenReturn(product);
 
         Product createdProduct = productService.createProduct(productRequest);
-        
-        verify(categoryRepository, times(1)).findById(categoryName);
-        verify(categoryRepository, times(1)).findById("other");
+
+        verify(categoryService, times(1)).getCategoryByName(categoryName);
         verify(productRepository, times(1)).save(any(Product.class));
 
-        assertEquals(other, createdProduct.getCategory());
+        assertEquals(other.getName(), createdProduct.getCategory().getName());
     }
     
     @Test
     @DisplayName("GIVEN a product's updated information WHEN the original its updated THEN the updated product's information should match the given")
     void updateProductsTest () throws NonExistingProductException, InvalidCartConnectionException {
-    	
-    	
+
+
     	String productName = "TestProduct";
         String productDescription = "TestDescription";
         String categoryName = "TestCategory";
@@ -121,15 +115,17 @@ public class ProductServiceTest {
         long id = 1;
         
         Category other = new Category("other", 0.0);
-        Product product = new Product(productName, productDescription, other, productPrice, productStock,productWeight);
         ProductRequest productRequest = new ProductRequest(productName, productDescription, categoryName, productPrice, productStock, productWeight);
-        Mockito.when(categoryRepository.findById("other")).thenReturn(Optional.of(other));
+        Product product = new Product(productRequest, other);
+
+        Mockito.when(categoryService.getCategoryByName(categoryName)).thenReturn(other);
+        Mockito.when(productRepository.existsById(id)).thenReturn(true);
         Mockito.when(productRepository.findById(id)).thenReturn(Optional.of(product));
         Mockito.when(productRepository.save(product)).thenReturn(product);       
               
         Product productAfterUpdate = productService.updateProduct(id, productRequest);
 
-        verify(categoryRepository, times(1)).findById("other");
+        verify(categoryService, times(1)).getCategoryByName(categoryName);
         verify(productRepository, times(1)).save(any(Product.class));
 
         assertEquals(productAfterUpdate.getName(),productName);
@@ -141,33 +137,31 @@ public class ProductServiceTest {
     }
 
     @Test
-    @DisplayName("WHEN deletepProduct is executed THEN delete a product object")
-    void deleteProductTest () throws NonExistingProductException {
+    @DisplayName("WHEN deleteProduct is executed THEN delete a product object")
+    void deleteProductTest() throws NonExistingProductException {
         long id = 1;
         Category other = new Category("other", 0.0);
         Product product = new Product("TestProduct", "TestDescription", other, 10.0, 50,1.0);
 
         Mockito.when(productRepository.findById(id)).thenReturn(Optional.of(product));
+        Mockito.when(productRepository.existsById(id)).thenReturn(true);
         Mockito.doNothing().when(productRepository).deleteById(id);
+
         productService.deleteProduct(id);
+
         verify(productRepository,times(1)).deleteById(id);
-
-
     }
 
     @Test
-    @DisplayName("WHEN Non Existing Products is try to delete  THEN NonExistingProductException is thrown")
-    void deleteProductTrhowsExceptionTest () throws NonExistingProductException {
+    @DisplayName("WHEN Non Existing Products are trying to be deleted THEN the NonExistingProductException is thrown")
+    void deleteProductThrowsExceptionTest() {
         long id = 1;
-        Category other = new Category("other", 0.0);
-        Product product = new Product("TestProduct", "TestDescription", other, 10.0, 50,1.0);
 
-        //Mockito.when(productRepository.findById(1)).thenReturn(Optional.of(product));
         Mockito.doNothing().when(productRepository).deleteById(id);
+
         assertThrows(NonExistingProductException.class, () -> productService.deleteProduct(id));
+
         verify(productRepository,times(0)).deleteById(id);
-
-
     }
 
     // start of listProductById() tests
@@ -262,7 +256,7 @@ public class ProductServiceTest {
     }    
     
     @Test
-    @DisplayName("When a product is created but the category is not foun, Then it should be associated with the 'other' category")
+    @DisplayName("When a product is created but the category is not found, Then it should be associated with the 'other' category")
     void createProductsTest(){
         List<ProductRequest> productRequests = Arrays.asList(
             new ProductRequest(
@@ -281,31 +275,19 @@ public class ProductServiceTest {
                 1.0)            
         );
 
-        Category other = new Category("other", 0.0);
         Category food = new Category("food", 25.0);
- 
-        Product productTest1 = new Product(
-                "TestProduct1", 
-                "TestDescription1", 
-                food, 
-                10.0, 
-                50,
-                1.0);
+        Category other = new Category("other", 0.0);
 
-        Product productTest2 = new Product(
-                "TestProduct2", 
-                "TestDescription2", 
-                other, 
-                10.0, 
-                100,
-                1.0);
-        
-        List<Product> products = Arrays.asList(productTest1, productTest2);
-        Mockito.when(categoryRepository.findById("food")).thenReturn(Optional.of(food));
-        Mockito.when(categoryRepository.findById("other")).thenReturn(Optional.of(other));
+        Product productTestFood = new Product(productRequests.get(0), food);
+        Product productTestOther = new Product(productRequests.get(1), other);
 
-        Mockito.when(productRepository.save(productTest1)).thenReturn(productTest1);
-        Mockito.when(productRepository.save(productTest2)).thenReturn(productTest2);
+        List<Product> products = Arrays.asList(productTestFood, productTestOther);
+
+        Mockito.when(categoryService.getCategoryByName("food")).thenReturn(food);
+        Mockito.when(categoryService.getCategoryByName("TestCategory")).thenReturn(other);
+
+        Mockito.when(productRepository.save(productTestFood)).thenReturn(productTestFood);
+        Mockito.when(productRepository.save(productTestOther)).thenReturn(productTestOther);
 
         List<Product> createdProducts = productService.createProducts(productRequests);
 
@@ -316,18 +298,20 @@ public class ProductServiceTest {
     @Test
     public void createProductsResponsesTest() {
         Category food = new Category("food", 25.0);
-        List<Product> products = Arrays.asList(new Product(
-                "TestProduct1", 
-                "TestDescription1", 
-                food, 
-                10.0, 
+        List<Product> products = List.of(new Product(
+                "TestProduct1",
+                "TestDescription1",
+                food,
+                10.0,
                 50,
                 1.0));    
                 
-        BigDecimal bd = new BigDecimal(7.50);
-        BigDecimal roundedPrice = bd.setScale(2, RoundingMode.CEILING);        
+        BigDecimal bd = new BigDecimal("7.50");
+        BigDecimal roundedPrice = bd.setScale(2, RoundingMode.CEILING);
+
         List<ProductDTO> productDTOS = productService.buildProductsDTOs(products);
-        List<ProductDTO> expectedProductsResponses = Arrays.asList(new ProductDTO(0, roundedPrice, 50,1.0 ));
+        List<ProductDTO> expectedProductsResponses = List.of(new ProductDTO(0, roundedPrice, 50, 1.0));
+
         assertEquals(expectedProductsResponses, productDTOS);
     }
 
@@ -353,11 +337,13 @@ public class ProductServiceTest {
         
         
         List<Product> products = Arrays.asList(productTest1, productTest2);
-        List<Long> idList = Arrays.asList(Long.valueOf(1),Long.valueOf(2));
+        List<Long> idList = Arrays.asList(1L, 2L);
 
         Mockito.when(productRepository.findAllById(idList)).thenReturn(products);
+
         List<Product> productsExpected= Arrays.asList(productTest1, productTest2);
-        List<Product> productsRetrievedList = productService.getProductsWithIDs(idList);
+        List<Product> productsRetrievedList = productService.getProductsByIDs(idList);
+
         assertEquals(productsExpected, productsRetrievedList);
 
     }
@@ -379,6 +365,7 @@ public class ProductServiceTest {
 
         assertEquals(2, numberOfProducts);
     }
+
     @Test
     @DisplayName("Given valid products, when checking if they can be submitted and submitting, then expect submitted ProductDTOs")
     public void checkIfProductsCanBeSubmittedAndSubmitTest() throws NonExistingProductException, NotEnoughStockException {
@@ -387,6 +374,7 @@ public class ProductServiceTest {
                 new ProductToSubmit(1L,5),
                 new ProductToSubmit(2L,5)
         );
+
         List<Long> idList = Arrays.asList(1L,2L);
 
         Product product1 = new Product(
@@ -396,7 +384,9 @@ public class ProductServiceTest {
                 10.00,
                 50,
                 1.0);
+
         product1.setId(1L);
+
         Product product2 = new Product(
                 "TestProduct2",
                 "TestDescription2",
@@ -404,6 +394,7 @@ public class ProductServiceTest {
                 10.00,
                 50,
                 1.0);
+
         product2.setId(2L);
 
         BigDecimal bd = new BigDecimal(10);
@@ -421,7 +412,7 @@ public class ProductServiceTest {
         Mockito.when(productRepository.save(product1)).thenReturn(product1);
         Mockito.when(productRepository.save(product2)).thenReturn(product2);
 
-        List<ProductDTO> retrievedProductDTOs = productService.checkIfProductsCanBeSubmittedAndSubmit(productsToSubmit);
+        List<ProductDTO> retrievedProductDTOs = productService.checkIfEnoughStockAndSubtract(productsToSubmit);
 
         assertEquals(submittedProductDTOs, retrievedProductDTOs);
     }
@@ -434,6 +425,7 @@ public class ProductServiceTest {
                 new ProductToSubmit(1L,5),
                 new ProductToSubmit(2L,5)
         );
+
         Product product1 = new Product(
                 "TestProduct1",
                 "TestDescription1",
@@ -441,7 +433,9 @@ public class ProductServiceTest {
                 10.00,
                 50,
                 1.0);
+
         product1.setId(1L);
+
         Product product2 = new Product(
                 "TestProduct2",
                 "TestDescription2",
@@ -449,8 +443,11 @@ public class ProductServiceTest {
                 10.00,
                 50,
                 1.0);
+
         product2.setId(2L);
+
         List<Long> idList = Arrays.asList(1L,2L);
+
         List<Product> checkedProducts = Arrays.asList(product1,product2);
 
         Mockito.when(productRepository.findAllById(idList)).thenReturn(checkedProducts);
@@ -469,6 +466,7 @@ public class ProductServiceTest {
                 new ProductToSubmit(1L,5),
                 new ProductToSubmit(2L,5)
         );
+
         Product product1 = new Product(
                 "TestProduct1",
                 "TestDescription1",
@@ -476,7 +474,9 @@ public class ProductServiceTest {
                 10.00,
                 50,
                 1.0);
+
         product1.setId(1L);
+
         Product product2 = new Product(
                 "TestProduct2",
                 "TestDescription2",
@@ -484,10 +484,10 @@ public class ProductServiceTest {
                 10.00,
                 50,
                 1.0);
-        product2.setId(2L);
-        List<Long> idList = Arrays.asList(1L,2L);
-        List<Product> checkedProducts = Arrays.asList(product1,product2);
 
+        product2.setId(2L);
+
+        List<Product> checkedProducts = Arrays.asList(product1,product2);
 
         List<Product> productsRetrieved = productService.getProductsWithEnoughStock(checkedProducts,productsToSubmit);
 
@@ -501,6 +501,7 @@ public class ProductServiceTest {
                 new ProductToSubmit(1L,5),
                 new ProductToSubmit(2L,5)
         );
+
         Product product1 = new Product(
                 "TestProduct1",
                 "TestDescription1",
@@ -508,7 +509,9 @@ public class ProductServiceTest {
                 10.00,
                 3,
                 1.0);
+
         product1.setId(1L);
+
         Product product2 = new Product(
                 "TestProduct2",
                 "TestDescription2",
@@ -516,17 +519,18 @@ public class ProductServiceTest {
                 10.00,
                 50,
                 1.0);
-        product2.setId(2L);
-        List<Long> idList = Arrays.asList(1L,2L);
-        List<Product> checkedProducts = Arrays.asList(product1,product2);
 
+        product2.setId(2L);
+
+        List<Product> checkedProducts = Arrays.asList(product1,product2);
 
         assertThrows(NotEnoughStockException.class , () -> productService.getProductsWithEnoughStock(checkedProducts,productsToSubmit));
 
     }
+
     @Test
     @DisplayName("Given a product and products to submit, when checking if stock is enough, then expect true")
-    void isStockEnoughtTest(){
+    void isStockEnoughTest(){
         Category other = new Category("other", 0.0);
         Product product1 = new Product(
                 "TestProduct1",
@@ -535,20 +539,19 @@ public class ProductServiceTest {
                 10.00,
                 50,
                 1.0);
+
         product1.setId(1L);
+
         List<ProductToSubmit> productsToSubmit = Arrays.asList(
                 new ProductToSubmit(1L,5),
                 new ProductToSubmit(2L,5)
         );
 
-
-
-
         assertTrue(productService.isStockEnough(product1,productsToSubmit));
     }
     @Test
     @DisplayName("Given a product with insufficient stock and products to submit, when checking if stock is enough, then expect false")
-    void isNotStockEnoughtTest(){
+    void isNotStockEnoughTest(){
         Category other = new Category("other", 0.0);
         Product product1 = new Product(
                 "TestProduct1",
@@ -557,14 +560,13 @@ public class ProductServiceTest {
                 10.00,
                 4,
                 1.0);
+
         product1.setId(1L);
+
         List<ProductToSubmit> productsToSubmit = Arrays.asList(
                 new ProductToSubmit(1L,5),
                 new ProductToSubmit(2L,5)
         );
-
-
-
 
         assertFalse(productService.isStockEnough(product1,productsToSubmit));
     }
@@ -594,10 +596,7 @@ public class ProductServiceTest {
                 1.0);
         product2.setId(2L);
 
-        List<Long> idList = Arrays.asList(1L,2L);
-
         List<Product> productsAvailable = Arrays.asList(product1,product2);
-
 
         Product product1Modified = new Product(
                 "TestProduct1",
@@ -616,7 +615,7 @@ public class ProductServiceTest {
                 1.0);
         product2Modified.setId(2L);
 
-        List<Product> productsModified= Arrays.asList(product1Modified,product2Modified);
+        List<Product> productsModified = Arrays.asList(product1Modified,product2Modified);
 
         List<Product> productsRetrieved = productService.getProductsWithEnoughStock(productsAvailable,productsToSubmit);
 
@@ -625,7 +624,7 @@ public class ProductServiceTest {
 
     @Test
     @DisplayName("Given a product and products to submit, when subtracting stock, then expect modified product")
-    void substractStockTest(){
+    void subtractStockTest(){
         Category other = new Category("other", 0.0);
         Product product1 = new Product(
                 "TestProduct1",

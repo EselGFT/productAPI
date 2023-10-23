@@ -27,11 +27,8 @@ public class ProductRequest {
     @Min(value = 0, message="Weight should not be less than 0")
     private Double weight;
 
-    public ProductRequest(){
-        
-    }
-    
-   
+    public ProductRequest(){}
+
     public ProductRequest(String name, String description, String category, Double price, int stock, Double weight) {
         this.name = name;
         this.description = description;

@@ -6,16 +6,13 @@ info:
   contact:
     name: Product team
 
-
-
 tags:
   - name: "Product"
-    description: "Everything about your products"
-
+    description: "A product stored in a catalog"
 
 paths:
-  
-  /product:
+
+  /products:
 
     post:
       tags:
@@ -42,8 +39,6 @@ paths:
         500:
           description: Internal server error
 
-  /products:
-
     get:
       tags:
         - Product
@@ -66,39 +61,8 @@ paths:
         500:
           description: Internal server error
 
-    post:
-      tags:
-        - Product
-      summary: Adds products in block to the catalog
-      description: Adds products in block to the catalog
-      operationId: postProducts
-      requestBody:
-        description: Json list of products to add
-        required: true
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/ProductRequest'
 
-      responses:
-        200:
-          description: Products added succesfully
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Product'
-        404:
-          description: Product not found
-
-        500:
-          description: Internal server error
-
-
-  /products/{id_product}:
+  /products/{product_id}:
     get:
       tags:
         - Product
@@ -106,7 +70,7 @@ paths:
       description: Get the specified catalog product
       operationId: getProduct
       parameters:
-        - name: id_product
+        - name: product_id
           in: path
           required: true
           schema:
@@ -136,7 +100,7 @@ paths:
       description: Modifies the specified catalog product using the parameters in the request body
       operationId: putProduct
       parameters:
-        - name: id_product
+        - name: product_id
           in: path
           required: true
           schema:
@@ -164,11 +128,11 @@ paths:
     delete:
       tags:
         - Product
-      summary: Delete a catalog product
+      summary: Deletes a catalog product
       description: Deletes the specified catalog product
       operationId: deleteProduct
       parameters:
-        - name: id_product
+        - name: product_id
           in: path
           required: true
           schema:
@@ -213,7 +177,40 @@ paths:
 
         500:
           description: Internal server error
-  /productsWithIDs:
+
+  /products/bulkCreate:
+    post:
+      tags:
+        - Product
+      summary: Adds products in bulk to the catalog
+      description: Adds products in bulk to the catalog
+      operationId: postProducts
+      requestBody:
+        description: Json list of products to add
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProductRequest'
+
+      responses:
+        200:
+          description: Products added succesfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        404:
+          description: Product not found
+
+        500:
+          description: Internal server error
+
+  /products/getBasicInfo:
     post:
       tags:
         - Product
@@ -229,7 +226,7 @@ paths:
               type: array
               items:
                 type: integer
-            example: [0]
+            example: [1, 5, 43]
 
 
       responses:
@@ -246,13 +243,14 @@ paths:
 
         500:
           description: Internal server error
-  /submitProducts:
+
+  /products/reduceStock:
     post:
       tags:
         - Product
       summary: Update stock of product
       description: Update stock of product
-      operationId: submitProducts
+      operationId: reduceStock
       requestBody:
         description: Json list of the products to submit
         required: true
@@ -274,7 +272,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/ProductDTO'
         400:
-          description: Not enought stock
+          description: Not enough stock
         404:
           description: Product not found
 

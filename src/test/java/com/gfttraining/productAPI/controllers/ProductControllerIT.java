@@ -4,15 +4,8 @@ import com.gfttraining.productAPI.model.ProductRequest;
 import com.gfttraining.productAPI.model.ProductToSubmit;
 import com.gfttraining.productAPI.services.ProductService;
 import com.github.tomakehurst.wiremock.WireMockServer;
-import com.github.tomakehurst.wiremock.client.WireMock;
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
-import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
-import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import jakarta.annotation.PostConstruct;
-
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -23,8 +16,6 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.*;
@@ -33,6 +24,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 public class ProductControllerIT {
+
     @LocalServerPort
     private int port;
     private WebTestClient client;
@@ -64,12 +56,10 @@ public class ProductControllerIT {
                 .build();
     }
 
-
-    //////////////// ORDER STARTS HERE *****************************************************************
     @Test
-    @DisplayName("Given a list of productRquests When a post is made to /products Then it should be saved in database and return the saved products")
+    @DisplayName("Given a list of productRequests When a post is made to /products Then it should be saved in database and return the saved products")
     @Order(1)
-    void postLoadProductsTest() {
+    void createProductsBulkTest() {
         List<ProductRequest> productRequests = Arrays.asList(
                 new ProductRequest(
                         "TestProduct1",
@@ -87,7 +77,7 @@ public class ProductControllerIT {
                         1.0)
         );
 
-        client.post().uri("/products")
+        client.post().uri("/products/bulkCreate")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(productRequests)
                 .exchange()
@@ -111,9 +101,9 @@ public class ProductControllerIT {
     }
 
     @Test
-    @DisplayName("Given a list of productRequests with bad content When a post is made to /products Then it should return an error message")
+    @DisplayName("Given a list of productRequests with a non valid one When a post is made to /products/bulkCreate Then it should return an error message")
     @Order(2)
-    void postLoadProductsErrorTest() {
+    void createProductsBulkErrorTest() {
         List<ProductRequest> productRequests = Arrays.asList(
                 new ProductRequest(
                         "TestProduct1",
@@ -131,7 +121,7 @@ public class ProductControllerIT {
                         1.0)
         );
 
-        client.post().uri("/products")
+        client.post().uri("/products/bulkCreate")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(productRequests)
                 .exchange()
@@ -142,9 +132,9 @@ public class ProductControllerIT {
     }
 
     @Test
-    @DisplayName("Given a productRequests  When a post is made to /product Then it should be saved in the database and return the saved product")
+    @DisplayName("Given a productRequest When a post is made to /products Then it should be saved in the database and return the saved product")
     @Order(3)
-    void postLoadProductTest() {
+    void createProductTest() {
 
         ProductRequest productRequest = new ProductRequest(
                 "TestProduct1",
@@ -154,8 +144,7 @@ public class ProductControllerIT {
                 50,
                 1.0);
 
-
-        client.post().uri("/product")
+        client.post().uri("/products")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(productRequest)
                 .exchange()
@@ -169,14 +158,12 @@ public class ProductControllerIT {
                 .jsonPath("$.price").isEqualTo(10.0)
                 .jsonPath("$.stock").isEqualTo(50)
                 .jsonPath("$.weight").isEqualTo(1.0);
-
-
     }
 
     @Test
-    @DisplayName("Given a productRequest with bad content When a post is made to /product Then it should return an error message")
+    @DisplayName("Given a productRequest with bad content When a post is made to /products Then it should return an error message")
     @Order(4)
-    void postLoadProductErrorTest() {
+    void createProductErrorTest() {
 
         ProductRequest productRequest = new ProductRequest(
                 "TestProduct1",
@@ -187,7 +174,7 @@ public class ProductControllerIT {
                 1.0);
 
 
-        client.post().uri("/product")
+        client.post().uri("/products")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(productRequest)
                 .exchange()
@@ -249,7 +236,7 @@ public class ProductControllerIT {
     }
 
     @Test
-    @DisplayName("GIVEN a stirng product ID WHEN tying to list it THEN an error should be invoked")
+    @DisplayName("GIVEN a string product ID WHEN tying to list it THEN an error should be invoked")
     @Order(7)
     void listOneProductWithStringIDTest() {
         client.get().uri("/products/str")
@@ -263,24 +250,24 @@ public class ProductControllerIT {
     @DisplayName("GIVEN a non existing product ID WHEN trying to list it THEN an error should be found")
     @Order(8)
     void listOneNonExistentProductTest() {
-        int numberOfProducts = productService.getNumberOfProducts();
+        int nonExistingID = productService.getNumberOfProducts() + 1;
 
-        client.get().uri("/products/" + (numberOfProducts + 1))
+        client.get().uri("/products/" + nonExistingID)
                 .exchange()
                 .expectStatus().isEqualTo(404)
                 .expectBody()
-                .jsonPath("$").isEqualTo("Product IDs not found: 10");
+                .jsonPath("$").isEqualTo("Product IDs not found: " + nonExistingID);
     }
 
     @Test
-    @DisplayName("Given a list of IDs When a post is made to /productsWithIDs Then it should return the ProductDTO of the found IDs")
+    @DisplayName("Given a list of IDs When a post is made to /products/getBasicInfo Then it should return the ProductDTO of the found IDs")
     @Order(9)
-    void productsWithIDsTest() {
+    void getProductsBasicInfoTest() {
         long id1 = 1;
         long id2 = 2;
         List<Long> IDsList = Arrays.asList(id1, id2);
 
-        client.post().uri("/productsWithIDs")
+        client.post().uri("/products/getBasicInfo")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(IDsList)
                 .exchange()
@@ -298,15 +285,15 @@ public class ProductControllerIT {
     }
 
     @Test
-    @DisplayName("Given a list of IDs When a post is made to /productsWithIDs Then it should return the ProductDTO of the found IDs")
+    @DisplayName("Given a list of IDs When a post is made to /products/getBasicInfo Then it should return the ProductDTO of the found IDs")
     @Order(10)
-    void productsWithIDsErrorTest() {
+    void getProductsBasicInfoErrorTest() {
         long id1 = 1;
         long id2 = 2;
         long id4 = 100;
         List<Long> IDsList = Arrays.asList(id1, id2, id4);
 
-        client.post().uri("/productsWithIDs")
+        client.post().uri("/products/getBasicInfo")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(IDsList)
                 .exchange()
@@ -380,7 +367,7 @@ public class ProductControllerIT {
     }
 
     @Test
-    @DisplayName("GIVEN a product's information WHEN the product's controller putUpdate method is called THEN the provided product's information is updated with te new information")
+    @DisplayName("GIVEN a product's information WHEN the product's controller updateProduct method is called THEN the provided product's information is updated with te new information")
     @Order(14)
     void productUpdateIT() {
 
@@ -452,7 +439,7 @@ public class ProductControllerIT {
                 .expectStatus().is5xxServerError();
     }
     @Test
-    @DisplayName("GIVEN a product's information WHEN the product's controller putUpdate method is called THEN the provided product's information is updated with the new information")
+    @DisplayName("GIVEN a product's information WHEN the product's controller updateProduct method is called THEN the provided product's information is updated with the new information")
     @Order(16)
     void productUpdateThrowExceptionIT() {
         //GIVEN
@@ -470,14 +457,14 @@ public class ProductControllerIT {
     }
 
     @Test
-    @DisplayName("WHEN deleteProduct is executed THEN delete a product object")
+    @DisplayName("GIVEN a valid product ID WHEN the delete product endpoint is called THEN the specified product is deleted")
     @Order(17)
     void productDeleteIT() {
 
         int numberOfProducts = productService.getNumberOfProducts();
 
-
-        client.get().uri("/products").exchange()
+        client.get().uri("/products")
+                .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBodyList(Product.class)
@@ -496,12 +483,11 @@ public class ProductControllerIT {
 
         client.get().uri("/products/" + numberOfProducts).exchange()
                 .expectStatus().isNotFound();
-        //.expectBody().isEmpty()
 
     }
 
     @Test
-    @DisplayName("GIVEN a product's information WHEN the product's controller putUpdate method is called with incorrect Id THEN throws the NonExistingProductException exception")
+    @DisplayName("GIVEN a product's information WHEN the product's controller updateProduct method is called with a non existent Id THEN the NonExistingProductException exception is thrown")
     @Order(18)
     void productDeleteThrowExceptionIT() {
         //GIVEN
@@ -511,13 +497,12 @@ public class ProductControllerIT {
                 .expectStatus().isNotFound()
                 .expectBody()
                 .jsonPath("$").isEqualTo("The provided ID is non existent");
-        ;
     }
 
     @Test
-    @DisplayName("Given a list of products to submit, When they are submitted, Then it should return the products with the modified stock")
+    @DisplayName("Given a list of products to reduce their stock, When the endpoint is called, Then it should return the products with the modified stock")
     @Order(19)
-    void submitProductsIT() {
+    void reduceProductsStockIT() {
 
         client.get().uri("/products/1").exchange()
                 .expectStatus().isOk()
@@ -529,7 +514,7 @@ public class ProductControllerIT {
                 new ProductToSubmit(1L, 5)
         );
 
-        client.post().uri("/submitProducts")
+        client.post().uri("/products/reduceStock")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(productsToSubmit)
                 .exchange()
@@ -540,9 +525,9 @@ public class ProductControllerIT {
     }
 
     @Test
-    @DisplayName("Given a list of products to submit with incorrect IDs, When they are submitted, Then it should return the exception")
+    @DisplayName("Given a list of products to submit with incorrect IDs, When the endpoint is called Then it should return the exception")
     @Order(20)
-    void submitProductsIDsNotFoundIT() {
+    void reduceProductsStockIDsNotFoundIT() {
 
         client.get().uri("/products/1").exchange()
                 .expectStatus().isOk()
@@ -554,7 +539,7 @@ public class ProductControllerIT {
                 new ProductToSubmit(99999L, 5)
         );
 
-        client.post().uri("/submitProducts")
+        client.post().uri("/products/reduceStock")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(productsToSubmit)
                 .exchange()
@@ -564,7 +549,7 @@ public class ProductControllerIT {
 
     }
     @Test
-    @DisplayName("Given a list of products to submit with not enough stock, When they are submitted, Then it should return the exception")
+    @DisplayName("Given a list of products to submit with not enough stock, When the endpoint is called, Then it should return the exception")
     @Order(21)
     void submitProductsNotEnoughStockIT() {
 
@@ -578,7 +563,7 @@ public class ProductControllerIT {
                 new ProductToSubmit(1L, 15)
         );
 
-        client.post().uri("/submitProducts")
+        client.post().uri("/products/reduceStock")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(productsToSubmit)
                 .exchange()
@@ -586,8 +571,5 @@ public class ProductControllerIT {
                 .expectBody()
                 .jsonPath("$").isEqualTo("Product IDs without required stock: [1]");
     }
-
-
-
 
 }
