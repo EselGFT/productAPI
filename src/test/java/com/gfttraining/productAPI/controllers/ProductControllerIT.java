@@ -4,6 +4,7 @@ import com.gfttraining.productAPI.model.ProductRequest;
 import com.gfttraining.productAPI.model.ProductToSubmit;
 import com.gfttraining.productAPI.services.ProductService;
 import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import jakarta.annotation.PostConstruct;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.*;
