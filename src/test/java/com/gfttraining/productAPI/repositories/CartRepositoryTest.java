@@ -49,8 +49,8 @@ public class CartRepositoryTest {
         ResponseEntity<Void> response = new ResponseEntity<>(HttpStatus.OK);
 
         Mockito.when(restTemplate.exchange(
-                cartRepository.externalServiceUrl + "/carts/updateStock/",
-                HttpMethod.POST,
+                "http://"+ cartRepository.externalServiceUrl +":"+"8887"+"/carts/updateStock/",
+                HttpMethod.PUT,
                 requestEntity,
                 Void.class
         )).thenReturn(response);
@@ -78,8 +78,8 @@ public class CartRepositoryTest {
         ResponseEntity<Void> response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         Mockito.when(restTemplate.exchange(
-                cartRepository.externalServiceUrl + "/carts/updateStock/",
-                HttpMethod.POST,
+                "http://"+ cartRepository.externalServiceUrl +":"+"8887"+"/carts/updateStock/",
+                HttpMethod.PUT,
                 requestEntity,
                 Void.class
         )).thenReturn(response);
