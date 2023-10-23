@@ -12,26 +12,24 @@ import org.springframework.stereotype.Service;
 import com.gfttraining.productAPI.model.Category;
 import com.gfttraining.productAPI.model.Product;
 import com.gfttraining.productAPI.model.ProductRequest;
-import com.gfttraining.productAPI.repositories.CategoryRepository;
 import com.gfttraining.productAPI.repositories.ProductRepository;
 
 
 @Service
 public class ProductService {
 
-    private final CategoryRepository categoryRepository;
+    private final CategoryService categoryService;
 
     private final ProductRepository productRepository;
 
-    public ProductService(CategoryRepository categoryRepository, ProductRepository productRepository) {
-        this.categoryRepository = categoryRepository;
+    public ProductService(CategoryService categoryService, ProductRepository productRepository) {
+        this.categoryService = categoryService;
         this.productRepository = productRepository;
     }
 
     public Product createProduct(ProductRequest productRequest) {
 
-        Category category = categoryRepository.findById(productRequest.getCategory())
-                .orElse(categoryRepository.findById("other").get());
+        Category category = categoryService.getCategoryByName(productRequest.getCategory());
 
         Product product = new Product(productRequest, category);
 
@@ -41,31 +39,30 @@ public class ProductService {
 
     public Product updateProduct (long id, ProductRequest productRequest) throws NonExistingProductException {
 
-    	Category category = categoryRepository.findById(productRequest.getCategory()).orElse(categoryRepository.findById("other").get());
-
-        if (productRepository.findById(id).isEmpty()){
+        if (! productRepository.existsById(id)){
             throw new NonExistingProductException("The provided ID is non existent");
-        }else {
-            Product productUpdate = productRepository.findById(id).get();
-            productUpdate.setName(productRequest.getName());
-            productUpdate.setDescription(productRequest.getDescription());
-            productUpdate.setCategory(category);
-            productUpdate.setPrice(productRequest.getPrice());
-            productUpdate.setStock(productRequest.getStock());
-            productUpdate.setWeight(productRequest.getWeight());
-
-            return productRepository.save(productUpdate);
         }
+
+        Category category = categoryService.getCategoryByName(productRequest.getCategory());
+
+        Product productToUpdate = productRepository.findById(id).get();
+            productToUpdate.setName(productRequest.getName());
+            productToUpdate.setDescription(productRequest.getDescription());
+            productToUpdate.setCategory(category);
+            productToUpdate.setPrice(productRequest.getPrice());
+            productToUpdate.setStock(productRequest.getStock());
+            productToUpdate.setWeight(productRequest.getWeight());
+
+        return productRepository.save(productToUpdate);
     }
 
-    public void deleteProduct (long id) throws NonExistingProductException {
+    public void deleteProduct(long id) throws NonExistingProductException {
 
-        if (productRepository.findById(id).isEmpty()){
+        if (! productRepository.existsById(id)){
            throw new NonExistingProductException("The provided ID is non existent");
-         }else {
-            productRepository.deleteById(id);
-         }
+        }
 
+        productRepository.deleteById(id);
     }
 
     public List<Product> listProducts() {
@@ -83,52 +80,53 @@ public class ProductService {
 
     public List<Product> createProducts(List<ProductRequest> productRequests) {
         return productRequests.stream()
-                .map(productRequest -> createProduct(productRequest))
-                .toList();
+            .map(this::createProduct)
+            .toList();
     }
 
     public List<ProductDTO> createProductResponsesWithProductIDs(List<Long> ids) throws NonExistingProductException {
-        List<Product> products = getProductsWithIDs(ids);
+        List<Product> products = getProductsByIDs(ids);
         return buildProductsDTOs(products);
     }
 
-    public List<Product> getProductsWithIDs(List<Long> ids) throws NonExistingProductException {
+    public List<Product> getProductsByIDs(List<Long> ids) throws NonExistingProductException {
         List<Product> foundIds = productRepository.findAllById(ids);
+
         if (foundIds.size() == ids.size()) {
             return foundIds;
-        } else {
-            List<Long> notFoundIds = ids.stream()
-                    .filter(id -> foundIds.stream().noneMatch(product -> product.getId() == id))
-                    .toList();
-
-            throw new NonExistingProductException("Product IDs not found: " + notFoundIds);
         }
+
+        List<Long> notFoundIds = ids.stream()
+            .filter(id -> foundIds.stream().noneMatch(product -> product.getId() == id))
+            .toList();
+
+        throw new NonExistingProductException("Product IDs not found: " + notFoundIds);
     }
 
     public int getNumberOfProducts() {
         return productRepository.findAll().size();
     }
+
     public List<ProductDTO> buildProductsDTOs(List<Product> products) {
         return products.stream()
-                .map(product -> {
-                    ProductDTO productDTO = new ProductDTO();
+            .map(product -> {
+                ProductDTO productDTO = new ProductDTO();
                     productDTO.setId(product.getId());
                     productDTO.setPrice(calculateDiscountedPrice(product));
-                    productDTO.setStock(product.getStock());;
+                    productDTO.setStock(product.getStock());
                     productDTO.setWeight(product.getWeight());
-                    return productDTO;
-                })
-                .toList();
+                return productDTO;
+            })
+            .toList();
     }
 
     public BigDecimal calculateDiscountedPrice(Product product) {
-        double priceNotRounded = (1 - product.getCategory().getDiscount() / 100) * product.getPrice();
-        BigDecimal bd = new BigDecimal(priceNotRounded);
-        BigDecimal roundedPrice = bd.setScale(2, RoundingMode.CEILING);
-        return roundedPrice;
+        double discountedPrice = (1 - product.getCategory().getDiscount() / 100) * product.getPrice();
+
+        return BigDecimal.valueOf(discountedPrice).setScale(2, RoundingMode.CEILING); // Discounted price rounded to 2 decimal digits
     }
 
-    public List<ProductDTO> checkIfProductsCanBeSubmittedAndSubmit(List<ProductToSubmit> productsToSubmit) throws NonExistingProductException, NotEnoughStockException {
+    public List<ProductDTO> checkIfEnoughStockAndSubtract(List<ProductToSubmit> productsToSubmit) throws NonExistingProductException, NotEnoughStockException {
         List<Product> productsFound = getProductsWithProductsToSubmitIDs(productsToSubmit);
         List<Product> productsAvailable = getProductsWithEnoughStock(productsFound, productsToSubmit);
         List<Product> productsWithModifiedStock = subtractStockWithProductToSubmit(productsAvailable, productsToSubmit);
@@ -137,7 +135,6 @@ public class ProductService {
 
     public List<Product> subtractStockWithProductToSubmit(List<Product> productsAvailable, List<ProductToSubmit> productsToSubmit) {
         return productsAvailable.stream().map(product -> subtractStock(product,productsToSubmit)).toList();
-
     }
 
     public Product subtractStock(Product product, List<ProductToSubmit> productsToSubmit) {
@@ -147,12 +144,12 @@ public class ProductService {
                 break;
             }
         }
+
         return productRepository.save(product);
     }
 
-
     public List<Product> getProductsWithProductsToSubmitIDs(List<ProductToSubmit> productsToSubmit) throws NonExistingProductException {
-        return getProductsWithIDs(productsToSubmit.stream()
+        return getProductsByIDs(productsToSubmit.stream()
                 .map(ProductToSubmit::getId)
                 .toList());
     }
@@ -164,14 +161,15 @@ public class ProductService {
 
         if (productsAvailable.size() == products.size()) {
             return products;
-        } else {
-            List<Long> notEnoughtStockIDs = products.stream()
-                    .filter(product -> !productsAvailable.contains(product))
-                    .map(Product::getId)
-                    .toList();
-
-            throw new NotEnoughStockException("Product IDs without required stock: " + notEnoughtStockIDs);
         }
+
+        List<Long> notEnoughStockIDs = products.stream()
+            .filter(product -> ! productsAvailable.contains(product))
+            .map(Product::getId)
+            .toList();
+
+        throw new NotEnoughStockException("Product IDs without required stock: " + notEnoughStockIDs);
+
     }
 
     public boolean isStockEnough(Product product, List<ProductToSubmit> productsToSubmit) {

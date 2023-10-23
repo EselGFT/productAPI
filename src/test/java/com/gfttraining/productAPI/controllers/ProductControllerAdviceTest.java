@@ -30,9 +30,6 @@ public class ProductControllerAdviceTest {
     @Mock
     private ConstraintViolation<?> constraintViolation;
 
-    @Mock 
-    private MethodParameter methodParameter;
-
     @Mock
     private BindingResult bindingResult;
 

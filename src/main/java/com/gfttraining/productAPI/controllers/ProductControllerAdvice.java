@@ -41,12 +41,6 @@ public class ProductControllerAdvice {
         return new ResponseEntity<>(errorMessage.toString(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(NonExistingProductException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<String> handleNonExistingProductException(NonExistingProductException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
-    }
-
     @ExceptionHandler(NumberFormatException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<String> handleNumberFormatException(NumberFormatException ex) {
@@ -69,5 +63,11 @@ public class ProductControllerAdvice {
     public ResponseEntity<String> handleNotEnoughStockException(NotEnoughStockException ex) {
         String message = ex.getMessage();
         return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(NonExistingProductException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<String> handleNonExistingProductException(NonExistingProductException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 }
