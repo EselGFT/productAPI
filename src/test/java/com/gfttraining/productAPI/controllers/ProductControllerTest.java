@@ -25,7 +25,6 @@ import org.springframework.http.ResponseEntity;
 import com.gfttraining.productAPI.model.Category;
 import com.gfttraining.productAPI.model.Product;
 import com.gfttraining.productAPI.model.ProductRequest;
-import com.gfttraining.productAPI.repositories.ProductRepository;
 import com.gfttraining.productAPI.services.ProductService;
 
 import jakarta.validation.ConstraintViolation;
