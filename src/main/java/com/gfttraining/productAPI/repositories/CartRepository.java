@@ -18,12 +18,11 @@ public class CartRepository {
     @Value("${cartMicroservice.port}")
     private int port;
 
-
     private final String baseUri;
 
     public CartRepository(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
-        baseUri = String.format("http://%s:%d", cartServiceUrl, 8085);
+        baseUri = String.format("http://%s:%d", cartServiceUrl, port);
     }
 
     public ProductDTO updateProduct(ProductDTO productDTO) throws InvalidCartConnectionException {
