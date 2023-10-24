@@ -4,10 +4,12 @@ import com.gfttraining.productAPI.exceptions.InvalidCartConnectionException;
 import com.gfttraining.productAPI.model.ProductDTO;
 import com.gfttraining.productAPI.services.ProductService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -22,36 +24,46 @@ public class CartRepositoryTest {
     @Mock
     RestTemplate restTemplate;
 
-    private CartRepository cartRepository;
+    @Value("${cartMicroservice.url}")
+    private String cartServiceUrl;
 
+    @Value("${cartMicroservice.port}")
+    private int port;
 
-    @BeforeEach
-    void setUp() {
+    private final String baseUri;
+
+    private final CartRepository cartRepository;
+
+    public CartRepositoryTest() {
         MockitoAnnotations.openMocks(this);
         cartRepository = new CartRepository(restTemplate);
+        baseUri = String.format("http://%s:%d", cartServiceUrl, port);
     }
 
     @Test
+    @DisplayName("GIVEN a proper connection with the microservice WHEN sending the update request THEN the correct DTO is returned")
     void updateProductTest() throws InvalidCartConnectionException {
-        BigDecimal bd = new BigDecimal("10.00");
-        BigDecimal roundedPrice = bd.setScale(2, RoundingMode.CEILING);
+        BigDecimal newPrice = new BigDecimal("10.00");
+        BigDecimal newPriceRounded = newPrice.setScale(2, RoundingMode.CEILING);
+
         ProductDTO productDTO = new ProductDTO(
                 1L,
-                roundedPrice,
+                newPriceRounded,
                 50,
                 1.0
         );
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<ProductDTO> requestEntity = new HttpEntity<>(productDTO, headers);
+        HttpEntity<ProductDTO> request = new HttpEntity<>(productDTO, headers);
 
         ResponseEntity<Void> response = new ResponseEntity<>(HttpStatus.OK);
 
         Mockito.when(restTemplate.exchange(
-                "http://"+ cartRepository.externalServiceUrl +":"+"8887"+"/carts/updateStock/",
+                baseUri + "/carts/updateStock/",
                 HttpMethod.PUT,
-                requestEntity,
+                request,
                 Void.class
         )).thenReturn(response);
 
@@ -60,31 +72,35 @@ public class CartRepositoryTest {
         assertEquals(productDTOResponse, productDTO);
 
     }
+
     @Test
-    void updateProductExceptionTest() throws InvalidCartConnectionException {
-        BigDecimal bd = new BigDecimal("10.00");
-        BigDecimal roundedPrice = bd.setScale(2, RoundingMode.CEILING);
+    @DisplayName("GIVEN a bad connection with the microservice WHEN sending the update request THEN the InvalidCartConnectionException is invoked")
+    void updateProductExceptionTest() {
+        BigDecimal newPrice = new BigDecimal("10.00");
+        BigDecimal newPriceRounded = newPrice.setScale(2, RoundingMode.CEILING);
+
         ProductDTO productDTO = new ProductDTO(
                 1L,
-                roundedPrice,
+                newPriceRounded,
                 50,
                 1.0
         );
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<ProductDTO> requestEntity = new HttpEntity<>(productDTO, headers);
+        HttpEntity<ProductDTO> request = new HttpEntity<>(productDTO, headers);
 
         ResponseEntity<Void> response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         Mockito.when(restTemplate.exchange(
-                "http://"+ cartRepository.externalServiceUrl +":"+"8887"+"/carts/updateStock/",
+                baseUri + "/carts/updateStock/",
                 HttpMethod.PUT,
-                requestEntity,
+                request,
                 Void.class
         )).thenReturn(response);
 
-       assertThrows(InvalidCartConnectionException.class,() ->cartRepository.updateProduct(productDTO));
+       assertThrows(InvalidCartConnectionException.class, () -> cartRepository.updateProduct(productDTO));
 
 
 
