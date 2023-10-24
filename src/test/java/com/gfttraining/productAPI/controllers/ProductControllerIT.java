@@ -5,6 +5,7 @@ import com.gfttraining.productAPI.model.ProductToSubmit;
 import com.gfttraining.productAPI.services.ProductService;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.stubbing.Scenario;
 import jakarta.annotation.PostConstruct;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -374,6 +375,56 @@ public class ProductControllerIT {
     void productUpdateIT() {
 
         wireMockServer.stubFor(WireMock.put(WireMock.urlMatching("/carts/updateStock/"))
+                .willReturn(aResponse().withStatus(200)));
+
+        ProductRequest productRequestTest = new ProductRequest("TestProduct", "", "TestCategory", 10.0, 50, 2.0);
+
+        client.get().uri("/products/2").exchange()
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody(Product.class)
+                .consumeWith(response -> {
+                    Product product = response.getResponseBody();
+                    assertEquals("books", product.getCategory().getName());
+                    assertEquals("Small book", product.getDescription());
+                    assertEquals("Book", product.getName());
+                    assertEquals(5.0, product.getPrice());
+                    assertEquals(20, product.getStock());
+                    assertEquals(1.0, product.getWeight());
+                });
+
+        client.put().uri("/products/2")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(productRequestTest)
+                .exchange() // THEN
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody(Product.class)
+                .consumeWith(response -> {
+                    Product afterUpdateProduct = response.getResponseBody();
+                    assertEquals("TestProduct", afterUpdateProduct.getName());
+                    assertEquals("", afterUpdateProduct.getDescription());
+                    assertEquals("other", afterUpdateProduct.getCategory().getName());
+                    assertEquals(10.0, afterUpdateProduct.getPrice());
+                    assertEquals(50, afterUpdateProduct.getStock());
+                    assertEquals(2.0, afterUpdateProduct.getWeight());
+
+                });
+    }
+    @Test
+    @DisplayName("GIVEN a product's information WHEN the product's controller updateProduct method is called THEN the provided product's information is updated with te new information")
+    @Order(15)
+    void productUpdateRetryIT() {
+
+        wireMockServer.stubFor(WireMock.put(WireMock.urlMatching("/carts/updateStock/"))
+                .inScenario("Retry Scenario")
+                .whenScenarioStateIs(Scenario.STARTED)
+                .willSetStateTo("Retry Attempt 1")
+                .willReturn(aResponse().withStatus(500)));
+
+        wireMockServer.stubFor(WireMock.put(WireMock.urlMatching("/carts/updateStock/"))
+                .inScenario("Retry Scenario")
+                .whenScenarioStateIs("Retry Attempt 1")
                 .willReturn(aResponse().withStatus(200)));
 
         ProductRequest productRequestTest = new ProductRequest("TestProduct", "", "TestCategory", 10.0, 50, 2.0);

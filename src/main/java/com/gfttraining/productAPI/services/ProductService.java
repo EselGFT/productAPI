@@ -5,6 +5,7 @@ import java.math.RoundingMode;
 import java.util.List;
 
 import com.gfttraining.productAPI.exceptions.InvalidCartConnectionException;
+import com.gfttraining.productAPI.exceptions.InvalidCartResponseException;
 import com.gfttraining.productAPI.exceptions.NonExistingProductException;
 import com.gfttraining.productAPI.exceptions.NotEnoughStockException;
 import com.gfttraining.productAPI.model.*;
@@ -44,7 +45,7 @@ public class ProductService {
 
     }
 
-    public Product updateProduct (long id, ProductRequest productRequest) throws NonExistingProductException, InvalidCartConnectionException {
+    public Product updateProduct (long id, ProductRequest productRequest) throws NonExistingProductException, InvalidCartConnectionException, InvalidCartResponseException {
 
         if (! productRepository.existsById(id)){
             throw new NonExistingProductException("The provided ID is non existent");
@@ -65,7 +66,7 @@ public class ProductService {
 
     }
 
-    public Product sendModifiedDataToCart (Product product) throws InvalidCartConnectionException {
+    public Product sendModifiedDataToCart (Product product) throws InvalidCartConnectionException, InvalidCartResponseException {
         ProductDTO productDTO = buildProductDTO(product);
         cartRepository.updateProduct(productDTO);
         return product;

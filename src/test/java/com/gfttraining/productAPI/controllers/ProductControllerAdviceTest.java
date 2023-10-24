@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.gfttraining.productAPI.exceptions.InvalidCartConnectionException;
+import com.gfttraining.productAPI.exceptions.InvalidCartResponseException;
 import com.gfttraining.productAPI.exceptions.NonExistingProductException;
 import com.gfttraining.productAPI.exceptions.NotEnoughStockException;
 import org.junit.jupiter.api.BeforeEach;
@@ -104,10 +105,18 @@ public class ProductControllerAdviceTest {
 
     @Test
     void testInvalidCartConnectionException() {
-        InvalidCartConnectionException ex = new InvalidCartConnectionException("Could not connect with cart microservice");
+        InvalidCartConnectionException ex = new InvalidCartConnectionException("Invalid connection with cart microservice");
         ResponseEntity<String> response = productControllerAdvice.handleInvalidCartConnectionException(ex);
         assertEquals("Could not connect with cart microservice", response.getBody());
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+    }
+
+    @Test
+    void testInvalidCartResponseException() {
+        InvalidCartResponseException ex = new InvalidCartResponseException("Invalid cart response: Expected 200 Got: 400");
+        ResponseEntity<String> response = productControllerAdvice.handleInvalidCartResponseException(ex);
+        assertEquals("Invalid cart response: Expected 200 Got: 400", response.getBody());
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
 }

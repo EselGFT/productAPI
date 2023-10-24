@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.gfttraining.productAPI.exceptions.InvalidCartConnectionException;
+import com.gfttraining.productAPI.exceptions.InvalidCartResponseException;
 import com.gfttraining.productAPI.exceptions.NonExistingProductException;
 import com.gfttraining.productAPI.exceptions.NotEnoughStockException;
 import com.gfttraining.productAPI.model.*;
@@ -104,7 +105,7 @@ public class ProductServiceTest {
     
     @Test
     @DisplayName("GIVEN a product's updated information WHEN the original its updated THEN the updated product's information should match the given")
-    void updateProductsTest () throws NonExistingProductException, InvalidCartConnectionException {
+    void updateProductsTest () throws NonExistingProductException, InvalidCartConnectionException, InvalidCartResponseException {
 
 
     	String productName = "TestProduct";
@@ -694,7 +695,7 @@ public class ProductServiceTest {
         assertEquals(productDTO, productDTORetrieved);
     }
     @Test
-    public void sendModifiedDataToCartTest() throws InvalidCartConnectionException {
+    public void sendModifiedDataToCartTest() throws InvalidCartConnectionException, InvalidCartResponseException {
         Category other = new Category("other", 0.0);
         Product product = new Product(
                 "TestProduct1",
