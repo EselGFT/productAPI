@@ -6,6 +6,7 @@ import com.gfttraining.productAPI.services.ProductService;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import jakarta.annotation.PostConstruct;
+import org.apache.log4j.Logger;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -35,20 +36,23 @@ public class ProductControllerIT {
 
     public static WireMockServer wireMockServer = new WireMockServer(8887);
 
-
+    private static Logger logger = Logger.getLogger(ProductControllerIT.class);
     @BeforeAll
     static void setUp() {
         wireMockServer.start();
+        logger.info("******************** wireMock starts ******************************************");
     }
 
     @AfterAll
     static void tearDown() {
         wireMockServer.stop();
+        logger.info("/////////////////////////////// wireMock stops //////////////////////////////////");
     }
 
     @AfterEach
     void resetAll() {
         wireMockServer.resetAll();
+        logger.error("------------------------------------ wireMock resets -----------------------");
     }
     //Initiate the web client
     @PostConstruct
