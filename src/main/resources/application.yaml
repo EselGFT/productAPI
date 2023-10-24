@@ -8,3 +8,4 @@ spring:
     defer-datasource-initialization: true
 cartMicroservice:
   url: localhost
+  port: 8085
