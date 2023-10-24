@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
+import com.gfttraining.productAPI.exceptions.InvalidCartConnectionException;
 import com.gfttraining.productAPI.exceptions.NonExistingProductException;
 import com.gfttraining.productAPI.exceptions.NotEnoughStockException;
 import com.gfttraining.productAPI.model.*;
@@ -76,7 +77,7 @@ public class ProductControllerTest {
 
     @Test
     @DisplayName("GIVEN a product's information WHEN the product's controller updateProduct method is called THEN the provided product's information is updated with te new information")
-    public void putUpdateControllerTest() throws NonExistingProductException {
+    public void putUpdateControllerTest() throws NonExistingProductException, InvalidCartConnectionException  {
 
     	String productName = "TestProduct";
         String productDescription = "TestDescription";

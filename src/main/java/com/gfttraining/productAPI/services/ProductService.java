@@ -4,9 +4,11 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 
+import com.gfttraining.productAPI.exceptions.InvalidCartConnectionException;
 import com.gfttraining.productAPI.exceptions.NonExistingProductException;
 import com.gfttraining.productAPI.exceptions.NotEnoughStockException;
 import com.gfttraining.productAPI.model.*;
+import com.gfttraining.productAPI.repositories.CartRepository;
 import org.springframework.stereotype.Service;
 
 import com.gfttraining.productAPI.model.Category;
@@ -22,9 +24,14 @@ public class ProductService {
 
     private final ProductRepository productRepository;
 
-    public ProductService(CategoryService categoryService, ProductRepository productRepository) {
+    private final CartRepository cartRepository;
+
+    public ProductService(CategoryService categoryService, ProductRepository productRepository, CartRepository cartRepository) {
+
         this.categoryService = categoryService;
         this.productRepository = productRepository;
+        this.cartRepository = cartRepository;
+
     }
 
     public Product createProduct(ProductRequest productRequest) {
@@ -37,7 +44,7 @@ public class ProductService {
 
     }
 
-    public Product updateProduct (long id, ProductRequest productRequest) throws NonExistingProductException {
+    public Product updateProduct (long id, ProductRequest productRequest) throws NonExistingProductException, InvalidCartConnectionException {
 
         if (! productRepository.existsById(id)){
             throw new NonExistingProductException("The provided ID is non existent");
@@ -53,10 +60,19 @@ public class ProductService {
             productToUpdate.setStock(productRequest.getStock());
             productToUpdate.setWeight(productRequest.getWeight());
 
-        return productRepository.save(productToUpdate);
+            sendModifiedDataToCart(productToUpdate);
+            return productRepository.save(productToUpdate);
+
     }
 
-    public void deleteProduct(long id) throws NonExistingProductException {
+    public Product sendModifiedDataToCart (Product product) throws InvalidCartConnectionException {
+        ProductDTO productDTO = buildProductDTO(product);
+        cartRepository.updateProduct(productDTO);
+        return product;
+
+    }
+
+    public void deleteProduct (long id) throws NonExistingProductException {
 
         if (! productRepository.existsById(id)){
            throw new NonExistingProductException("The provided ID is non existent");
@@ -107,17 +123,19 @@ public class ProductService {
         return productRepository.findAll().size();
     }
 
+    public ProductDTO buildProductDTO(Product product) {
+        ProductDTO productDTO = new ProductDTO();
+        productDTO.setId(product.getId());
+        productDTO.setPrice(calculateDiscountedPrice(product));
+        productDTO.setStock(product.getStock());;
+        productDTO.setWeight(product.getWeight());
+        return productDTO;
+    }
+
     public List<ProductDTO> buildProductsDTOs(List<Product> products) {
         return products.stream()
-            .map(product -> {
-                ProductDTO productDTO = new ProductDTO();
-                    productDTO.setId(product.getId());
-                    productDTO.setPrice(calculateDiscountedPrice(product));
-                    productDTO.setStock(product.getStock());
-                    productDTO.setWeight(product.getWeight());
-                return productDTO;
-            })
-            .toList();
+                .map(this::buildProductDTO)
+                .toList();
     }
 
     public BigDecimal calculateDiscountedPrice(Product product) {

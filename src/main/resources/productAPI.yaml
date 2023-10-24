@@ -197,7 +197,7 @@ paths:
 
       responses:
         200:
-          description: Products added succesfully
+          description: Products added successfully
           content:
             application/json:
               schema:
@@ -264,7 +264,7 @@ paths:
 
       responses:
         200:
-          description: Products retrieved succesfully
+          description: Products retrieved successfully
           content:
             application/json:
               schema:

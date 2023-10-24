@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import java.util.Set;
 
+import com.gfttraining.productAPI.exceptions.InvalidCartConnectionException;
 import com.gfttraining.productAPI.exceptions.NonExistingProductException;
 import com.gfttraining.productAPI.exceptions.NotEnoughStockException;
 import org.junit.jupiter.api.BeforeEach;
@@ -100,4 +101,13 @@ public class ProductControllerAdviceTest {
         assertEquals("Product IDs without required stock: [1]", response.getBody());
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
+
+    @Test
+    void testInvalidCartConnectionException() {
+        InvalidCartConnectionException ex = new InvalidCartConnectionException("Could not connect with cart microservice");
+        ResponseEntity<String> response = productControllerAdvice.handleInvalidCartConnectionException(ex);
+        assertEquals("Could not connect with cart microservice", response.getBody());
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+    }
+
 }

@@ -3,6 +3,8 @@ package com.gfttraining.productAPI.controllers;
 import com.gfttraining.productAPI.model.ProductRequest;
 import com.gfttraining.productAPI.model.ProductToSubmit;
 import com.gfttraining.productAPI.services.ProductService;
+import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import jakarta.annotation.PostConstruct;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.*;
@@ -30,6 +33,23 @@ public class ProductControllerIT {
     @Autowired
     private ProductService productService;
 
+    public static WireMockServer wireMockServer = new WireMockServer(8887);
+
+
+    @BeforeAll
+    static void setUp() {
+        wireMockServer.start();
+    }
+
+    @AfterAll
+    static void tearDown() {
+        wireMockServer.stop();
+    }
+
+    @AfterEach
+    void resetAll() {
+        wireMockServer.resetAll();
+    }
     //Initiate the web client
     @PostConstruct
     void init() {
@@ -352,7 +372,10 @@ public class ProductControllerIT {
     @DisplayName("GIVEN a product's information WHEN the product's controller updateProduct method is called THEN the provided product's information is updated with te new information")
     @Order(14)
     void productUpdateIT() {
-        //GIVEN
+
+        wireMockServer.stubFor(WireMock.put(WireMock.urlMatching("/carts/updateStock/"))
+                .willReturn(aResponse().withStatus(200)));
+
         ProductRequest productRequestTest = new ProductRequest("TestProduct", "", "TestCategory", 10.0, 50, 2.0);
 
         client.get().uri("/products/2").exchange()
@@ -387,10 +410,39 @@ public class ProductControllerIT {
 
                 });
     }
+    @Test
+    @DisplayName("GIVEN a product's information WHEN the product's controller putUpdate method is called, it tries to connect to cart microservice but it fails THEN it throws exception")
+    @Order(15)
+    void productUpdateCartExceptionIT() {
 
+        wireMockServer.stubFor(WireMock.put(WireMock.urlMatching("/carts/updateStock/"))
+                .willReturn(aResponse().withStatus(500)));
+
+        ProductRequest productRequestTest = new ProductRequest("TestProduct", "", "TestCategory", 10.0, 50, 2.0);
+
+        client.get().uri("/products/2").exchange()
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody(Product.class)
+                .consumeWith(response -> {
+                    Product product = response.getResponseBody();
+                    assertEquals("TestProduct", product.getName());
+                    assertEquals("",product.getDescription());
+                    assertEquals("other", product.getCategory().getName());
+                    assertEquals(10.0, product.getPrice());
+                    assertEquals(50, product.getStock());
+                    assertEquals(2.0, product.getWeight());
+                });
+
+        client.put().uri("/products/2")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(productRequestTest)
+                .exchange() // THEN
+                .expectStatus().is5xxServerError();
+    }
     @Test
     @DisplayName("GIVEN a product's information WHEN the product's controller updateProduct method is called THEN the provided product's information is updated with the new information")
-    @Order(15)
+    @Order(16)
     void productUpdateThrowExceptionIT() {
         //GIVEN
         ProductRequest productRequestTest = new ProductRequest("TestProduct", "", "TestCategory", 10.0, 50, 2.0);
@@ -408,7 +460,7 @@ public class ProductControllerIT {
 
     @Test
     @DisplayName("GIVEN a valid product ID WHEN the delete product endpoint is called THEN the specified product is deleted")
-    @Order(16)
+    @Order(17)
     void productDeleteIT() {
 
         int numberOfProducts = productService.getNumberOfProducts();
@@ -438,7 +490,7 @@ public class ProductControllerIT {
 
     @Test
     @DisplayName("GIVEN a product's information WHEN the product's controller updateProduct method is called with a non existent Id THEN the NonExistingProductException exception is thrown")
-    @Order(17)
+    @Order(18)
     void productDeleteThrowExceptionIT() {
         //GIVEN
 
@@ -451,7 +503,7 @@ public class ProductControllerIT {
 
     @Test
     @DisplayName("Given a list of products to reduce their stock, When the endpoint is called, Then it should return the products with the modified stock")
-    @Order(18)
+    @Order(19)
     void reduceProductsStockIT() {
 
         client.get().uri("/products/1").exchange()
@@ -476,7 +528,7 @@ public class ProductControllerIT {
 
     @Test
     @DisplayName("Given a list of products to submit with incorrect IDs, When the endpoint is called Then it should return the exception")
-    @Order(19)
+    @Order(20)
     void reduceProductsStockIDsNotFoundIT() {
 
         client.get().uri("/products/1").exchange()
@@ -500,7 +552,7 @@ public class ProductControllerIT {
     }
     @Test
     @DisplayName("Given a list of products to submit with not enough stock, When the endpoint is called, Then it should return the exception")
-    @Order(20)
+    @Order(21)
     void submitProductsNotEnoughStockIT() {
 
         client.get().uri("/products/1").exchange()
