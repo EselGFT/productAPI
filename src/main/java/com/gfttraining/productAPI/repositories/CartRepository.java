@@ -2,14 +2,12 @@ package com.gfttraining.productAPI.repositories;
 
 import com.gfttraining.productAPI.exceptions.InvalidCartConnectionException;
 import com.gfttraining.productAPI.model.ProductDTO;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.RestTemplate;
 
-@Component
+@Repository
 public class CartRepository {
 
 
