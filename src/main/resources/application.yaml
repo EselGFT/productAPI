@@ -6,3 +6,5 @@ spring:
     password: sa
   jpa:
     defer-datasource-initialization: true
+cartMicroservice:
+  url: localhost
