@@ -1,6 +1,7 @@
 package com.gfttraining.productAPI.repositories;
 
 import com.gfttraining.productAPI.exceptions.InvalidCartConnectionException;
+import com.gfttraining.productAPI.exceptions.InvalidCartResponseException;
 import com.gfttraining.productAPI.model.ProductDTO;
 import com.gfttraining.productAPI.services.ProductService;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,7 +33,7 @@ public class CartRepositoryTest {
     }
 
     @Test
-    void updateProductTest() throws InvalidCartConnectionException {
+    void updateProductTest() throws InvalidCartConnectionException, InvalidCartResponseException {
         BigDecimal bd = new BigDecimal("10.00");
         BigDecimal roundedPrice = bd.setScale(2, RoundingMode.CEILING);
         ProductDTO productDTO = new ProductDTO(
@@ -84,7 +85,7 @@ public class CartRepositoryTest {
                 Void.class
         )).thenReturn(response);
 
-       assertThrows(InvalidCartConnectionException.class,() ->cartRepository.updateProduct(productDTO));
+       assertThrows(InvalidCartResponseException.class,() ->cartRepository.updateProduct(productDTO));
 
 
 

@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.gfttraining.productAPI.exceptions.InvalidCartConnectionException;
+import com.gfttraining.productAPI.exceptions.InvalidCartResponseException;
 import com.gfttraining.productAPI.exceptions.NonExistingProductException;
 import com.gfttraining.productAPI.exceptions.NotEnoughStockException;
 import com.gfttraining.productAPI.model.*;
@@ -104,7 +105,7 @@ public class ProductServiceTest {
     
     @Test
     @DisplayName("GIVEN a product's updated information WHEN the original its updated THEN the updated product's information should match the given")
-    void updateProductsTest () throws NonExistingProductException, InvalidCartConnectionException {
+    void updateProductsTest () throws NonExistingProductException, InvalidCartConnectionException, InvalidCartResponseException {
 
 
     	String productName = "TestProduct";
@@ -694,7 +695,7 @@ public class ProductServiceTest {
         assertEquals(productDTO, productDTORetrieved);
     }
     @Test
-    public void sendModifiedDataToCartTest() throws InvalidCartConnectionException {
+    public void sendModifiedDataToCartTest() throws InvalidCartConnectionException, InvalidCartResponseException {
         Category other = new Category("other", 0.0);
         Product product = new Product(
                 "TestProduct1",
@@ -720,6 +721,34 @@ public class ProductServiceTest {
 
 
         assertEquals(product, productRetrieved);
+    }
+
+    @Test
+    public void createProductResponsesWIthProductIDsTest() throws NonExistingProductException {
+        List<Long> ids = List.of(1L);
+        Category other = new Category("other", 0.0);
+        BigDecimal bd = new BigDecimal("10.00");
+        BigDecimal roundedPrice = bd.setScale(2, RoundingMode.CEILING);
+        Product product = new Product(
+                "product1",
+                "description",
+                other,
+                10.0,
+                50,
+                1.0
+        );
+        ProductDTO productDTO = new ProductDTO(
+                0L,
+                roundedPrice,
+                50,
+                1.0
+        );
+
+        Mockito.when(productRepository.findAllById(ids)).thenReturn(List.of(product));
+        List<ProductDTO> productDTOs = productService.createProductResponsesWithProductIDs(ids);
+
+
+        assertEquals(List.of(productDTO), productDTOs);
     }
 
 
