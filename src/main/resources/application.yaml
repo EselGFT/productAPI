@@ -8,6 +8,7 @@ spring:
     defer-datasource-initialization: true
 cartMicroservice:
   url: localhost
+  port: 8085
 retry:
   maxAttempts: 2
   maxDelay: 100
