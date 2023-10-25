@@ -47,17 +47,17 @@ public class CartRepository {
 
             if (responseEntity.getStatusCode() == HttpStatus.OK) {
                 return productDTO;
-            } else if(responseEntity.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR){
-                throw new InvalidCartConnectionException("Invalid connection with cart microservice");
-            } else{
-                throw new InvalidCartResponseException("Invalid cart response: Expected 200 Got: " + responseEntity.getStatusCode());
             }
+
+            if(responseEntity.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR){
+                throw new InvalidCartConnectionException("Invalid connection with cart microservice");
+            }
+
+            throw new InvalidCartResponseException("Invalid cart response: Expected 200 Got: " + responseEntity.getStatusCode());
 
         } catch (RestClientException ex){
             throw new InvalidCartConnectionException("Invalid connection with cart microservice");
         }
-
-
 
     }
 
