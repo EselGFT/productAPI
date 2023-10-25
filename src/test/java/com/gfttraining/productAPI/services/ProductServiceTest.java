@@ -351,21 +351,26 @@ public class ProductServiceTest {
     }
 
     @Test
-    @DisplayName("GIVEN a list of products WHEN the getNumberOfProducts method is called THEN an int representing the ammount of products in the DB is returned")
-    public void getNumberOfProductsTest() {
+    @DisplayName("GIVEN a list of products WHEN the getLastCreatedID method is called THEN a long that represents the ID of the last created product is returned")
+    public void getLastCreatedIDTest() {
 
         Product apple = new Product("Apple", "A rounded food object", new Category("food", 25.0), 1.25, 23, 1.1);
+
+        Mockito.when(productRepository.findLastProductId()).thenReturn(1L);
+
+        long lastID = productService.getLastCreatedID();
+
+        assertEquals(1, lastID);
+
         Product dictionary = new Product("Dictionary", "A book that defines words", new Category("books", 15.0), 19.89, 13 ,1.0);
 
-        List<Product> products = Arrays.asList(apple, dictionary);
+        Mockito.when(productRepository.findLastProductId()).thenReturn(2L);
 
-        Mockito.when(productRepository.findAll()).thenReturn(products);
+        lastID = productService.getLastCreatedID();
 
-        int numberOfProducts = productService.getNumberOfProducts();
+        verify(productRepository, times(2)).findLastProductId();
 
-        verify(productRepository, times(1)).findAll();
-
-        assertEquals(2, numberOfProducts);
+        assertEquals(2, lastID);
     }
 
     @Test

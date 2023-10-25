@@ -3,12 +3,9 @@ package com.gfttraining.productAPI.controllers;
 import com.gfttraining.productAPI.model.ProductRequest;
 import com.gfttraining.productAPI.model.ProductToSubmit;
 import com.gfttraining.productAPI.services.ProductService;
-import com.github.tomakehurst.wiremock.WireMockServer;
-import com.github.tomakehurst.wiremock.client.WireMock;
 import jakarta.annotation.PostConstruct;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import com.gfttraining.productAPI.model.Product;
@@ -18,7 +15,6 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.*;
@@ -121,7 +117,7 @@ public class ProductControllerIT {
     @DisplayName("WHEN trying to list all products THEN a list containing all of them must be returned")
     void listAllTest() {
 
-        int numberOfProducts = productService.getNumberOfProducts();
+        long numberOfProducts = productService.getLastCreatedID();
 
         //Apple
         productService.createProduct(new ProductRequest("Apple", "A rounded food object", "food", 1.25, 23, 1.0));
@@ -154,7 +150,7 @@ public class ProductControllerIT {
         //Apple
         productService.createProduct(new ProductRequest("Apple", "A rounded food object", "food", 1.25, 23, 1.0));
 
-        int appleID = productService.getNumberOfProducts();
+        long appleID = productService.getLastCreatedID();
 
         client.get().uri("/products/" + appleID)
                 .exchange()
@@ -260,7 +256,7 @@ public class ProductControllerIT {
     @Order(9)
     void productDeleteIT() {
 
-        int numberOfProducts = productService.getNumberOfProducts();
+        int numberOfProducts = (int) productService.getLastCreatedID();
 
         client.get().uri("/products")
                 .exchange()

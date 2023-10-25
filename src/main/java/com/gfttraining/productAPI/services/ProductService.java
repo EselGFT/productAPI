@@ -120,8 +120,8 @@ public class ProductService {
         throw new NonExistingProductException("Product IDs not found: " + notFoundIds);
     }
 
-    public int getNumberOfProducts() {
-        return productRepository.findAll().size();
+    public long getLastCreatedID() {
+        return productRepository.findLastProductId();
     }
 
     public ProductDTO buildProductDTO(Product product) {
