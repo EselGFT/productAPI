@@ -5,10 +5,12 @@ import com.gfttraining.productAPI.model.ProductDTO;
 import jakarta.annotation.PostConstruct;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -17,35 +19,32 @@ import java.math.RoundingMode;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 public class CartRepositoryTest {
 
     @Mock
     RestTemplate restTemplate;
 
-    @Value("${cartMicroservice.url}")
-    private String cartServiceUrl;
+    public String cartServiceUrl = "localhost";
 
-    @Value("${cartMicroservice.port}")
-    private int port;
-
-    private String baseUri;
+    public int cartPort = 8085;
 
     private final CartRepository cartRepository;
 
     public CartRepositoryTest() {
         MockitoAnnotations.openMocks(this);
         cartRepository = new CartRepository(restTemplate);
-    }
-
-    @PostConstruct
-    void init() {
-        baseUri = String.format("http://%s:%d", cartServiceUrl, port);
+        cartRepository.setCartPort(cartPort);
+        cartRepository.setCartServiceUrl(cartServiceUrl);
     }
 
     @Test
     @DisplayName("GIVEN a proper connection with the microservice WHEN sending the update request THEN the correct DTO is returned")
     void updateProductTest() throws InvalidCartConnectionException {
+
         BigDecimal newPrice = new BigDecimal("10.00");
         BigDecimal newPriceRounded = newPrice.setScale(2, RoundingMode.CEILING);
 
@@ -64,7 +63,7 @@ public class CartRepositoryTest {
         ResponseEntity<Void> response = new ResponseEntity<>(HttpStatus.OK);
 
         Mockito.when(restTemplate.exchange(
-                baseUri + "/carts/updateStock/",
+                "http://" + cartServiceUrl + ":" + cartPort + "/carts/updateStock/",
                 HttpMethod.PUT,
                 request,
                 Void.class
@@ -73,7 +72,6 @@ public class CartRepositoryTest {
         ProductDTO productDTOResponse = cartRepository.updateProduct(productDTO);
 
         assertEquals(productDTOResponse, productDTO);
-
     }
 
     @Test
@@ -97,15 +95,12 @@ public class CartRepositoryTest {
         ResponseEntity<Void> response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         Mockito.when(restTemplate.exchange(
-                baseUri + "/carts/updateStock/",
+                "http://" + cartServiceUrl + ":" + cartPort + "/carts/updateStock/",
                 HttpMethod.PUT,
                 request,
                 Void.class
         )).thenReturn(response);
 
        assertThrows(InvalidCartConnectionException.class, () -> cartRepository.updateProduct(productDTO));
-
-
-
     }
 }

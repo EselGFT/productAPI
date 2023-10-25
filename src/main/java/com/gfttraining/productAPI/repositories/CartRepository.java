@@ -2,48 +2,42 @@ package com.gfttraining.productAPI.repositories;
 
 import com.gfttraining.productAPI.exceptions.InvalidCartConnectionException;
 import com.gfttraining.productAPI.model.ProductDTO;
-import jakarta.annotation.PostConstruct;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.RestTemplate;
 
 @Repository
+@Setter
 public class CartRepository {
 
-    private final RestTemplate restTemplate;
+    RestTemplate restTemplate;
 
     @Value("${cartMicroservice.url}")
-    private String cartServiceUrl;
+    public String cartServiceUrl;
 
     @Value("${cartMicroservice.port}")
-    private int port;
-
-    private static String baseUri;
+    public int cartPort;
 
     public CartRepository(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
-    }
-
-    @PostConstruct
-    void init() {
-        baseUri = String.format("http://%s:%d", cartServiceUrl, port);
     }
 
     public ProductDTO updateProduct(ProductDTO productDTO) throws InvalidCartConnectionException {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<ProductDTO> requestEntity = new HttpEntity<>(productDTO, headers);
+        HttpEntity<ProductDTO> request = new HttpEntity<>(productDTO, headers);
 
-        ResponseEntity<Void> responseEntity = restTemplate.exchange(
-                baseUri + "/carts/updateStock/",
+        ResponseEntity<Void> response = restTemplate.exchange(
+                "http://" + cartServiceUrl + ":" + cartPort + "/carts/updateStock/",
                 HttpMethod.PUT,
-                requestEntity,
+                request,
                 Void.class
         );
 
-        if (responseEntity.getStatusCode() == HttpStatus.OK) {
+        if (response.getStatusCode() == HttpStatus.OK) {
             return productDTO;
         }
 
