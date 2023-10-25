@@ -3,7 +3,7 @@ package com.gfttraining.productAPI.repositories;
 import com.gfttraining.productAPI.exceptions.InvalidCartConnectionException;
 import com.gfttraining.productAPI.exceptions.InvalidCartResponseException;
 import com.gfttraining.productAPI.model.ProductDTO;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.retry.annotation.Backoff;
@@ -14,12 +14,16 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 @Repository
+@Setter
 public class CartRepository {
 
 
     private final RestTemplate restTemplate;
     @Value("${cartMicroservice.url}")
-    public String externalServiceUrl;
+    public String cartServiceUrl;
+
+    @Value("${cartMicroservice.port}")
+    public int cartPort;
 
     public CartRepository(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
@@ -35,7 +39,7 @@ public class CartRepository {
 
         try{
             ResponseEntity<Void> responseEntity = restTemplate.exchange(
-                     "http://"+ externalServiceUrl +":"+"8887"+"/carts/updateStock/",
+                     "http://"+ cartServiceUrl +":"+ cartPort +"/carts/updateStock/",
                     HttpMethod.PUT,
                     requestEntity,
                     Void.class
