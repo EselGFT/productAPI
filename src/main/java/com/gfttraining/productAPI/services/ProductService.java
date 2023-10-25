@@ -168,8 +168,11 @@ public class ProductService {
     public List<ProductDTO> checkIfEnoughStockAndSubtract(List<ProductToSubmit> productsToSubmit) throws NonExistingProductException, NotEnoughStockException {
         logger.info(" ProductService's checkIfEnoughStockAndSubtract starts ");
         List<Product> productsFound = getProductsWithProductsToSubmitIDs(productsToSubmit);
+        logger.info(" ProductService checkIfEnoughStockAndSubtract's getProductsWithProductsToSubmitIDs was executed ");
         List<Product> productsAvailable = getProductsWithEnoughStock(productsFound, productsToSubmit);
+        logger.info(" ProductService checkIfEnoughStockAndSubtract's getProductsWithEnoughStock was executed ");
         List<Product> productsWithModifiedStock = subtractStockWithProductToSubmit(productsAvailable, productsToSubmit);
+        logger.info(" ProductService checkIfEnoughStockAndSubtract's subtractStockWithProductToSubmit was executed, so it build a ProductDTO");
         return buildProductsDTOs(productsWithModifiedStock);
      }
 
