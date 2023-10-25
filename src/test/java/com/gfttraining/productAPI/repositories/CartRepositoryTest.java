@@ -44,7 +44,7 @@ public class CartRepositoryTest {
 
     @Test
     @DisplayName("GIVEN a proper connection with the microservice WHEN sending the update request THEN the correct DTO is returned")
-    void updateProductTest() throws InvalidCartConnectionException {
+    void updateProductTest() throws InvalidCartConnectionException, InvalidCartResponseException {
 
         BigDecimal newPrice = new BigDecimal("10.00");
         BigDecimal newPriceRounded = newPrice.setScale(2, RoundingMode.CEILING);
