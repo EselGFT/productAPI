@@ -2,6 +2,7 @@ package com.gfttraining.productAPI.repositories;
 
 import com.gfttraining.productAPI.exceptions.InvalidCartConnectionException;
 import com.gfttraining.productAPI.model.ProductDTO;
+import jakarta.annotation.PostConstruct;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -28,13 +29,17 @@ public class CartRepositoryTest {
     @Value("${cartMicroservice.port}")
     private int port;
 
-    private final String baseUri;
+    private String baseUri;
 
     private final CartRepository cartRepository;
 
     public CartRepositoryTest() {
         MockitoAnnotations.openMocks(this);
         cartRepository = new CartRepository(restTemplate);
+    }
+
+    @PostConstruct
+    void init() {
         baseUri = String.format("http://%s:%d", cartServiceUrl, port);
     }
 

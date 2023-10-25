@@ -2,6 +2,7 @@ package com.gfttraining.productAPI.repositories;
 
 import com.gfttraining.productAPI.exceptions.InvalidCartConnectionException;
 import com.gfttraining.productAPI.model.ProductDTO;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Repository;
@@ -18,10 +19,14 @@ public class CartRepository {
     @Value("${cartMicroservice.port}")
     private int port;
 
-    private final String baseUri;
+    private static String baseUri;
 
     public CartRepository(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
+    }
+
+    @PostConstruct
+    void init() {
         baseUri = String.format("http://%s:%d", cartServiceUrl, port);
     }
 

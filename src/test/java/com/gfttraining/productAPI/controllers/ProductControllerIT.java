@@ -8,6 +8,7 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import jakarta.annotation.PostConstruct;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import com.gfttraining.productAPI.model.Product;
@@ -25,19 +26,36 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(webEnvironment = RANDOM_PORT)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ProductControllerIT {
 
     @LocalServerPort
     private int port;
+
+    protected static int cartPort;
+
     private WebTestClient client;
+
     @Autowired
     private ProductService productService;
 
-    public static WireMockServer wireMockServer = new WireMockServer(8887);
+    private static WireMockServer wireMockServer;
 
+    @Value("${cartMicroservice.port}")
+    public void setCartPort(int cartPort) {                 // Sets the cart microservice port, located in the application.yaml file
+        ProductControllerIT.cartPort = cartPort;
+    }
+
+    @PostConstruct
+    void init() {                                           // Initiates the web client
+        client = WebTestClient.bindToServer()
+                .baseUrl("http://localhost:%d".formatted(port))
+                .build();
+    }
 
     @BeforeAll
-    static void setUp() {
+    static void setUp() {                                   // Starts the wireMockServer
+        wireMockServer = new WireMockServer(cartPort);
         wireMockServer.start();
     }
 
@@ -49,13 +67,6 @@ public class ProductControllerIT {
     @AfterEach
     void resetAll() {
         wireMockServer.resetAll();
-    }
-    //Initiate the web client
-    @PostConstruct
-    void init() {
-        client = WebTestClient.bindToServer()
-                .baseUrl("http://localhost:%d".formatted(port))
-                .build();
     }
 
     @Test
