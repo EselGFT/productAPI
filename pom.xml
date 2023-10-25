@@ -95,7 +95,7 @@
 					</excludes>
 				</configuration>
 			</plugin>
-			<!-- Pligging JaCoCo para informes coverage -->
+
 
 			
 		</plugins>
