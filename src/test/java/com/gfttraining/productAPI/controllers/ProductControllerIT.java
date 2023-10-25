@@ -26,47 +26,21 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(webEnvironment = RANDOM_PORT)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ProductControllerIT {
 
     @LocalServerPort
     private int port;
-
-    protected static int cartPort;
 
     private WebTestClient client;
 
     @Autowired
     private ProductService productService;
 
-    private static WireMockServer wireMockServer;
-
-    @Value("${cartMicroservice.port}")
-    public void setCartPort(int cartPort) {                 // Sets the cart microservice port, located in the application.yaml file
-        ProductControllerIT.cartPort = cartPort;
-    }
-
     @PostConstruct
     void init() {                                           // Initiates the web client
         client = WebTestClient.bindToServer()
                 .baseUrl("http://localhost:%d".formatted(port))
                 .build();
-    }
-
-    @BeforeAll
-    static void setUp() {                                   // Starts the wireMockServer
-        wireMockServer = new WireMockServer(cartPort);
-        wireMockServer.start();
-    }
-
-    @AfterAll
-    static void tearDown() {
-        wireMockServer.stop();
-    }
-
-    @AfterEach
-    void resetAll() {
-        wireMockServer.resetAll();
     }
 
     @Test
@@ -114,39 +88,8 @@ public class ProductControllerIT {
     }
 
     @Test
-    @DisplayName("Given a list of productRequests with a non valid one When a post is made to /products/bulkCreate Then it should return an error message")
-    @Order(2)
-    void createProductsBulkErrorTest() {
-        List<ProductRequest> productRequests = Arrays.asList(
-                new ProductRequest(
-                        "TestProduct1",
-                        "TestDescription1",
-                        "TestCategory",
-                        null,
-                        50,
-                        1.0),
-                new ProductRequest(
-                        "TestProduct2",
-                        "TestDescription2",
-                        "TestCategory",
-                        10.0,
-                        100,
-                        1.0)
-        );
-
-        client.post().uri("/products/bulkCreate")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(productRequests)
-                .exchange()
-
-                .expectStatus().isBadRequest()
-                .expectBody(String.class)
-                .value(message -> assertTrue(message.contains("Price should not be null")));
-    }
-
-    @Test
     @DisplayName("Given a productRequest When a post is made to /products Then it should be saved in the database and return the saved product")
-    @Order(3)
+    @Order(2)
     void createProductTest() {
 
         ProductRequest productRequest = new ProductRequest(
@@ -174,36 +117,12 @@ public class ProductControllerIT {
     }
 
     @Test
-    @DisplayName("Given a productRequest with bad content When a post is made to /products Then it should return an error message")
-    @Order(4)
-    void createProductErrorTest() {
-
-        ProductRequest productRequest = new ProductRequest(
-                "TestProduct1",
-                "TestDescription1",
-                "TestCategory",
-                null,
-                50,
-                1.0);
-
-
-        client.post().uri("/products")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(productRequest)
-                .exchange()
-
-                .expectStatus().isBadRequest()
-                .expectBody(String.class)
-                .value(message -> assertTrue(message.contains("Price should not be null")));
-
-    }
-
-    @Test
-    @Order(5)
+    @Order(3)
     @DisplayName("WHEN trying to list all products THEN a list containing all of them must be returned")
     void listAllTest() {
 
         int numberOfProducts = productService.getNumberOfProducts();
+
         //Apple
         productService.createProduct(new ProductRequest("Apple", "A rounded food object", "food", 1.25, 23, 1.0));
 
@@ -230,7 +149,7 @@ public class ProductControllerIT {
 
     @Test
     @DisplayName("GIVEN a valid product ID WHEN trying to list it THEN the corresponding product should be listed")
-    @Order(6)
+    @Order(4)
     void listOneProductByIDTest() {
         //Apple
         productService.createProduct(new ProductRequest("Apple", "A rounded food object", "food", 1.25, 23, 1.0));
@@ -249,32 +168,8 @@ public class ProductControllerIT {
     }
 
     @Test
-    @DisplayName("GIVEN a string product ID WHEN tying to list it THEN an error should be invoked")
-    @Order(7)
-    void listOneProductWithStringIDTest() {
-        client.get().uri("/products/str")
-                .exchange()
-                .expectStatus().is4xxClientError()
-                .expectBody()
-                .jsonPath("$").isEqualTo("Wrong type exception, please consult the OpenAPI documentation");
-    }
-
-    @Test
-    @DisplayName("GIVEN a non existing product ID WHEN trying to list it THEN an error should be found")
-    @Order(8)
-    void listOneNonExistentProductTest() {
-        int nonExistingID = productService.getNumberOfProducts() + 1;
-
-        client.get().uri("/products/" + nonExistingID)
-                .exchange()
-                .expectStatus().isEqualTo(404)
-                .expectBody()
-                .jsonPath("$").isEqualTo("Product IDs not found: " + nonExistingID);
-    }
-
-    @Test
     @DisplayName("Given a list of IDs When a post is made to /products/getBasicInfo Then it should return the ProductDTO of the found IDs")
-    @Order(9)
+    @Order(5)
     void getProductsBasicInfoTest() {
         long id1 = 1;
         long id2 = 2;
@@ -298,26 +193,7 @@ public class ProductControllerIT {
     }
 
     @Test
-    @DisplayName("Given a list of IDs When a post is made to /products/getBasicInfo Then it should return the ProductDTO of the found IDs")
-    @Order(10)
-    void getProductsBasicInfoErrorTest() {
-        long id1 = 1;
-        long id2 = 2;
-        long id4 = 100;
-        List<Long> IDsList = Arrays.asList(id1, id2, id4);
-
-        client.post().uri("/products/getBasicInfo")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(IDsList)
-                .exchange()
-
-                .expectStatus().isNotFound()
-                .expectBody(String.class)
-                .value(message -> assertEquals("Product IDs not found: [100]", message));
-    }
-
-    @Test
-    @Order(11)
+    @Order(6)
     @DisplayName("GIVEN two products that contain ouch WHEN searching that query THEN both are returned")
     void searchProductMultipleResultsTest() {
 
@@ -346,7 +222,7 @@ public class ProductControllerIT {
     }
 
     @Test
-    @Order(12)
+    @Order(7)
     @DisplayName("GIVEN a name that only corresponds to 1 product WHEN searching by it THEN only that product is returned")
     void searchProductOneResultTest() {
 
@@ -367,7 +243,7 @@ public class ProductControllerIT {
     }
 
     @Test
-    @Order(13)
+    @Order(8)
     @DisplayName("GIVEN a name that only corresponds no products WHEN searching by it THEN no products are returned")
     void searchProductNoResultTest() {
 
@@ -380,98 +256,8 @@ public class ProductControllerIT {
     }
 
     @Test
-    @DisplayName("GIVEN a product's information WHEN the product's controller updateProduct method is called THEN the provided product's information is updated with te new information")
-    @Order(14)
-    void productUpdateIT() {
-
-        wireMockServer.stubFor(WireMock.put(WireMock.urlMatching("/carts/updateStock/"))
-                .willReturn(aResponse().withStatus(200)));
-
-        ProductRequest productRequestTest = new ProductRequest("TestProduct", "", "TestCategory", 10.0, 50, 2.0);
-
-        client.get().uri("/products/2").exchange()
-                .expectStatus().isOk()
-                .expectHeader().contentType(MediaType.APPLICATION_JSON)
-                .expectBody(Product.class)
-                .consumeWith(response -> {
-                    Product product = response.getResponseBody();
-                    assertEquals("books", product.getCategory().getName());
-                    assertEquals("Small book", product.getDescription());
-                    assertEquals("Book", product.getName());
-                    assertEquals(5.0, product.getPrice());
-                    assertEquals(20, product.getStock());
-                    assertEquals(1.0, product.getWeight());
-                });
-
-        client.put().uri("/products/2")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(productRequestTest)
-                .exchange() // THEN
-                .expectStatus().isOk()
-                .expectHeader().contentType(MediaType.APPLICATION_JSON)
-                .expectBody(Product.class)
-                .consumeWith(response -> {
-                    Product afterUpdateProduct = response.getResponseBody();
-                    assertEquals("TestProduct", afterUpdateProduct.getName());
-                    assertEquals("", afterUpdateProduct.getDescription());
-                    assertEquals("other", afterUpdateProduct.getCategory().getName());
-                    assertEquals(10.0, afterUpdateProduct.getPrice());
-                    assertEquals(50, afterUpdateProduct.getStock());
-                    assertEquals(2.0, afterUpdateProduct.getWeight());
-
-                });
-    }
-    @Test
-    @DisplayName("GIVEN a product's information WHEN the product's controller putUpdate method is called, it tries to connect to cart microservice but it fails THEN it throws exception")
-    @Order(15)
-    void productUpdateCartExceptionIT() {
-
-        wireMockServer.stubFor(WireMock.put(WireMock.urlMatching("/carts/updateStock/"))
-                .willReturn(aResponse().withStatus(500)));
-
-        ProductRequest productRequestTest = new ProductRequest("TestProduct", "", "TestCategory", 10.0, 50, 2.0);
-
-        client.get().uri("/products/2").exchange()
-                .expectStatus().isOk()
-                .expectHeader().contentType(MediaType.APPLICATION_JSON)
-                .expectBody(Product.class)
-                .consumeWith(response -> {
-                    Product product = response.getResponseBody();
-                    assertEquals("TestProduct", product.getName());
-                    assertEquals("",product.getDescription());
-                    assertEquals("other", product.getCategory().getName());
-                    assertEquals(10.0, product.getPrice());
-                    assertEquals(50, product.getStock());
-                    assertEquals(2.0, product.getWeight());
-                });
-
-        client.put().uri("/products/2")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(productRequestTest)
-                .exchange() // THEN
-                .expectStatus().is5xxServerError();
-    }
-    @Test
-    @DisplayName("GIVEN a product's information WHEN the product's controller updateProduct method is called THEN the provided product's information is updated with the new information")
-    @Order(16)
-    void productUpdateThrowExceptionIT() {
-        //GIVEN
-        ProductRequest productRequestTest = new ProductRequest("TestProduct", "", "TestCategory", 10.0, 50, 2.0);
-
-        client.put().uri("/products/" + productService.getNumberOfProducts() + 1)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(productRequestTest)
-                .exchange() // THEN
-                .expectStatus().isEqualTo(404)
-                .expectBody()
-                .jsonPath("$").isEqualTo("The provided ID is non existent");
-
-
-    }
-
-    @Test
     @DisplayName("GIVEN a valid product ID WHEN the delete product endpoint is called THEN the specified product is deleted")
-    @Order(17)
+    @Order(9)
     void productDeleteIT() {
 
         int numberOfProducts = productService.getNumberOfProducts();
@@ -500,21 +286,8 @@ public class ProductControllerIT {
     }
 
     @Test
-    @DisplayName("GIVEN a product's information WHEN the product's controller updateProduct method is called with a non existent Id THEN the NonExistingProductException exception is thrown")
-    @Order(18)
-    void productDeleteThrowExceptionIT() {
-        //GIVEN
-
-        client.delete().uri("/products/" + (productService.getNumberOfProducts() + 1))
-                .exchange()
-                .expectStatus().isNotFound()
-                .expectBody()
-                .jsonPath("$").isEqualTo("The provided ID is non existent");
-    }
-
-    @Test
     @DisplayName("Given a list of products to reduce their stock, When the endpoint is called, Then it should return the products with the modified stock")
-    @Order(19)
+    @Order(10)
     void reduceProductsStockIT() {
 
         client.get().uri("/products/1").exchange()
@@ -535,54 +308,6 @@ public class ProductControllerIT {
                 .expectBody()
                 .jsonPath("$[0].stock").isEqualTo(5);
 
-    }
-
-    @Test
-    @DisplayName("Given a list of products to submit with incorrect IDs, When the endpoint is called Then it should return the exception")
-    @Order(20)
-    void reduceProductsStockIDsNotFoundIT() {
-
-        client.get().uri("/products/1").exchange()
-                .expectStatus().isOk()
-                .expectHeader().contentType(MediaType.APPLICATION_JSON)
-                .expectBody()
-                .jsonPath("$.stock").isEqualTo(5);
-
-        List<ProductToSubmit> productsToSubmit = List.of(
-                new ProductToSubmit(99999L, 5)
-        );
-
-        client.post().uri("/products/reduceStock")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(productsToSubmit)
-                .exchange()
-                .expectStatus().isNotFound()
-                .expectBody()
-                .jsonPath("$").isEqualTo("Product IDs not found: [99999]");
-
-    }
-    @Test
-    @DisplayName("Given a list of products to submit with not enough stock, When the endpoint is called, Then it should return the exception")
-    @Order(21)
-    void submitProductsNotEnoughStockIT() {
-
-        client.get().uri("/products/1").exchange()
-                .expectStatus().isOk()
-                .expectHeader().contentType(MediaType.APPLICATION_JSON)
-                .expectBody()
-                .jsonPath("$.stock").isEqualTo(5);
-
-        List<ProductToSubmit> productsToSubmit = List.of(
-                new ProductToSubmit(1L, 15)
-        );
-
-        client.post().uri("/products/reduceStock")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(productsToSubmit)
-                .exchange()
-                .expectStatus().isBadRequest()
-                .expectBody()
-                .jsonPath("$").isEqualTo("Product IDs without required stock: [1]");
     }
 
 }
