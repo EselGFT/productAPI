@@ -1,6 +1,7 @@
 package com.gfttraining.productAPI.repositories;
 
 import com.gfttraining.productAPI.exceptions.InvalidCartConnectionException;
+import com.gfttraining.productAPI.exceptions.InvalidCartResponseException;
 import com.gfttraining.productAPI.model.ProductDTO;
 import jakarta.annotation.PostConstruct;
 import org.junit.jupiter.api.DisplayName;
@@ -101,6 +102,7 @@ public class CartRepositoryTest {
                 Void.class
         )).thenReturn(response);
 
-       assertThrows(InvalidCartConnectionException.class, () -> cartRepository.updateProduct(productDTO));
+        assertThrows(InvalidCartResponseException.class,() ->cartRepository.updateProduct(productDTO));
+
     }
 }

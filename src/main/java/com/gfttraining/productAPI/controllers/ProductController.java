@@ -3,6 +3,7 @@ package com.gfttraining.productAPI.controllers;
 import java.util.List;
 
 import com.gfttraining.productAPI.exceptions.InvalidCartConnectionException;
+import com.gfttraining.productAPI.exceptions.InvalidCartResponseException;
 import com.gfttraining.productAPI.exceptions.NonExistingProductException;
 import com.gfttraining.productAPI.exceptions.NotEnoughStockException;
 import com.gfttraining.productAPI.model.ProductToSubmit;
@@ -56,7 +57,7 @@ public class ProductController {
     }
 
     @PutMapping("/products/{product_id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable long product_id, @RequestBody @Valid ProductRequest updateProductRequest) throws NonExistingProductException, InvalidCartConnectionException {
+    public ResponseEntity<Product> updateProduct(@PathVariable long product_id, @RequestBody @Valid ProductRequest updateProductRequest) throws NonExistingProductException, InvalidCartConnectionException, InvalidCartResponseException {
         return new ResponseEntity<>(
                 productService.updateProduct(product_id, updateProductRequest),
                 HttpStatus.OK
