@@ -6,6 +6,7 @@ import com.gfttraining.productAPI.exceptions.InvalidCartConnectionException;
 import com.gfttraining.productAPI.exceptions.NonExistingProductException;
 import com.gfttraining.productAPI.exceptions.NotEnoughStockException;
 import com.gfttraining.productAPI.model.ProductToSubmit;
+import org.apache.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -22,7 +23,7 @@ import jakarta.validation.Valid;
 @Validated
 public class ProductController {
 
-    
+    private static Logger logger = Logger.getLogger(ProductController.class);
     private final ProductService productService;   
 
     public ProductController(ProductService productService) {
@@ -57,14 +58,17 @@ public class ProductController {
 
     @PutMapping("/products/{product_id}")
     public ResponseEntity<Product> updateProduct(@PathVariable long product_id, @RequestBody @Valid ProductRequest updateProductRequest) throws NonExistingProductException, InvalidCartConnectionException {
+        logger.info("product Controller updateProduct starts");
         return new ResponseEntity<>(
                 productService.updateProduct(product_id, updateProductRequest),
                 HttpStatus.OK
         );
+
     }
 
     @DeleteMapping("/products/{product_id}")
     public ResponseEntity <?> deleteProduct(@PathVariable long product_id) throws NonExistingProductException  {
+        logger.info("product Controller deleteProduct starts");
         productService.deleteProduct(product_id);
 
         return new ResponseEntity<>(

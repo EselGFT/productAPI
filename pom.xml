@@ -91,9 +91,12 @@
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
 						</exclude>
+						<exclude>**/models/*</exclude>
 					</excludes>
 				</configuration>
 			</plugin>
+			<!-- Pligging JaCoCo para informes coverage -->
+
 			
 		</plugins>
 	</build>

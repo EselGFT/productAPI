@@ -9,6 +9,7 @@ import com.gfttraining.productAPI.exceptions.NonExistingProductException;
 import com.gfttraining.productAPI.exceptions.NotEnoughStockException;
 import com.gfttraining.productAPI.model.*;
 import com.gfttraining.productAPI.repositories.CartRepository;
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import com.gfttraining.productAPI.model.Category;
@@ -20,6 +21,7 @@ import com.gfttraining.productAPI.repositories.ProductRepository;
 @Service
 public class ProductService {
 
+    private static Logger logger = Logger.getLogger(ProductService.class);
     private final CategoryService categoryService;
 
     private final ProductRepository productRepository;
@@ -47,7 +49,9 @@ public class ProductService {
     public Product updateProduct (long id, ProductRequest productRequest) throws NonExistingProductException, InvalidCartConnectionException {
 
         if (! productRepository.existsById(id)){
+            logger.error("updateProduct error message: id not found, NonExistingProductException was thrown ");
             throw new NonExistingProductException("The provided ID is non existent");
+
         }
 
         Category category = categoryService.getCategoryByName(productRequest.getCategory());
@@ -61,6 +65,8 @@ public class ProductService {
             productToUpdate.setWeight(productRequest.getWeight());
 
             sendModifiedDataToCart(productToUpdate);
+
+        logger.info("update info message: product updated ");
             return productRepository.save(productToUpdate);
 
     }
@@ -75,17 +81,22 @@ public class ProductService {
     public void deleteProduct (long id) throws NonExistingProductException {
 
         if (! productRepository.existsById(id)){
+            logger.error("deleteProduct error message: id not found, NonExistingProductException was thrown ");
            throw new NonExistingProductException("The provided ID is non existent");
         }
 
         productRepository.deleteById(id);
+        logger.info("deleteProduct info message: product deleted ");
     }
 
     public List<Product> listProducts() {
+        logger.info("ListProducts info message: product listados ");
         return productRepository.findAll();
+
     }
 
     public List<Product> listProductsByNameContainsIgnoreCase(String name) {
+        logger.info("product listados info message: by name ignore case");
         return productRepository.findByNameIgnoreCaseContaining(name);
     }
 
