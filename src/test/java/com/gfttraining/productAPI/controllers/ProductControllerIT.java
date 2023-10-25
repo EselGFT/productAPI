@@ -427,7 +427,7 @@ public class ProductControllerIT {
                 .whenScenarioStateIs("Retry Attempt 1")
                 .willReturn(aResponse().withStatus(200)));
 
-        ProductRequest productRequestTest = new ProductRequest("TestProduct", "", "TestCategory", 10.0, 50, 2.0);
+        ProductRequest productRequestTest = new ProductRequest("TestProduct", "", "TestCategory", 10.0, 45, 2.0);
 
         client.get().uri("/products/2").exchange()
                 .expectStatus().isOk()
@@ -435,14 +435,13 @@ public class ProductControllerIT {
                 .expectBody(Product.class)
                 .consumeWith(response -> {
                     Product product = response.getResponseBody();
-                    assertEquals("books", product.getCategory().getName());
-                    assertEquals("Small book", product.getDescription());
-                    assertEquals("Book", product.getName());
-                    assertEquals(5.0, product.getPrice());
-                    assertEquals(20, product.getStock());
-                    assertEquals(1.0, product.getWeight());
+                    assertEquals("TestProduct", product.getName());
+                    assertEquals("",product.getDescription());
+                    assertEquals("other", product.getCategory().getName());
+                    assertEquals(10.0, product.getPrice());
+                    assertEquals(50, product.getStock());
+                    assertEquals(2.0, product.getWeight());
                 });
-
         client.put().uri("/products/2")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(productRequestTest)

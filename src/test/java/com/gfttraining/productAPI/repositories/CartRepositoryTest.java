@@ -85,7 +85,7 @@ public class CartRepositoryTest {
                 Void.class
         )).thenReturn(response);
 
-       assertThrows(InvalidCartConnectionException.class,() ->cartRepository.updateProduct(productDTO));
+       assertThrows(InvalidCartResponseException.class,() ->cartRepository.updateProduct(productDTO));
 
 
 

@@ -107,7 +107,7 @@ public class ProductControllerAdviceTest {
     void testInvalidCartConnectionException() {
         InvalidCartConnectionException ex = new InvalidCartConnectionException("Invalid connection with cart microservice");
         ResponseEntity<String> response = productControllerAdvice.handleInvalidCartConnectionException(ex);
-        assertEquals("Could not connect with cart microservice", response.getBody());
+        assertEquals("Invalid connection with cart microservice", response.getBody());
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
     }
 

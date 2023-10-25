@@ -27,7 +27,7 @@ public class CartRepository {
     }
     @Retryable(retryFor = InvalidCartConnectionException.class, maxAttemptsExpression = "${retry.maxAttempts}", backoff = @Backoff(delayExpression = "${retry.maxDelay}"))
     public ProductDTO updateProduct(ProductDTO productDTO) throws InvalidCartConnectionException, InvalidCartResponseException {
-        System.out.println("Attempt");
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 

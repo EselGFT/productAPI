@@ -723,5 +723,33 @@ public class ProductServiceTest {
         assertEquals(product, productRetrieved);
     }
 
+    @Test
+    public void createProductResponsesWIthProductIDsTest() throws NonExistingProductException {
+        List<Long> ids = List.of(1L);
+        Category other = new Category("other", 0.0);
+        BigDecimal bd = new BigDecimal("10.00");
+        BigDecimal roundedPrice = bd.setScale(2, RoundingMode.CEILING);
+        Product product = new Product(
+                "product1",
+                "description",
+                other,
+                10.0,
+                50,
+                1.0
+        );
+        ProductDTO productDTO = new ProductDTO(
+                0L,
+                roundedPrice,
+                50,
+                1.0
+        );
+
+        Mockito.when(productRepository.findAllById(ids)).thenReturn(List.of(product));
+        List<ProductDTO> productDTOs = productService.createProductResponsesWithProductIDs(ids);
+
+
+        assertEquals(List.of(productDTO), productDTOs);
+    }
+
 
 }
