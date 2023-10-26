@@ -107,7 +107,9 @@ public class ProductService {
     public Product listProductById(long id) throws NonExistingProductException {
         logger.info(" ProductService's listProductsByNameContainsIgnoreCase starts ");
         return productRepository.findById(id)
-                .orElseThrow(() -> new NonExistingProductException("Product IDs not found: " + id));
+                .orElseThrow(() -> {
+                    logger.error(" ProductService's listProductById started but throws NonExistingProductException ");
+                    return new NonExistingProductException("Product IDs not found: " + id);});
     }
 
     public List<Product> createProducts(List<ProductRequest> productRequests) {

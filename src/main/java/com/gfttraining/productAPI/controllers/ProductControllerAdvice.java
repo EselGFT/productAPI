@@ -4,6 +4,7 @@ import com.gfttraining.productAPI.exceptions.InvalidCartConnectionException;
 import com.gfttraining.productAPI.exceptions.InvalidCartResponseException;
 import com.gfttraining.productAPI.exceptions.NonExistingProductException;
 import com.gfttraining.productAPI.exceptions.NotEnoughStockException;
+import org.apache.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -17,7 +18,7 @@ import jakarta.validation.ConstraintViolationException;
 
 @RestControllerAdvice
 public class ProductControllerAdvice {
-
+    private static Logger logger = Logger.getLogger(ProductControllerAdvice.class);
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<String> handleConstraintViolationException(ConstraintViolationException ex) {
@@ -55,6 +56,7 @@ public class ProductControllerAdvice {
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<String> handleMethodArgumentTypeMismatchException() {
+        logger.error(" MethodArgumentTypeMismatchException was thrown ");
          return new ResponseEntity<>("Wrong type exception, please consult the OpenAPI documentation", HttpStatus.BAD_REQUEST);
     }
     @ExceptionHandler(NotEnoughStockException.class)
@@ -67,6 +69,7 @@ public class ProductControllerAdvice {
     @ExceptionHandler(NonExistingProductException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<String> handleNonExistingProductException(NonExistingProductException ex) {
+
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
