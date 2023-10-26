@@ -18,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -60,7 +61,7 @@ public class CartRepositoryTest {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<ProductDTO> request = new HttpEntity<>(productDTO, headers);
+        HttpEntity<List<ProductDTO>> request = new HttpEntity<>(List.of(productDTO), headers);
 
         ResponseEntity<Void> response = new ResponseEntity<>(HttpStatus.OK);
 
@@ -92,7 +93,7 @@ public class CartRepositoryTest {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<ProductDTO> request = new HttpEntity<>(productDTO, headers);
+        HttpEntity<List<ProductDTO>> request = new HttpEntity<>(List.of(productDTO), headers);
 
         ResponseEntity<Void> response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
@@ -122,7 +123,7 @@ public class CartRepositoryTest {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<ProductDTO> request = new HttpEntity<>(productDTO, headers);
+        HttpEntity<List<ProductDTO>> request = new HttpEntity<>(List.of(productDTO), headers);
 
         ResponseEntity<Void> response = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 
@@ -153,8 +154,7 @@ public class CartRepositoryTest {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<ProductDTO> request = new HttpEntity<>(productDTO, headers);
-
+        HttpEntity<List<ProductDTO>> request = new HttpEntity<>(List.of(productDTO), headers);
 
 
         Mockito.when(restTemplate.exchange(
