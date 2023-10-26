@@ -2,6 +2,8 @@ package com.gfttraining.productAPI.config;
 
 import java.util.Arrays;
 
+import com.gfttraining.productAPI.services.ProductService;
+import org.apache.log4j.Logger;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -10,7 +12,7 @@ import com.gfttraining.productAPI.repositories.CategoryRepository;
 
 @Component
 public class CategoryInitializer implements CommandLineRunner{
-   
+    private static Logger logger = Logger.getLogger(CategoryInitializer.class);
     private final CategoryRepository categoryRepository;
 
     public CategoryInitializer(CategoryRepository categoryRepository) {
@@ -30,6 +32,7 @@ public class CategoryInitializer implements CommandLineRunner{
                 new Category("other", 0.0)
             )
         );
+        logger.info(" Category DDBB was initialized  ");
     }
     
 }
