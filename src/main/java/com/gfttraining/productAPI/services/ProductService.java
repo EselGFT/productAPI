@@ -187,7 +187,7 @@ public class ProductService {
             if (product.getId() == productToSubmit.getId()) {
                 product.setStock(product.getStock() - productToSubmit.getStock());
                 logger.info(" ProductService's subtractStock started and a product stock was modified ");
-                break;
+
             }
         }
 
