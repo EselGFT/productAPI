@@ -3,9 +3,14 @@ package com.gfttraining.productAPI.model;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProductRequest {
     
     @NotBlank(message = "Name should not be blank")
@@ -27,16 +32,4 @@ public class ProductRequest {
     @Min(value = 0, message="Weight should not be less than 0")
     private Double weight;
 
-    public ProductRequest(){}
-
-    public ProductRequest(String name, String description, String category, Double price, int stock, Double weight) {
-        this.name = name;
-        this.description = description;
-        this.category = category;
-        this.price = price;
-        this.stock = stock;
-        this.weight = weight;
-    }
-    
-    
 }

@@ -108,7 +108,7 @@ public class ProductControllerExceptionsIT {
     @DisplayName("GIVEN a non existing product ID WHEN trying to list it THEN an error should be found")
     @Order(4)
     void listOneNonExistentProductTest() {
-        int nonExistingID = productService.getNumberOfProducts() + 1;
+        long nonExistingID = productService.getLastCreatedID() + 1;
 
         client.get().uri("/products/" + nonExistingID)
                 .exchange()
@@ -143,7 +143,7 @@ public class ProductControllerExceptionsIT {
         //GIVEN
         ProductRequest productRequestTest = new ProductRequest("TestProduct", "", "TestCategory", 10.0, 50, 2.0);
 
-        client.put().uri("/products/" + productService.getNumberOfProducts() + 1)
+        client.put().uri("/products/" + productService.getLastCreatedID() + 1)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(productRequestTest)
                 .exchange() // THEN
@@ -158,7 +158,7 @@ public class ProductControllerExceptionsIT {
     void productDeleteThrowExceptionIT() {
         //GIVEN
 
-        client.delete().uri("/products/" + (productService.getNumberOfProducts() + 1))
+        client.delete().uri("/products/" + (productService.getLastCreatedID() + 1))
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody()
