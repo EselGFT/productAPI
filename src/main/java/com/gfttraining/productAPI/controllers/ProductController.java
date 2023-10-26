@@ -3,10 +3,13 @@ package com.gfttraining.productAPI.controllers;
 import java.util.List;
 
 import com.gfttraining.productAPI.ProductApiApplication;
+import jakarta.validation.Valid;
+
 import com.gfttraining.productAPI.exceptions.InvalidCartConnectionException;
 import com.gfttraining.productAPI.exceptions.InvalidCartResponseException;
 import com.gfttraining.productAPI.exceptions.NonExistingProductException;
 import com.gfttraining.productAPI.exceptions.NotEnoughStockException;
+
 import com.gfttraining.productAPI.model.ProductToSubmit;
 import org.apache.log4j.Logger;
 import org.springframework.http.HttpStatus;
@@ -19,7 +22,10 @@ import com.gfttraining.productAPI.model.ProductRequest;
 import com.gfttraining.productAPI.model.ProductDTO;
 import com.gfttraining.productAPI.services.ProductService;
 
-import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Validated
