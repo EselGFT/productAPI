@@ -29,7 +29,7 @@ public class CartRepository {
 
     }
 
-    @Retryable(retryFor = InvalidCartConnectionException.class, maxAttemptsExpression = "${retry.maxAttempts}", backoff = @Backoff(delayExpression = "${retry.maxDelay}"),listeners = {"retryListener"})
+    @Retryable(retryFor = InvalidCartConnectionException.class, maxAttemptsExpression = "${retry.maxAttempts}", backoff = @Backoff(delayExpression = "${retry.maxDelay}"))
     public ProductDTO updateProduct(ProductDTO productDTO) throws InvalidCartConnectionException, InvalidCartResponseException {
 
         HttpHeaders headers = new HttpHeaders();

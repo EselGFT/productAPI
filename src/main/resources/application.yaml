@@ -12,3 +12,5 @@ cartMicroservice:
 retry:
   maxAttempts: 2
   maxDelay: 100
+server:
+  port: 8084
