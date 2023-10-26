@@ -17,6 +17,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
+
 @Repository
 @Setter
 public class CartRepository {
@@ -38,7 +40,7 @@ public class CartRepository {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<ProductDTO> requestEntity = new HttpEntity<>(productDTO, headers);
+        HttpEntity<List<ProductDTO>> requestEntity = new HttpEntity<>(List.of(productDTO), headers);
 
         try{
             ResponseEntity<Void> responseEntity = restTemplate.exchange(
