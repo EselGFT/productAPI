@@ -1,0 +1,398 @@
+openapi: 3.0.0
+info:
+  title: Product API
+  description: Documentation of Product API
+  version: 1.0.0
+  contact:
+    name: Product team
+
+tags:
+  - name: "Product"
+    description: "A product stored in a catalog"
+
+paths:
+
+  /products:
+
+    post:
+      tags:
+        - Product
+      summary: Adds a product to the catalog
+      description: Adds a product to the catalog using the specified data
+      operationId: postProduct
+      requestBody:
+        description: Product data required to add a product to the catalog
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductRequest'
+      responses:
+        200:
+          description: Products added succesfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        500:
+          description: Internal server error
+
+    get:
+      tags:
+        - Product
+      summary: Gets all the catalog products
+      description: Retieves a list of all the catalog products
+      operationId: getProducts
+      responses:
+        200:
+          description: Product retrieved succesfully
+          content:
+            application/json:
+
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        404:
+          description: Product not found
+
+        500:
+          description: Internal server error
+
+
+  /products/{product_id}:
+    get:
+      tags:
+        - Product
+      summary: Gets a catalog product
+      description: Get the specified catalog product
+      operationId: getProduct
+      parameters:
+        - name: product_id
+          in: path
+          required: true
+          schema:
+            type: number
+            format: long
+
+      responses:
+        200:
+          description: Products added succesfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+
+        404:
+          description: Product not found
+
+        500:
+          description: Internal server error
+
+    put:
+      tags:
+        - Product
+      summary: Modifies a catalog product
+      description: Modifies the specified catalog product using the parameters in the request body
+      operationId: putProduct
+      parameters:
+        - name: product_id
+          in: path
+          required: true
+          schema:
+            type: number
+            format: long
+      requestBody:
+        description: Required product data to modify a catalog product
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductRequest'
+
+      responses:
+        200:
+          description: Product modified succesfully
+
+        404:
+          description: Product not found
+
+        500:
+          description: Internal server error
+
+
+    delete:
+      tags:
+        - Product
+      summary: Deletes a catalog product
+      description: Deletes the specified catalog product
+      operationId: deleteProduct
+      parameters:
+        - name: product_id
+          in: path
+          required: true
+          schema:
+            type: number
+            format: long
+      responses:
+        200:
+          description: Product deleted succesfully
+          content:
+            application/json:
+              example:
+                id: 10239
+        404:
+          description: Product not found
+
+        500:
+          description: Internal server error
+
+  /products/search/{product_name}:
+    get:
+      tags:
+        - Product
+      summary: Gets catalogs products by their name
+      description: Get the specified catalog products based on their name, its case insensitive.
+      operationId: searchProducts
+      parameters:
+        - name: product_name
+          in: path
+          required: true
+          schema:
+            type: string
+
+      responses:
+        200:
+          description: Products retrieved succesfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+
+        500:
+          description: Internal server error
+
+  /products/bulkCreate:
+    post:
+      tags:
+        - Product
+      summary: Adds products in bulk to the catalog
+      description: Adds products in bulk to the catalog
+      operationId: postProducts
+      requestBody:
+        description: Json list of products to add
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProductRequest'
+
+      responses:
+        200:
+          description: Products added successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        404:
+          description: Product not found
+
+        500:
+          description: Internal server error
+
+  /products/getBasicInfo:
+    post:
+      tags:
+        - Product
+      summary: Retrieves the list of products given a list of IDs
+      description: Retrieves the list of products given a list of IDs
+      operationId: productWithIDs
+      requestBody:
+        description: Json list of IDs
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: integer
+            example: [1, 5, 43]
+
+
+      responses:
+        200:
+          description: Products retrieved succesfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductDTO'
+        404:
+          description: Product not found
+
+        500:
+          description: Internal server error
+
+  /products/reduceStock:
+    post:
+      tags:
+        - Product
+      summary: Update stock of product
+      description: Update stock of product
+      operationId: reduceStock
+      requestBody:
+        description: Json list of the products to submit
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProductToSubmit'
+
+
+      responses:
+        200:
+          description: Products retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductDTO'
+        400:
+          description: Not enough stock
+        404:
+          description: Product not found
+
+        500:
+          description: Internal server error
+
+components:
+  schemas:
+    Category:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: books
+        discount:
+          type: number
+          format: double
+          minimum: 0.0
+          maximum: 100.0
+          example: 15.0
+
+    ProductRequest:
+      type: object
+      required:
+        - name
+        - price
+        - stock
+        - weight
+      properties:
+        name:
+          type: string
+          example: Galleta María
+        description:
+          type: string
+          example: Chocolate cookies
+        category:
+          type: string
+          format: object
+          example: Food
+        price:
+          type: number
+          format: double
+          example: 5.99
+        stock:
+          type: integer
+          format: int64
+          example: 1000
+        weight:
+          type: number
+          format: double
+          example: 1.0
+
+    Product:
+      type: object
+      required:
+        - name
+        - price
+        - stock
+        - weight
+      properties:
+        name:
+          type: string
+          example: Galleta María
+        description:
+          type: string
+          example: Chocolate cookies
+        category:
+          type: object
+          properties:
+            name:
+              type: string
+              example: Food
+
+            discount:
+              type: number
+              example: 25.0
+        price:
+          type: number
+          format: double
+          example: 5.99
+        stock:
+          type: integer
+          format: int64
+          example: 1000
+        weight:
+          type: number
+          format: double
+          example: 1.0
+
+    ProductDTO:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 0
+        price:
+          type: number
+          format: double
+          example: 9.99
+        stock:
+          type: number
+          format: double
+          example: 5
+        weight:
+          type: number
+          format: double
+          example: 1.0
+
+    ProductToSubmit:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 0
+        stock:
+          type: number
+          format: double
+          example: 5
+
+
+        
