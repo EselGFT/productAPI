@@ -1,6 +1,5 @@
 package com.gfttraining.productAPI.config;
 
-
 import java.util.Arrays;
 
 import org.springframework.boot.CommandLineRunner;

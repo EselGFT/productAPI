@@ -1,13 +1,17 @@
 package com.gfttraining.productAPI.model;
 
 import jakarta.persistence.*;
+
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
+@NoArgsConstructor
 public class Product {
 
     @Id
@@ -36,8 +40,6 @@ public class Product {
     @Min(value = 0, message="The product's weight can't be less than 0")
     private Double weight;
 
-    public Product(){}
-
     public Product(ProductRequest productRequest, Category category) {
         this.name = productRequest.getName();
         this.description = productRequest.getDescription();
@@ -55,5 +57,4 @@ public class Product {
         this.stock = stock;
         this.weight = weight;
     }
-
 }
