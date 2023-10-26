@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.gfttraining.productAPI.exceptions.InvalidCartConnectionException;
+import com.gfttraining.productAPI.exceptions.InvalidCartResponseException;
 import com.gfttraining.productAPI.exceptions.NonExistingProductException;
 import com.gfttraining.productAPI.exceptions.NotEnoughStockException;
 import com.gfttraining.productAPI.model.*;
@@ -104,7 +105,7 @@ public class ProductServiceTest {
     
     @Test
     @DisplayName("GIVEN a product's updated information WHEN the original its updated THEN the updated product's information should match the given")
-    void updateProductsTest () throws NonExistingProductException, InvalidCartConnectionException {
+    void updateProductsTest () throws NonExistingProductException, InvalidCartConnectionException, InvalidCartResponseException {
 
 
     	String productName = "TestProduct";
@@ -114,16 +115,27 @@ public class ProductServiceTest {
         int productStock = 50;
         Double productWeight = 1.0;
         long id = 1;
-        
+
+
         Category other = new Category("other", 0.0);
         ProductRequest productRequest = new ProductRequest(productName, productDescription, categoryName, productPrice, productStock, productWeight);
         Product product = new Product(productRequest, other);
+        product.setId(id);
+        BigDecimal bd = new BigDecimal("10.00");
+        BigDecimal roundedPrice = bd.setScale(2, RoundingMode.CEILING);
+        ProductDTO productDTO = new ProductDTO(
+                1L,
+                roundedPrice,
+                50,
+                1.0
+        );
 
         Mockito.when(categoryService.getCategoryByName(categoryName)).thenReturn(other);
         Mockito.when(productRepository.existsById(id)).thenReturn(true);
         Mockito.when(productRepository.findById(id)).thenReturn(Optional.of(product));
         Mockito.when(productRepository.save(product)).thenReturn(product);       
-              
+        Mockito.when(cartRepository.updateProduct(productDTO)).thenReturn(productDTO);
+
         Product productAfterUpdate = productService.updateProduct(id, productRequest);
 
         verify(categoryService, times(1)).getCategoryByName(categoryName);
@@ -185,6 +197,18 @@ public class ProductServiceTest {
         assertEquals(apple.getPrice(), found.getPrice());
         assertEquals(apple.getStock(),found.getStock());
         assertEquals(apple.getWeight(), found.getWeight());
+    }
+
+    @Test
+    @DisplayName("WHEN a product is requested GIVEN its invalid ID THEN it should return an exception")
+    void listProductInvalidIDTest() throws NonExistingProductException {
+
+        long id = 1;
+
+        Mockito.when(productRepository.findById(id)).thenReturn(Optional.empty());
+
+
+        assertThrows(NonExistingProductException.class, ()-> productService.listProductById(id));
     }
 
     // end of listProductById() tests
@@ -635,9 +659,9 @@ public class ProductServiceTest {
                 50,
                 1.0);
         product1.setId(1L);
-        List<ProductToSubmit> productsToSubmit = Arrays.asList(
-                new ProductToSubmit(1L,5),
-                new ProductToSubmit(2L,5)
+        List<ProductToSubmit> productsToSubmit = List.of(
+
+                new ProductToSubmit(1L,5)
         );
 
         Product product1Modified = new Product(
@@ -656,6 +680,7 @@ public class ProductServiceTest {
         assertEquals(product1Modified,productRetrieved);
 
     }
+
 
 
     @Test
@@ -694,7 +719,7 @@ public class ProductServiceTest {
         assertEquals(productDTO, productDTORetrieved);
     }
     @Test
-    public void sendModifiedDataToCartTest() throws InvalidCartConnectionException {
+    public void sendModifiedDataToCartTest() throws InvalidCartConnectionException, InvalidCartResponseException {
         Category other = new Category("other", 0.0);
         Product product = new Product(
                 "TestProduct1",
@@ -722,5 +747,90 @@ public class ProductServiceTest {
         assertEquals(product, productRetrieved);
     }
 
+    @Test
+    public void createProductResponsesWIthProductIDsTest() throws NonExistingProductException {
+        List<Long> ids = List.of(1L);
+        Category other = new Category("other", 0.0);
+        BigDecimal bd = new BigDecimal("10.00");
+        BigDecimal roundedPrice = bd.setScale(2, RoundingMode.CEILING);
+        Product product = new Product(
+                "product1",
+                "description",
+                other,
+                10.0,
+                50,
+                1.0
+        );
+        ProductDTO productDTO = new ProductDTO(
+                0L,
+                roundedPrice,
+                50,
+                1.0
+        );
+
+        Mockito.when(productRepository.findAllById(ids)).thenReturn(List.of(product));
+        List<ProductDTO> productDTOs = productService.createProductResponsesWithProductIDs(ids);
+
+
+        assertEquals(List.of(productDTO), productDTOs);
+    }
+
+    @Test
+    @DisplayName("GIVEN a product's with invalid ID WHEN the system check if the id exists THEN it should return and exception")
+    void updateProductsInvalidIDTest () throws NonExistingProductException, InvalidCartConnectionException, InvalidCartResponseException {
+
+
+        String productName = "TestProduct";
+        String productDescription = "TestDescription";
+        String categoryName = "TestCategory";
+        Double productPrice = 10.0;
+        int productStock = 50;
+        Double productWeight = 1.0;
+        long id = 1;
+
+        Category other = new Category("other", 0.0);
+        ProductRequest productRequest = new ProductRequest(productName, productDescription, categoryName, productPrice, productStock, productWeight);
+        Product product = new Product(productRequest, other);
+
+        Mockito.when(productRepository.existsById(id)).thenReturn(false);
+
+
+
+
+        assertThrows(NonExistingProductException.class, () -> productService.updateProduct(1L,productRequest));
+    }
+    @Test
+    @DisplayName("Given a list of ids WHEN products are retrieved from the repository and not all were found THEN an exception should be returned")
+    void getProductsByIDsInvalidResponseTest() throws NonExistingProductException {
+        Category other = new Category("other", 0.0);
+        List<ProductToSubmit> productsToSubmit = Arrays.asList(
+                new ProductToSubmit(1L,5),
+                new ProductToSubmit(2L,5)
+        );
+        Product product1 = new Product(
+                "TestProduct1",
+                "TestDescription1",
+                other,
+                10.00,
+                50,
+                1.0);
+        product1.setId(1L);
+        Product product2 = new Product(
+                "TestProduct2",
+                "TestDescription2",
+                other,
+                10.00,
+                50,
+                1.0);
+        product2.setId(2L);
+
+        List<Long> ids = Arrays.asList(1L,2L);
+        List<Product> productsFound = List.of(product1);
+
+        Mockito.when(productRepository.findAllById(ids)).thenReturn(productsFound);
+
+        assertThrows(NonExistingProductException.class,() ->  productService.getProductsByIDs(ids));
+
+    }
 
 }

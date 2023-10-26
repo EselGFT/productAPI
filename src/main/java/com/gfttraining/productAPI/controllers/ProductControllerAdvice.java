@@ -1,6 +1,7 @@
 package com.gfttraining.productAPI.controllers;
 
 import com.gfttraining.productAPI.exceptions.InvalidCartConnectionException;
+import com.gfttraining.productAPI.exceptions.InvalidCartResponseException;
 import com.gfttraining.productAPI.exceptions.NonExistingProductException;
 import com.gfttraining.productAPI.exceptions.NotEnoughStockException;
 import org.springframework.http.HttpStatus;
@@ -73,5 +74,11 @@ public class ProductControllerAdvice {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<String> handleInvalidCartConnectionException(InvalidCartConnectionException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(InvalidCartResponseException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<String> handleInvalidCartResponseException(InvalidCartResponseException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }
