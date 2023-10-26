@@ -3,19 +3,23 @@ package com.gfttraining.productAPI.repositories;
 import com.gfttraining.productAPI.exceptions.InvalidCartConnectionException;
 import com.gfttraining.productAPI.exceptions.InvalidCartResponseException;
 import com.gfttraining.productAPI.model.ProductDTO;
+
 import lombok.Setter;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
+
 import org.springframework.stereotype.Repository;
+
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 @Repository
 @Setter
 public class CartRepository {
-
 
     private final RestTemplate restTemplate;
     @Value("${cartMicroservice.url}")
@@ -26,7 +30,6 @@ public class CartRepository {
 
     public CartRepository(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
-
     }
 
     @Retryable(retryFor = InvalidCartConnectionException.class, maxAttemptsExpression = "${retry.maxAttempts}", backoff = @Backoff(delayExpression = "${retry.maxDelay}"))
