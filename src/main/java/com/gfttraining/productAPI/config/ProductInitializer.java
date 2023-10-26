@@ -2,6 +2,7 @@ package com.gfttraining.productAPI.config;
 
 import java.util.Arrays;
 
+import org.apache.log4j.Logger;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -10,7 +11,7 @@ import com.gfttraining.productAPI.services.ProductService;
 
 @Component
 public class ProductInitializer implements CommandLineRunner {
-    
+    private static Logger logger = Logger.getLogger(ProductInitializer.class);
     private final ProductService productService;
 
     public ProductInitializer(ProductService productService){
@@ -27,6 +28,7 @@ public class ProductInitializer implements CommandLineRunner {
                 new ProductRequest("Desk", "Big desk", "furniture", 9.99, 1,1.0)
             )
         );
+        logger.info(" Products DDBB was initialized  ");
     }
         
 }
