@@ -13,6 +13,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.*;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
@@ -76,7 +77,7 @@ public class CartRepositoryTest {
     }
 
     @Test
-    @DisplayName("GIVEN a bad connection with the microservice WHEN sending the update request THEN the InvalidCartConnectionException is invoked")
+    @DisplayName("GIVEN a bad response of the cart microservice WHEN sending the update request THEN the InvalidCartResponseException is invoked")
     void updateProductExceptionTest() {
         BigDecimal newPrice = new BigDecimal("10.00");
         BigDecimal newPriceRounded = newPrice.setScale(2, RoundingMode.CEILING);
@@ -103,6 +104,67 @@ public class CartRepositoryTest {
         )).thenReturn(response);
 
         assertThrows(InvalidCartResponseException.class,() ->cartRepository.updateProduct(productDTO));
+
+    }
+    @Test
+    @DisplayName("GIVEN a bad connection with the microservice WHEN sending the update request THEN the InvalidCartConnectionException is invoked")
+    void updateProduct500ExceptionTest() {
+        BigDecimal newPrice = new BigDecimal("10.00");
+        BigDecimal newPriceRounded = newPrice.setScale(2, RoundingMode.CEILING);
+
+        ProductDTO productDTO = new ProductDTO(
+                1L,
+                newPriceRounded,
+                50,
+                1.0
+        );
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<ProductDTO> request = new HttpEntity<>(productDTO, headers);
+
+        ResponseEntity<Void> response = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+
+        Mockito.when(restTemplate.exchange(
+                "http://" + cartServiceUrl + ":" + cartPort + "/carts/updateStock/",
+                HttpMethod.PUT,
+                request,
+                Void.class
+        )).thenReturn(response);
+
+        assertThrows(InvalidCartConnectionException.class,() ->cartRepository.updateProduct(productDTO));
+
+    }
+
+    @Test
+    @DisplayName("GIVEN an attempt to connect to cart microservice WHEN sending the update request and restClientException is thrown THEN the InvalidCartConnectionException is invoked")
+    void updateProductRestClientExceptionTest() {
+        BigDecimal newPrice = new BigDecimal("10.00");
+        BigDecimal newPriceRounded = newPrice.setScale(2, RoundingMode.CEILING);
+
+        ProductDTO productDTO = new ProductDTO(
+                1L,
+                newPriceRounded,
+                50,
+                1.0
+        );
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<ProductDTO> request = new HttpEntity<>(productDTO, headers);
+
+
+
+        Mockito.when(restTemplate.exchange(
+                "http://" + cartServiceUrl + ":" + cartPort + "/carts/updateStock/",
+                HttpMethod.PUT,
+                request,
+                Void.class
+        )).thenThrow(RestClientException.class);
+
+        assertThrows(InvalidCartConnectionException.class,() ->cartRepository.updateProduct(productDTO));
 
     }
 }
