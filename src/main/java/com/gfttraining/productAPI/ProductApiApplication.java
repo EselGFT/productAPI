@@ -13,7 +13,7 @@ public class ProductApiApplication {
 	private static Logger logger = Logger.getLogger(ProductApiApplication.class);
 	public static void main(String[] args) {
 		SpringApplication.run(ProductApiApplication.class, args);
-		logger.info("******** Catalog microservice starts ****************");
+		//logger.info("******** Catalog microservice starts ****************");
 
 	}
 
